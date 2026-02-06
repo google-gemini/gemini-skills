@@ -32,7 +32,7 @@ The Gemini API provides access to Google's most advanced AI models. Key capabili
 - **JavaScript/TypeScript**: `@google/genai` install with `npm install @google/genai`
 
 > [!WARNING]
-> Legacy SDKs `google-generativeai` (Python) and `@google/generative-ai` (JS) are deprecated. Migrate to the new SDKs above.
+> Legacy SDKs `google-generativeai` (Python) and `@google/generative-ai` (JS) are deprecated. Migrate to the new SDKs above urgently by following the Migration Guide.
 
 ## Quick Start
 
@@ -85,3 +85,4 @@ This index contains links to all documentation pages in `.md.txt` format. Use we
 - [Image understanding](https://ai.google.dev/gemini-api/docs/image-understanding.md.txt)
 - [Embeddings](https://ai.google.dev/gemini-api/docs/embeddings.md.txt)
 - [Interactions API](https://ai.google.dev/gemini-api/docs/interactions.md.txt)
+- [SDK migration guide](https://ai.google.dev/gemini-api/docs/migrate.md.txt)
