@@ -23,7 +23,7 @@
     - **Concurrency**: Process multiple requests per instance (Cloud Run concurrency settings).
 
 4.  **[Continuously monitor and improve](https://cloud.google.com/architecture/framework/performance-optimization/continuously-monitor-and-improve-performance)**:
-    - **Cloud Profiler**: Continuous CPU/Heap profiling with low overhead. identifying "hot" code paths.
+- **Cloud Profiler**: Continuous CPU/Heap profiling with low overhead to identify "hot" code paths.
     - **Cloud Trace**: Distributed tracing to find latency bottlenecks in microservices.
     - **Performance Dashboard**: Visualize packet loss and latency between regions.
 
