@@ -31,7 +31,18 @@ print(response.text)
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({});
-// Add interaction-specific code examples here
+
+// To start a chat, use startChat()
+async function runChat() {
+  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+  const chat = model.startChat();
+  const result = await chat.sendMessage("Hello there! Can you tell me a joke?");
+  const response = await result.response;
+  const text = response.text();
+  console.log(text);
+}
+
+runChat();
 ```
 
 ## Resources
