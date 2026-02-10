@@ -24,7 +24,7 @@
 - **Storage Lifecycle**: Delete unnecessary data. Move cold data to Archive storage (tape is very efficient).
     - **Data Format**: Use efficient formats like Parquet/Avro (columnar, compressed) instead of CSV/JSON.
 
-5.  **[Continuously Measure](https://cloud.google.com/architecture/framework/sustainability/continuously-measure-improve)**:
+5.  **[Continuously measure and improve](https://cloud.google.com/architecture/framework/sustainability/continuously-measure-and-improve)**:
     - **Carbon Footprint Dashboard**: Track gross emissions per project/service.
     - **Export Data**: Export carbon data to BigQuery for custom analysis and visualization.
 
