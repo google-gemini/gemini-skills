@@ -92,7 +92,7 @@ If the user's request is vague (e.g., "Build me a photo app"), use these questio
 **3. Reliability**
 
 - _Criticality_: "What is the business impact of a 1-hour outage?"
-- _Availability_: "Do you need 99.9% (regional) or 99.99% (global/multi-region) availability?"
+- _Availability_: "What is your target availability SLO (e.g., 99.9%, 99.95%, 99.99%)? This will determine whether a zonal, regional, or multi-region architecture is needed."
 - _Recovery_: "What is your RPO (max data loss) and RTO (max downtime) in a disaster?"
 
 **4. Cost Optimization**
