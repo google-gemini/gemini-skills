@@ -17,10 +17,13 @@ The Gemini Interactions API provides a structured way to build interactive conve
 
 ### Python
 ```python
-from google import genai
+import google.generativeai as genai
 
-client = genai.Client()
-# Add interaction-specific code examples here
+# Assumes GOOGLE_API_KEY is set as an environment variable
+model = genai.GenerativeModel('gemini-1.5-flash-latest')
+chat = model.start_chat()
+response = chat.send_message("Hello there! Can you tell me a joke?")
+print(response.text)
 ```
 
 ### JavaScript/TypeScript
