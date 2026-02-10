@@ -35,7 +35,7 @@
 
 - **Principle of Least Privilege**: Use predefined or custom roles, not Owner/Editor.
 - **Service Accounts**: Limit service account privileges and rotate keys.
-- **Workforce Identity Federation**: allow external identities (e.g., Azure AD) to access GCP resources.
+- **Workforce Identity Federation**: Use to allow external identities (e.g., Azure AD) to access GCP resources without syncing user credentials.
 
 ### Data Security
 
