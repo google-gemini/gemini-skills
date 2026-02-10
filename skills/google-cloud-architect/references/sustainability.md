@@ -21,7 +21,7 @@
 
 4.  **[Optimize Data and Storage](https://cloud.google.com/architecture/framework/sustainability/optimize-storage)**:
     - **Data Movement**: minimizing network transfer saves energy. Process data in the region where it resides.
-    - **Storage Lifecycle**: Delete undefined data. Move cold data to Archive storage (tape is very efficient).
+- **Storage Lifecycle**: Delete unnecessary data. Move cold data to Archive storage (tape is very efficient).
     - **Data Format**: Use efficient formats like Parquet/Avro (columnar, compressed) instead of CSV/JSON.
 
 5.  **[Continuously Measure](https://cloud.google.com/architecture/framework/sustainability/continuously-measure-improve)**:
