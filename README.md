@@ -25,6 +25,15 @@ building apps that use the Gemini API.
 npx skills add google-gemini/gemini-skills --skill gemini-api-dev --global
 ```
 
+### interactions-api
+
+Skill for building interactive chat experiences with the Gemini Interactions API.
+Provides best practices for managing conversation state and turn-based interactions.
+
+```sh
+npx skills add google-gemini/gemini-skills --skill interactions-api --global
+```
+
 ## Disclaimer
 
 This is not an officially supported Google product. This project is not
