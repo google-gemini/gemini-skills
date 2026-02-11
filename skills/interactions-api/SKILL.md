@@ -21,7 +21,7 @@ The Interactions API (Beta) is a unified interface for interacting with Gemini m
 
 ### Python
 ```python
-from google import genai
+import google.generativeai as genai
 
 client = genai.Client()
 
