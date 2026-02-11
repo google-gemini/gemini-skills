@@ -254,6 +254,7 @@ console.log(interaction.outputs[interaction.outputs.length - 1].text);
 
 ## Resources
 
+- See the [gemini-api-dev skill](../gemini-api-dev/SKILL.md) for canonical SDK guidance (installation, migration notes, and recommended models such as the google-genai / @google/genai SDKs).
 - [Official Interactions API Documentation](https://ai.google.dev/gemini-api/docs/interactions)
 - [Interactions API Quickstart Notebook](https://colab.sandbox.google.com/github/google-gemini/cookbook/blob/main/quickstarts/Get_started_interactions_api.ipynb)
 - [API Reference](https://ai.google.dev/api/interactions-api)
