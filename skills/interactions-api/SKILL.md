@@ -14,6 +14,8 @@ The Interactions API (Beta) is a unified interface for interacting with Gemini m
 - **Turn-based Communication** - Structured request/response patterns
 - **Session Handling** - Manage conversation sessions efficiently with interaction IDs
 - **Multimodal Support** - Process text, images, audio, video, and documents
+- **Tool Use** - Integrate external tools and function calling
+- **Agent Support** - Build and orchestrate AI agents
 
 > **Note:** The Interactions API is currently in Beta. Features and schemas are subject to breaking changes.
 
@@ -21,7 +23,7 @@ The Interactions API (Beta) is a unified interface for interacting with Gemini m
 
 ### Python
 ```python
-import google.generativeai as genai
+from google import genai
 
 client = genai.Client()
 
@@ -252,21 +254,51 @@ const interaction = await client.interactions.create({
 console.log(interaction.outputs[interaction.outputs.length - 1].text);
 ```
 
+## Tool Use with Interactions API
+
+The Interactions API supports function calling and tool use:
+
+#### Python
+```python
+from google import genai
+
+client = genai.Client()
+
+# Define a tool
+tools = [
+    {
+        "function_declarations": [
+            {
+                "name": "get_weather",
+                "description": "Get the current weather for a location",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": "The city and state"
+                        }
+                    },
+                    "required": ["location"]
+                }
+            }
+        ]
+    }
+]
+
+interaction = client.interactions.create(
+    model="gemini-3-flash-preview",
+    input="What's the weather in San Francisco?",
+    tools=tools
+)
+```
+
 ## Resources
 
-- See the [gemini-api-dev skill](../gemini-api-dev/SKILL.md) for canonical SDK guidance (installation, migration notes, and recommended models such as the google-genai / @google/genai SDKs).
-- [Official Interactions API Documentation](https://ai.google.dev/gemini-api/docs/interactions)
-- [Interactions API Quickstart Notebook](https://colab.sandbox.google.com/github/google-gemini/cookbook/blob/main/quickstarts/Get_started_interactions_api.ipynb)
-- [API Reference](https://ai.google.dev/api/interactions-api)
-- [Gemini API Documentation](https://ai.google.dev/gemini-api/docs/llms.txt)
-
-## Best Practices
-
-1. **Use Stateful Conversations**: Leverage `previous_interaction_id` for automatic state management instead of manually tracking history
-2. **Handle Storage**: Interaction objects are saved by default (`store=true`). Be mindful of data retention policies
-3. **Error Handling**: Implement robust error handling for network and API issues
-4. **Rate Limiting**: Be mindful of API rate limits in interactive scenarios
-5. **Beta Considerations**: The API is in Beta and subject to breaking changes
+See the [gemini-api-dev skill](https://github.com/google-gemini/gemini-skills/blob/main/skills/gemini-api-dev/SKILL.md) for canonical SDK guidance (installation, migration notes, and recommended models such as the google-genai / @google/genai SDKs).
+- [Official Interactions API Documentation](https://ai.google.dev/gemini-api/docs/interactions.md)
+- [Interactions API Reference](https://ai.google.dev/api/interactions-api.md)
+- [Gemini API llms.txt](https://ai.google.dev/gemini-api/docs/llms.txt)
 
 ## Common Use Cases
 
@@ -274,13 +306,11 @@ console.log(interaction.outputs[interaction.outputs.length - 1].text);
 - Interactive assistants with session management
 - Conversational interfaces with multimodal inputs
 - Context-aware Q&A systems
+- AI agents with tool orchestration
+- Function calling and external tool integration
 - Document analysis and understanding
 - Image, audio, and video processing workflows
 
 ## Data Storage
 
-> **Important:** Interaction objects are saved by default to enable state management features and background execution. See the [Data Storage and Retention](https://ai.google.dev/gemini-api/docs/interactions#data-storage-retention) documentation for details on retention periods and how to delete stored data or opt out.
-
----
-
-For more details, refer to the [official documentation](https://ai.google.dev/gemini-api/docs/interactions).
+> **Important:** Interaction objects are saved by default to enable state management features and background execution. See the [Data Storage and Retention](https://ai.google.dev/gemini-api/docs/interactions.md#data-storage-retention) documentation for details on retention periods and how to delete stored data or opt out.
