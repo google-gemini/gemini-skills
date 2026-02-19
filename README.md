@@ -62,6 +62,14 @@ npx skills add google-gemini/gemini-skills --skill gemini-api-dev --global
 # Context7 skills
 npx ctx7 skills install /google-gemini/gemini-skills gemini-api-dev
 ```
+### interactions-api
+
+Skill for building interactive chat experiences with the Gemini Interactions API.
+Provides best practices for managing conversation state and turn-based interactions.
+
+```sh
+npx skills add google-gemini/gemini-skills --skill interactions-api --global
+```
 
 ## Disclaimer
 
