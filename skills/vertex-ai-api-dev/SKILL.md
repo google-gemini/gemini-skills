@@ -82,10 +82,10 @@ print(response.text)
 
 ### Initialization with JavaScript/TypeScript
 ```typescript
-import { GoogleGenAI } from "@google/genai";
+import { Client } from "@google/genai";
 
 // Initialize with vertexai configuration
-const ai = new GoogleGenAI({ 
+const ai = new Client({ 
   vertexai: { 
     project: "your-project-id", 
     location: "global" 
@@ -182,7 +182,7 @@ class VideoSummary(BaseModel):
 client = genai.Client(vertexai=True, project="your-project-id", location="global")
 
 # Use Google Cloud Storage for Large Files (e.g. Video)
-video_file = Part.from_uri(
+video_file = types.Part.from_uri(
     file_uri="gs://cloud-samples-data/generative-ai/video/ad_copy_from_video.mp4",
     mime_type="video/mp4",
 )
