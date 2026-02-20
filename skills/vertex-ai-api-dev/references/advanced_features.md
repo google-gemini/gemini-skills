@@ -56,9 +56,15 @@ while job.state not in completed_states:
     job = client.batches.get(name=job.name)
 ```
 
-## Thinking (Reasoning Mode)
+### Thinking (Reasoning)
 
-Let the model "think" before responding to complex logic tasks.
+Thinking is on by default for `gemini-3.1-pro-preview` and `gemini-3-flash-preview`.
+It can be adjusted by using the `thinking_level` parameter.
+
+- **`MINIMAL`:** (Gemini 3 Flash Only) Constrains the model to use as few tokens as possible for thinking and is best used for low-complexity tasks that wouldn't benefit from extensive reasoning.
+- **`LOW`**: Constrains the model to use fewer tokens for thinking and is suitable for simpler tasks where extensive reasoning is not required.
+- **`MEDIUM`**: Offers a balanced approach suitable for tasks of moderate complexity that benefit from reasoning but don't require deep, multi-step planning.
+- **`HIGH`**: (Default) Maximizes reasoning depth. The model may take significantly longer to reach a first token, but the output will be more thoroughly vetted.
 
 ```python
 from google import genai
@@ -66,13 +72,16 @@ from google.genai import types
 
 client = genai.Client()
 response = client.models.generate_content(
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     contents="solve x^2 + 4x + 4 = 0",
     config=types.GenerateContentConfig(
-        thinking_config=types.ThinkingConfig(include_thoughts=True, thinking_budget=1024)
-    ),
+        thinking_config=types.ThinkingConfig(
+            thinking_level=types.ThinkingLevel.HIGH
+        )
+    )
 )
 
+# Access thoughts if returned
 for part in response.candidates[0].content.parts:
     if part.thought:
         print(f"Thought: {part.text}")
