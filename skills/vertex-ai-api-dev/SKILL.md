@@ -34,11 +34,14 @@ Provide these key capabilities:
   - groupId: `com.google.genai`, artifactId: `google-genai`
   - Latest version can be found here: https://central.sonatype.com/artifact/com.google.genai/google-genai/versions (let's call it `LAST_VERSION`) 
   - Install in `build.gradle`:
+
     ```
     implementation("com.google.genai:google-genai:${LAST_VERSION}")
     ```
+
   - Install Maven dependency in `pom.xml`:
-    ```
+
+    ```xml
     <dependency>
 	    <groupId>com.google.genai</groupId>
 	    <artifactId>google-genai</artifactId>
