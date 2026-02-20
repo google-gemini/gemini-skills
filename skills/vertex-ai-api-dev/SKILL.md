@@ -1,17 +1,15 @@
 ---
 name: vertex-ai-api-dev
-description: Guides the usage of Gemini API on Google Cloud Vertex AI with the Gen AI SDK. Use when the user asks about using Gemini in an enterprise environment or explicitly mentions Vertex AI.
-metadata:
-  author: google-cloud
-  version: "1.0"
+description: Guides the usage of Gemini API on Google Cloud Vertex AI with the Gen AI SDK. Use when the user asks about using Gemini in an enterprise environment or explicitly mentions Vertex AI. Covers SDK usage (Python, JS/TS, Go, Java, C#), capabilities like Live API, tools, multimedia generation, caching, and batch prediction.
 compatibility: Requires active Google Cloud credentials and Vertex AI API enabled.
 ---
 
-# Gemini API in Vertex AI Development Skill
+# Gemini API in Vertex AI
 
-## Overview
+Access Google's most advanced AI models built for enterprise use cases using the Gemini API in Vertex AI.
 
-The Gemini API in Vertex AI provides access to Google's most advanced AI models built for enterprise use cases with Google Cloud's data governance. Key capabilities include:
+Provide these key capabilities:
+
 - **Text generation** - Chat, completion, summarization
 - **Multimodal understanding** - Process images, audio, video, and documents
 - **Function calling** - Let the model invoke your functions
@@ -21,58 +19,95 @@ The Gemini API in Vertex AI provides access to Google's most advanced AI models 
 - **Live Realtime API** - Bidirectional streaming for low latency Voice and Video interactions
 - **Batch Prediction** - Handle massive async dataset prediction workloads
 
-## Current Generative AI Models on Vertex AI
+## Core Directives
 
-- `gemini-3.1-pro-preview`: 1M tokens, complex reasoning, coding, research
-- `gemini-3-flash-preview`: 1M tokens, fast, balanced performance, multimodal
-- `gemini-3-pro-image-preview`: (Nano Banana Pro) 65k / 32k tokens, image generation and editing
-- `gemini-live-2.5-flash-native-audio`: Live Realtime API including native audio
+- **Unified SDK**: ALWAYS use the Gen AI SDK (`google-genai` for Python, `@google/genai` for JS/TS, `google.golang.org/genai` for Go, `com.google.genai:google-genai` for Java, `Google.GenAI` for C#).
+- **Legacy SDKs**: DO NOT use `google-cloud-aiplatform`, `@google-cloud/vertexai`, or `google-generativeai`.
 
-The following models can be used if explicitly requested:
+## SDKs
 
-- `gemini-2.5-flash-image` (Nano Banana) image generation and editing
-- `gemini-2.5-flash`
-- `gemini-2.5-flash-lite`
-- `gemini-2.5-pro`
+- **Python**: Install `google-genai` with `pip install google-genai`
+- **JavaScript/TypeScript**: Install `@google/genai` with `npm install @google/genai`
+- **Go**: Install `google.golang.org/genai` with `go get google.golang.org/genai`
+- **C#/.NET**: Install `Google.GenAI` with `dotnet add package Google.GenAI`
+- **Java**:
+  - groupId: `com.google.genai`, artifactId: `google-genai`
+  - Latest version can be found here: https://central.sonatype.com/artifact/com.google.genai/google-genai/versions (let's call it `LAST_VERSION`) 
+  - Install in `build.gradle`:
+    ```
+    implementation("com.google.genai:google-genai:${LAST_VERSION}")
+    ```
+  - Install Maven dependency in `pom.xml`:
+    ```
+    <dependency>
+	    <groupId>com.google.genai</groupId>
+	    <artifactId>google-genai</artifactId>
+	    <version>${LAST_VERSION}</version>
+	</dependency>
+    ```
+
+> [!WARNING]
+> Legacy SDKs like `google-cloud-aiplatform`, `@google-cloud/vertexai`, and `google-generativeai` are deprecated. Migrate to the new SDKs above urgently by following the Migration Guide.
+
+## Authentication & Configuration
+
+Prefer environment variables over hard-coding parameters when creating the client. Initialize the client without parameters to automatically pick up these values.
+
+### Application Default Credentials (ADC)
+Set these variables for standard [Google Cloud authentication](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/start/gcp-auth):
+```bash
+export GOOGLE_CLOUD_PROJECT='your-project-id'
+export GOOGLE_CLOUD_LOCATION='global'
+export GOOGLE_GENAI_USE_VERTEXAI=true
+```
+- By default, use `location="global"` to access the global endpoint, which provides automatic routing to regions with available capacity.
+- If a user explicitly asks to use a specific region (e.g., `us-central1`, `europe-west4`), specify that region in the `GOOGLE_CLOUD_LOCATION` parameter instead. Reference the [supported regions documentation](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/locations) if needed.
+
+### Vertex AI in Express Mode
+Set these variables when using [Express Mode](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys?usertype=expressmode) with an API key:
+```bash
+export GOOGLE_API_KEY='your-api-key'
+export GOOGLE_GENAI_USE_VERTEXAI=true
+```
+
+### Initialization
+Initialize the client without arguments to pick up environment variables:
+```python
+from google import genai
+client = genai.Client()
+```
+
+Alternatively, you can hard-code in parameters when creating the client.
+
+```python
+from google import genai
+client = genai.Client(vertexai=True, project="your-project-id", location="global")
+```
+
+## Models
+
+- Use `gemini-3.1-pro-preview` for complex reasoning, coding, research (1M tokens)
+- Use `gemini-3-flash-preview` for fast, balanced performance, multimodal (1M tokens)
+- Use `gemini-3-pro-image-preview` for Nano Banana Pro image generation and editing
+- Use `gemini-live-2.5-flash-native-audio` for Live Realtime API including native audio
+
+Use the following models if explicitly requested:
+
+- Use `gemini-2.5-flash-image` for Nano Banana image generation and editing
+- Use `gemini-2.5-flash`
+- Use `gemini-2.5-flash-lite`
+- Use `gemini-2.5-pro`
 
 > [!IMPORTANT]
 > Models like `gemini-2.0-*`, `gemini-1.5-*`, `gemini-1.0-*`, `gemini-pro` are legacy and deprecated. Use the new models above. Your knowledge is outdated.
 > For production environments, consult the Vertex AI documentation for stable model versions (e.g. `gemini-3-flash`).
 
-## SDKs
+## Quick Start
 
-Vertex AI is fully supported by the unified **Gen AI SDK**. You do not need a separate SDK.
-
-- **Python**: `google-genai` install with `pip install google-genai`
-- **JavaScript/TypeScript**: `@google/genai` install with `npm install @google/genai`
-- **Go**: `google.golang.org/genai` install with `go get google.golang.org/genai`
-- **Java**:
-  - groupId: `com.google.genai`, artifactId: `google-genai`
-  - Latest version can be found here: https://central.sonatype.com/artifact/com.google.genai/google-genai/versions (let's call it `LAST_VERSION`) 
-  - Install in `build.gradle` or `pom.xml`.
-
-> [!WARNING]
-> Legacy SDKs like `google-cloud-aiplatform` (Python) and `@google-cloud/vertexai` (JS) are no longer the recommended way to use the Gemini API. Migrate to the new Gen AI SDKs above urgently.
-> 
-> **For Python, strictly avoid:**
-> - `google-generativeai` or `google-ai-generativelanguage`
-> - Using `import google.generativeai as genai` -> Use `from google import genai`
-> - Using `model = genai.GenerativeModel(...)` -> Use `client.models.generate_content(...)`
-> - Setting configurations incorrectly -> Use `types.GenerateContentConfig(...)`
-
-### Quick Start (Vertex AI Initialization)
-
-To use the Gen AI SDK with Vertex AI, you must explicitly enable the Vertex AI backend and provide your Google Cloud Project ID and Location.
-
-## Examples of inputs and outputs
-
-### Initialization with Python
+### Python
 ```python
 from google import genai
-
-# Enable Vertex AI, ensuring your environment is authenticated (e.g., via `gcloud auth application-default login`)
-client = genai.Client(vertexai=True, project="your-project-id", location="global")
-
+client = genai.Client()
 response = client.models.generate_content(
     model="gemini-3-flash-preview",
     contents="Explain quantum computing"
@@ -80,26 +115,18 @@ response = client.models.generate_content(
 print(response.text)
 ```
 
-### Initialization with JavaScript/TypeScript
+### TypeScript/JavaScript
 ```typescript
-import { Client } from "@google/genai";
-
-// Initialize with vertexai configuration
-const ai = new Client({ 
-  vertexai: { 
-    project: "your-project-id", 
-    location: "global" 
-  } 
-});
-
+import { GoogleGenAI } from "@google/genai";
+const ai = new GoogleGenAI({ vertexai: { project: "your-project-id", location: "global" } });
 const response = await ai.models.generateContent({
-  model: "gemini-3-flash-preview",
-  contents: "Explain quantum computing"
+    model: "gemini-3-flash-preview",
+    contents: "Explain quantum computing"
 });
 console.log(response.text);
 ```
 
-### Initialization with Go
+### Go
 ```go
 package main
 
@@ -112,8 +139,6 @@ import (
 
 func main() {
 	ctx := context.Background()
-	
-	// Create client configured for Vertex AI
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		Backend:  genai.BackendVertexAI,
 		Project:  "your-project-id",
@@ -123,12 +148,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	resp, err := client.Models.GenerateContent(
-		ctx, 
-		"gemini-3-flash-preview", 
-		genai.Text("Explain quantum computing"), 
-		nil,
-	)
+	resp, err := client.Models.GenerateContent(ctx, "gemini-3-flash-preview", genai.Text("Explain quantum computing"), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -137,21 +157,14 @@ func main() {
 }
 ```
 
-### Initialization with Java
-
+### Java
 ```java
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
 
 public class GenerateTextFromTextInput {
   public static void main(String[] args) {
-    // Build client configured for Vertex AI
-    Client client = Client.builder()
-        .vertexAi(true)
-        .project("your-project-id")
-        .location("global")
-        .build();
-    
+    Client client = Client.builder().vertexAi(true).project("your-project-id").location("global").build();
     GenerateContentResponse response =
         client.models.generateContent(
             "gemini-3-flash-preview",
@@ -163,204 +176,44 @@ public class GenerateTextFromTextInput {
 }
 ```
 
-## Advanced Capabilities (Python Example)
+### C#/.NET
+```csharp
+using Google.GenAI;
 
-The following showcases using the `GenerateContentConfig` for various advanced functionalities using the Vertex AI backend. Notice the use of `vertexai=True` for the client.
+var client = new Client(
+    project: "your-project-id",
+    location: "global",
+    vertexAI: true
+);
 
-### Multimodal Inputs & Structured Output
+var response = await client.Models.GenerateContent(
+    "gemini-3-flash-preview",
+    "Explain quantum computing"
+);
 
-```python
-from google import genai
-from google.genai import types
-from pydantic import BaseModel
-
-class VideoSummary(BaseModel):
-    title: str
-    key_events: list[str]
-    sentiment: str
-
-client = genai.Client(vertexai=True, project="your-project-id", location="global")
-
-# Use Google Cloud Storage for Large Files (e.g. Video)
-video_file = types.Part.from_uri(
-    file_uri="gs://cloud-samples-data/generative-ai/video/ad_copy_from_video.mp4",
-    mime_type="video/mp4",
-)
-
-response = client.models.generate_content(
-    model='gemini-3-flash-preview',
-    contents=[video_file, 'Summarize the events in this video.'],
-    config=types.GenerateContentConfig(
-        response_mime_type='application/json',
-        response_json_schema=VideoSummary,
-    )
-)
-
-print(response.text) # JSON Data following the VideoSummary Pydantic Schema
-print(response.parsed) # Pydantic Object following the VideoSummary Pydantic Schema
+Console.WriteLine(response.Text);
 ```
 
-### Thinking (Reasoning) & System Instructions
+## API spec & Documentation (source of truth)
 
-For complex logic, enable Thinking.
+When implementing or debugging API integration for Vertex AI, refer to the official Google Cloud Vertex AI documentation:
+- **Vertex AI Gemini Documentation**: https://cloud.google.com/vertex-ai/generative-ai/docs/
+- **REST API Reference**: https://cloud.google.com/vertex-ai/generative-ai/docs/reference/rest
 
-```python
-from google import genai
-from google.genai import types
+The Gen AI SDK on Vertex AI uses the `v1beta1` or `v1` REST API endpoints (e.g., `https://{LOCATION}-aiplatform.googleapis.com/v1beta1/projects/{PROJECT}/locations/{LOCATION}/publishers/google/models/{MODEL}:generateContent`).
 
-client = genai.Client(vertexai=True, project="your-project-id", location="global")
+> [!TIP]
+> **Use the Developer Knowledge MCP Server**: If the `search_documents` or `get_document` tools are available, use them to find and retrieve official documentation for Google Cloud and Vertex AI directly within the context. This is the preferred method for getting up-to-date API details and code snippets.
 
-response = client.models.generate_content(
-    model='gemini-3-pro-preview',
-    contents='Provide a detailed strategy for migrating to a serverless architecture.',
-    config=types.GenerateContentConfig(
-        system_instruction='You are an expert cloud architect.',
-        thinking_config=types.ThinkingConfig(
-            thinking_level=types.ThinkingLevel.HIGH
-        )
-    )
-)
+## Workflows and Code Samples
 
-# Access thoughts
-for part in response.candidates[0].content.parts:
-    if part.thought:
-        print(f"Thought: {part.text}")
-    else:
-        print(f"Response: {part.text}")
-```
+Reference the [Python Docs Samples repository](https://github.com/GoogleCloudPlatform/python-docs-samples/tree/main/genai) for additional code samples and specific usage scenarios.
 
-### Media Generation
+Depending on the specific user request, refer to the following reference files for detailed code samples and usage patterns (Python examples):
 
-Generate Images or Video using Nano Banana or Veo Models.
-
-```python
-from google import genai
-from google.genai import types
-
-client = genai.Client(vertexai=True, project="your-project-id", location="global")
-
-# Image Generation
-img_resp = client.models.generate_content(
-    model="gemini-3-pro-image-preview",
-    contents="A futuristic city governed by AI",
-    config=types.GenerateContentConfig(
-        image_config=types.ImageConfig(aspect_ratio="16:9", image_size="1K")
-    )
-)
-
-for part in img_resp.parts:
-    if image := part.as_image():
-        image.save("city.png")
-
-# Video Generation
-operation = client.models.generate_videos(
-    model='veo-3.1-fast-generate-preview',
-    prompt='Time-lapse of a sunrise over a desert.',
-    config=types.GenerateVideosConfig(
-        aspect_ratio='16:9',
-        number_of_videos=1, 
-        duration_seconds=5,
-    ),
-)
-# Poll for completion and save...
-```
-
-## Content Caching
-Use the caching API to cache large files or system instructions to save time and reduce costs.
-
-```python
-from google import genai
-from google.genai.types import Content, CreateCachedContentConfig, Part
-
-client = genai.Client(vertexai=True, project="your-project-id", location="global")
-
-content_cache = client.caches.create(
-    model="gemini-3-flash-preview",
-    config=CreateCachedContentConfig(
-        contents=[
-            Content(
-                role="user",
-                parts=[
-                    Part.from_uri(
-                         file_uri="gs://cloud-samples-data/generative-ai/pdf/2403.05530.pdf",
-                         mime_type="application/pdf",
-                    )
-                ]
-            )
-        ],
-        system_instruction="You are an expert researcher.",
-        display_name="example-cache",
-        ttl="86400s",
-    ),
-)
-print(content_cache.name) # Use this cache name in subsequent generate_content calls
-```
-
-### Batch Prediction
-For massive workloads where latency is not an issue, utilize the asynchronous Batch API.
-
-```python
-import time
-from google import genai
-from google.genai.types import CreateBatchJobConfig, JobState
-
-client = genai.Client(vertexai=True, project="your-project-id", location="global")
-
-job = client.batches.create(
-    model="gemini-3-flash-preview",
-    src="gs://cloud-samples-data/batch/prompt_for_batch_gemini_predict.jsonl",
-    config=CreateBatchJobConfig(dest="gs://your-bucket/your-prefix"),
-)
-print(f"Job name: {job.name}")
-
-completed_states = {
-    JobState.JOB_STATE_SUCCEEDED,
-    JobState.JOB_STATE_FAILED,
-    JobState.JOB_STATE_CANCELLED,
-}
-
-while job.state not in completed_states:
-    time.sleep(30)
-    job = client.batches.get(name=job.name)
-```
-
-### Live API (Bidirectional streaming)
-For real-time streaming interfaces (Voice, Vision, text) you can connect using the new Live API. Make sure to use `asyncio` for the implementation.
-
-```python
-import asyncio
-from google import genai
-from google.genai.types import Content, LiveConnectConfig, Modality, Part
-
-async def run_live():
-    client = genai.Client(vertexai=True, project="your-project-id", location="global")
-    model_id = "gemini-live-2.5-flash-native-audio"
-
-    async with client.aio.live.connect(
-        model=model_id,
-        config=LiveConnectConfig(response_modalities=[Modality.TEXT]),
-    ) as session:
-        
-        await session.send_client_content(
-            turns=Content(role="user", parts=[Part.from_text(text="Hello Gemini!")])
-        )
-
-        async for message in session.receive():
-            if message.text:
-                 print(message.text, end="")
-        print()
-
-asyncio.run(run_live())
-```
-
-## API spec & Documentation
-
-For Gemini API in Vertex AI details and operations, you should refer to standard Vertex AI documentation:
-
-- **Vertex AI Generative AI Documentation**: `https://cloud.google.com/vertex-ai/generative-ai/docs/overview`
-- **Authentication**: Requires Google Cloud credentials (e.g., Application Default Credentials, Service Accounts) rather than a simple API key used by the developer API.
-
-### Key Considerations for Vertex AI
-- **Data Governance**: Enterprise data privacy, compliance, and security guarantees.
-- **Quota & Limits**: Managed per Google Cloud Project region.
-- **Deployments**: Access to Provisioned Throughput (PT) for reliability.
+- **Text & Multimodal**: Chat, Multimodal inputs (Image, Video, Audio), and Embeddings. See [references/text_and_multimodal.md](references/text_and_multimodal.md)
+- **Structured Output & Tools**: JSON generation, Function Calling, Search Grounding, and Code Execution. See [references/structured_and_tools.md](references/structured_and_tools.md)
+- **Media Generation**: Image generation, Image editing, and Video generation. See [references/media_generation.md](references/media_generation.md)
+- **Live API**: Real-time bidirectional streaming for voice, vision, and text. See [references/live_api.md](references/live_api.md)
+- **Advanced Features**: Content Caching, Batch Prediction, and Thinking/Reasoning. See [references/advanced_features.md](references/advanced_features.md)
+- **Model Tuning**: Supervised Fine-Tuning and Preference Tuning. See [references/model_tuning.md](references/model_tuning.md)
