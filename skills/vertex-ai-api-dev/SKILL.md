@@ -211,9 +211,11 @@ Reference the [Python Docs Samples repository](https://github.com/GoogleCloudPla
 
 Depending on the specific user request, refer to the following reference files for detailed code samples and usage patterns (Python examples):
 
-- **Text & Multimodal**: Chat, Multimodal inputs (Image, Video, Audio), and Embeddings. See [references/text_and_multimodal.md](references/text_and_multimodal.md)
+- **Text & Multimodal**: Chat, Multimodal inputs (Image, Video, Audio), and Streaming. See [references/text_and_multimodal.md](references/text_and_multimodal.md)
+- **Embeddings**: Generate text embeddings for semantic search. See [references/embeddings.md](references/embeddings.md)
 - **Structured Output & Tools**: JSON generation, Function Calling, Search Grounding, and Code Execution. See [references/structured_and_tools.md](references/structured_and_tools.md)
 - **Media Generation**: Image generation, Image editing, and Video generation. See [references/media_generation.md](references/media_generation.md)
+- **Bounding Box Detection**: Object detection and localization within images and video. See [references/bounding_box.md](references/bounding_box.md)
 - **Live API**: Real-time bidirectional streaming for voice, vision, and text. See [references/live_api.md](references/live_api.md)
 - **Advanced Features**: Content Caching, Batch Prediction, and Thinking/Reasoning. See [references/advanced_features.md](references/advanced_features.md)
 - **Model Tuning**: Supervised Fine-Tuning and Preference Tuning. See [references/model_tuning.md](references/model_tuning.md)

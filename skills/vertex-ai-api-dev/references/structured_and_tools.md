@@ -1,11 +1,11 @@
 # Structured Output and Tools
 
 ## Structured Output (JSON Schema)
-Force the model to return JSON matching a Pydantic schema or JSON schema.
+Enforce a specific JSON schema using standard Python type hints or Pydantic models.
 
 ```python
 from google import genai
-from google.genai.types import GenerateContentConfig
+from google.genai import types
 from pydantic import BaseModel
 
 class Recipe(BaseModel):
@@ -16,12 +16,15 @@ client = genai.Client()
 response = client.models.generate_content(
     model="gemini-3-flash-preview",
     contents="List a few popular cookie recipes.",
-    config=GenerateContentConfig(
+    config=types.GenerateContentConfig(
         response_mime_type="application/json",
-        response_schema=list[Recipe],
+        response_json_schema=list[Recipe],
     ),
 )
-print(response.parsed) # Returns list of Recipe objects
+# response.text is guaranteed to be valid JSON matching the schema
+print(response.text)
+ # Returns list of Recipe objects
+print(response.parsed)
 ```
 
 ## Function Calling
@@ -29,21 +32,31 @@ Let the model output function calls that you can execute.
 
 ```python
 from google import genai
-from google.genai.types import GenerateContentConfig
+from google.genai import types
 
 def get_current_weather(location: str) -> str:
     """Example method. Returns the current weather.
     Args: location: The city and state, e.g. San Francisco, CA
     """
+    if 'boston' in location.lower():
+        return "Snowing"
     return "Sunny"
 
 client = genai.Client()
 response = client.models.generate_content(
     model="gemini-3-flash-preview",
     contents="What is the weather like in Boston?",
-    config=GenerateContentConfig(tools=[get_current_weather]),
+    config=types.GenerateContentConfig(tools=[get_current_weather]),
 )
-print(response.text)
+
+if response.function_calls:
+    print('Function calls requested by the model:')
+    for function_call in response.function_calls:
+        print(f'- Function: {function_call.name}')
+        print(f'- Args: {dict(function_call.args)}')
+else:
+    print('The model responded directly:')
+    print(response.text)
 ```
 
 ## Search Grounding
@@ -51,18 +64,26 @@ Ground the model's responses in Google Search or your own enterprise data (Verte
 
 ```python
 from google import genai
-from google.genai.types import GenerateContentConfig, GoogleSearch, Tool
+from google.genai import types
 
 client = genai.Client()
 
 response = client.models.generate_content(
     model="gemini-3-flash-preview",
     contents="When is the next total solar eclipse in the US?",
-    config=GenerateContentConfig(
-        tools=[Tool(google_search=GoogleSearch())],
+    config=types.GenerateContentConfig(
+        tools=[
+            types.Tool(google_search=types.GoogleSearch())
+        ],
     ),
 )
 print(response.text)
+# Search details
+print(f'Search Query: {response.candidates[0].grounding_metadata.web_search_queries}')
+# Inspect grounding metadata
+print(response.candidates[0].grounding_metadata.search_entry_point.rendered_content)
+# Urls used for grounding
+print(f"Search Pages: {', '.join([site.web.title for site in response.candidates[0].grounding_metadata.grounding_chunks])}")
 ```
 
 ## Code Execution
@@ -70,17 +91,39 @@ Allow the model to run Python code to calculate answers precisely.
 
 ```python
 from google import genai
-from google.genai.types import GenerateContentConfig, Tool, ToolCodeExecution
+from google.genai import types
 
 client = genai.Client()
 
 response = client.models.generate_content(
     model="gemini-3-flash-preview",
     contents="Calculate 20th fibonacci number.",
-    config=GenerateContentConfig(
-        tools=[Tool(code_execution=ToolCodeExecution())],
+    config=types.GenerateContentConfig(
+        tools=[types.Tool(code_execution=types.ToolCodeExecution())],
     ),
 )
 print(response.executable_code)
 print(response.code_execution_result)
+```
+
+## Url Context
+You can use the URL context tool to provide Gemini with URLs as additional context for your prompt. The model can then retrieve content from the URLs and use that content to inform and shape its response.
+
+```python
+from google import genai
+from google.genai import types
+
+client = genai.Client()
+
+response = client.models.generate_content(
+    model=model_id,
+    contents="Compare recipes from http://example.com and http://example2.com",
+    config=GenerateContentConfig(
+        tools=[types.Tool(url_context=types.UrlContext)],
+    )
+)
+
+print(response.text)
+# get URLs retrieved for context
+print(response.candidates[0].url_context_metadata)
 ```

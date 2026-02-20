@@ -5,18 +5,18 @@ Supervised Fine-Tuning or Preference Tuning using your own datasets.
 ```python
 import time
 from google import genai
-from google.genai.types import CreateTuningJobConfig, TuningDataset
+from google.genai import types
 
 client = genai.Client()
 
-training_dataset = TuningDataset(
+training_dataset = types.TuningDataset(
     gcs_uri="gs://your-bucket/sft_train_data.jsonl",
 )
 
 tuning_job = client.tunings.tune(
     base_model="gemini-3-flash-preview",
     training_dataset=training_dataset,
-    config=CreateTuningJobConfig(
+    config=types.CreateTuningJobConfig(
         tuned_model_display_name="Example tuning job",
     ),
 )
