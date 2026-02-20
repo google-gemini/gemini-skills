@@ -15,7 +15,7 @@ circulation](https://ai.google.dev/gemini-api/docs/thinking#signatures)) or SDK
 changes.
 
 [Skills](https://agentskills.io/) are a lightweight technique for adding
-relevent context to your agents. This repo contains skills related to building
+relevant context to your agents. This repo contains skills related to building
 apps powered by the Gemini API.
 
 ### Performance
