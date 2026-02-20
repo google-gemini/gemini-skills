@@ -218,4 +218,5 @@ Depending on the specific user request, refer to the following reference files f
 - **Bounding Box Detection**: Object detection and localization within images and video. See [references/bounding_box.md](references/bounding_box.md)
 - **Live API**: Real-time bidirectional streaming for voice, vision, and text. See [references/live_api.md](references/live_api.md)
 - **Advanced Features**: Content Caching, Batch Prediction, and Thinking/Reasoning. See [references/advanced_features.md](references/advanced_features.md)
+- **Safety**: Adjusting Responsible AI filters and thresholds. See [references/safety.md](references/safety.md)
 - **Model Tuning**: Supervised Fine-Tuning and Preference Tuning. See [references/model_tuning.md](references/model_tuning.md)
