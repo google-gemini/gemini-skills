@@ -26,13 +26,12 @@ Key capabilities:
 
 ## Models
 
-| Model | Description |
-|-------|-------------|
-| `gemini-2.5-flash-native-audio-preview-12-2025` | Native audio output, affective dialog, proactive audio, thinking. 128k context window. |
-| `gemini-live-2.5-flash-preview` | Standard Live API model. 32k context window. |
+- `gemini-2.5-flash-native-audio-preview-12-2025` — Native audio output, affective dialog, proactive audio, thinking. 128k context window. **This is the recommended model for all Live API use cases.**
 
-> [!IMPORTANT]
-> Use `gemini-2.5-flash-native-audio-preview-12-2025` for the best audio experience with native audio features. Use `gemini-live-2.5-flash-preview` for text-only responses from audio input.
+> [!WARNING]
+> The following Live API models are **deprecated** and will be shut down. Migrate to `gemini-2.5-flash-native-audio-preview-12-2025`.
+> - `gemini-live-2.5-flash-preview` — Released June 17, 2025. Shutdown: December 9, 2025.
+> - `gemini-2.0-flash-live-001` — Released April 9, 2025. Shutdown: December 9, 2025.
 
 ## SDKs
 
@@ -46,211 +45,19 @@ Key capabilities:
 
 To streamline the development of real-time audio and video apps, you can use a third-party integration that supports the Gemini Live API over **WebRTC** or **WebSockets**:
 
-| Partner | Description |
-|---------|-------------|
-| [LiveKit](https://docs.livekit.io/agents/models/realtime/plugins/gemini/) | Use the Gemini Live API with LiveKit Agents. |
-| [Pipecat by Daily](https://docs.pipecat.ai/guides/features/gemini-live) | Create a real-time AI chatbot using Gemini Live and Pipecat. |
-| [Fishjam by Software Mansion](https://docs.fishjam.io/tutorials/gemini-live-integration) | Create live video and audio streaming applications with Fishjam. |
-| [Vision Agents by Stream](https://visionagents.ai/integrations/gemini) | Build real-time voice and video AI applications with Vision Agents. |
-| [Voximplant](https://voximplant.com/products/gemini-client) | Connect inbound and outbound calls to Live API with Voximplant. |
-| [Firebase AI SDK](https://firebase.google.com/docs/ai-logic/live-api?api=dev) | Get started with the Gemini Live API using Firebase AI Logic. |
+- [LiveKit](https://docs.livekit.io/agents/models/realtime/plugins/gemini/) — Use the Gemini Live API with LiveKit Agents.
+- [Pipecat by Daily](https://docs.pipecat.ai/guides/features/gemini-live) — Create a real-time AI chatbot using Gemini Live and Pipecat.
+- [Fishjam by Software Mansion](https://docs.fishjam.io/tutorials/gemini-live-integration) — Create live video and audio streaming applications with Fishjam.
+- [Vision Agents by Stream](https://visionagents.ai/integrations/gemini) — Build real-time voice and video AI applications with Vision Agents.
+- [Voximplant](https://voximplant.com/products/gemini-client) — Connect inbound and outbound calls to Live API with Voximplant.
+- [Firebase AI SDK](https://firebase.google.com/docs/ai-logic/live-api?api=dev) — Get started with the Gemini Live API using Firebase AI Logic.
 
-## Architecture: Server-to-Server vs Client-to-Server
+## Implementation Approaches
 
-| Approach | Description | Best For |
-|----------|-------------|----------|
-| **Server-to-server** | Backend connects to Live API via WebSocket. Client streams data to your server, which forwards it. | Production apps where you control the backend and want to keep API keys secure. |
-| **Client-to-server** | Frontend connects directly to Live API via WebSocket, bypassing your backend. | Lower latency for audio/video. Use **ephemeral tokens** instead of API keys for security. |
+There are two ways to connect to the Live API:
 
-> [!IMPORTANT]
-> For client-to-server production deployments, always use [ephemeral tokens](#ephemeral-tokens) instead of standard API keys.
-
-## Quick Start
-
-### Python — Bidirectional Audio
-
-```python
-import asyncio
-from google import genai
-import pyaudio
-
-client = genai.Client()
-
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-SEND_SAMPLE_RATE = 16000
-RECEIVE_SAMPLE_RATE = 24000
-CHUNK_SIZE = 1024
-
-pya = pyaudio.PyAudio()
-
-MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
-CONFIG = {
-    "response_modalities": ["AUDIO"],
-    "system_instruction": "You are a helpful and friendly AI assistant.",
-}
-
-audio_queue_output = asyncio.Queue()
-audio_queue_mic = asyncio.Queue(maxsize=5)
-
-async def listen_audio():
-    mic_info = pya.get_default_input_device_info()
-    stream = await asyncio.to_thread(
-        pya.open, format=FORMAT, channels=CHANNELS,
-        rate=SEND_SAMPLE_RATE, input=True,
-        input_device_index=mic_info["index"],
-        frames_per_buffer=CHUNK_SIZE,
-    )
-    while True:
-        data = await asyncio.to_thread(stream.read, CHUNK_SIZE, exception_on_overflow=False)
-        await audio_queue_mic.put({"data": data, "mime_type": "audio/pcm"})
-
-async def send_audio(session):
-    while True:
-        msg = await audio_queue_mic.get()
-        await session.send_realtime_input(audio=msg)
-
-async def receive_audio(session):
-    while True:
-        turn = session.receive()
-        async for response in turn:
-            if response.server_content and response.server_content.model_turn:
-                for part in response.server_content.model_turn.parts:
-                    if part.inline_data and isinstance(part.inline_data.data, bytes):
-                        audio_queue_output.put_nowait(part.inline_data.data)
-        # Clear queue on interruption
-        while not audio_queue_output.empty():
-            audio_queue_output.get_nowait()
-
-async def play_audio():
-    stream = await asyncio.to_thread(
-        pya.open, format=FORMAT, channels=CHANNELS,
-        rate=RECEIVE_SAMPLE_RATE, output=True,
-    )
-    while True:
-        data = await audio_queue_output.get()
-        await asyncio.to_thread(stream.write, data)
-
-async def run():
-    async with client.aio.live.connect(model=MODEL, config=CONFIG) as session:
-        print("Connected! Start speaking.")
-        async with asyncio.TaskGroup() as tg:
-            tg.create_task(send_audio(session))
-            tg.create_task(listen_audio())
-            tg.create_task(receive_audio(session))
-            tg.create_task(play_audio())
-
-if __name__ == "__main__":
-    asyncio.run(run())
-```
-
-### JavaScript — Bidirectional Audio
-
-```javascript
-import { GoogleGenAI, Modality } from '@google/genai';
-import mic from 'mic';
-import Speaker from 'speaker';
-
-const ai = new GoogleGenAI({});
-const model = 'gemini-2.5-flash-native-audio-preview-12-2025';
-const config = {
-  responseModalities: [Modality.AUDIO],
-  systemInstruction: "You are a helpful and friendly AI assistant.",
-};
-
-async function live() {
-  const responseQueue = [];
-  const audioQueue = [];
-  let speaker;
-
-  async function waitMessage() {
-    while (responseQueue.length === 0) {
-      await new Promise((resolve) => setImmediate(resolve));
-    }
-    return responseQueue.shift();
-  }
-
-  const session = await ai.live.connect({
-    model, config,
-    callbacks: {
-      onopen: () => console.log('Connected to Gemini Live API'),
-      onmessage: (message) => responseQueue.push(message),
-      onerror: (e) => console.error('Error:', e.message),
-      onclose: (e) => console.log('Closed:', e.reason),
-    },
-  });
-
-  // Setup microphone (16kHz, 16-bit, mono)
-  const micInstance = mic({ rate: '16000', bitwidth: '16', channels: '1' });
-  const micInputStream = micInstance.getAudioStream();
-
-  micInputStream.on('data', (data) => {
-    session.sendRealtimeInput({
-      audio: { data: data.toString('base64'), mimeType: "audio/pcm;rate=16000" }
-    });
-  });
-
-  micInstance.start();
-  console.log('Microphone started. Speak now...');
-}
-
-live().catch(console.error);
-```
-
-## Audio Formats
-
-| Direction | Format | Sample Rate | Encoding |
-|-----------|--------|-------------|----------|
-| **Input** | Raw PCM, little-endian, 16-bit, mono | 16kHz (native, will resample others) | `audio/pcm;rate=16000` |
-| **Output** | Raw PCM, little-endian, 16-bit, mono | 24kHz | — |
-
-> [!NOTE]
-> Always set the MIME type on input audio blobs (e.g. `audio/pcm;rate=16000`). The API will resample if a different rate is sent.
-
-## Establishing a Connection
-
-### Python
-
-```python
-import asyncio
-from google import genai
-
-client = genai.Client()
-model = "gemini-2.5-flash-native-audio-preview-12-2025"
-config = {"response_modalities": ["AUDIO"]}
-
-async def main():
-    async with client.aio.live.connect(model=model, config=config) as session:
-        # Send and receive content...
-        pass
-
-asyncio.run(main())
-```
-
-### JavaScript
-
-```javascript
-import { GoogleGenAI, Modality } from '@google/genai';
-
-const ai = new GoogleGenAI({});
-const model = 'gemini-2.5-flash-native-audio-preview-12-2025';
-const config = { responseModalities: [Modality.AUDIO] };
-
-const session = await ai.live.connect({
-  model, config,
-  callbacks: {
-    onopen: () => console.debug('Opened'),
-    onmessage: (message) => console.debug(message),
-    onerror: (e) => console.debug('Error:', e.message),
-    onclose: (e) => console.debug('Close:', e.reason),
-  },
-});
-
-// Send content...
-session.close();
-```
-
-## Sending Input
+1. **Using the google-genai SDK** — The SDK handles WebSocket management, serialization, and provides a high-level API. This is the recommended approach.
+2. **Using raw WebSockets** — Connect directly to the WebSocket endpoint for maximum control or when using a language without an official SDK.
 
 > [!IMPORTANT]
 > Use `send_realtime_input` / `sendRealtimeInput` for all real-time user input (audio, video, **and text**). This sends data via `BidiGenerateContentRealtimeInput` and is optimized for responsiveness. Use `send_client_content` / `sendClientContent` **only** for incremental conversation history updates (appending prior turns to context), not for sending new user messages.
@@ -258,418 +65,893 @@ session.close();
 > [!WARNING]
 > Do **not** use `media` in `sendRealtimeInput`. Use the specific keys: `audio` for audio data, `video` for images/video frames, and `text` for text input.
 
-### Realtime Audio Input
+## Audio Formats
 
-**Python:**
-```python
-await session.send_realtime_input(
-    audio=types.Blob(data=audio_bytes, mime_type="audio/pcm;rate=16000")
-)
-```
+- **Input**: Raw PCM, little-endian, 16-bit, mono. 16kHz native (will resample others). MIME type: `audio/pcm;rate=16000`
+- **Output**: Raw PCM, little-endian, 16-bit, mono. 24kHz sample rate.
 
-**JavaScript:**
-```javascript
-session.sendRealtimeInput({
-  audio: { data: base64Audio, mimeType: "audio/pcm;rate=16000" }
-});
-```
+---
 
-### Realtime Text Input
+# Using the google-genai SDK
 
-Send text to the model using `send_realtime_input` / `sendRealtimeInput`:
+## Authentication
 
-**Python:**
-```python
-await session.send_realtime_input(text="Hello, how are you?")
-```
+Authentication is handled by providing an API key when initializing the Gemini client.
 
-**JavaScript:**
-```javascript
-session.sendRealtimeInput({ text: 'Hello, how are you?' });
-```
+* {Python}
 
-### Incremental Context Updates (Conversation History)
+    ```python
+    from google import genai
+
+    client = genai.Client(api_key="YOUR_API_KEY")
+    ```
+
+* {JavaScript}
+
+    ```js
+    import { GoogleGenAI } from '@google/genai';
+
+    const ai = new GoogleGenAI({ apiKey: 'YOUR_API_KEY' });
+    ```
+
+## Connecting to the Live API
+
+To start a live session, use the connection method with a model name and configuration.
+
+* {Python}
+
+    ```python
+    from google.genai import types
+
+    async def start_session():
+        config = types.LiveConnectConfig(
+            response_modalities=[types.Modality.AUDIO],
+            system_instruction=types.Content(
+                parts=[types.Part(text="You are a helpful assistant.")]
+            )
+        )
+        
+        async with client.aio.live.connect(model="gemini-2.5-flash-native-audio-preview-12-2025", config=config) as session:
+            # Session is now active
+            pass
+    ```
+
+* {JavaScript}
+
+    ```js
+    const session = await ai.live.connect({
+      model: 'gemini-2.5-flash-native-audio-preview-12-2025',
+      config: {
+        responseModalities: ['audio'],
+        systemInstruction: {
+          parts: [{ text: 'You are a helpful assistant.' }]
+        }
+      },
+      callbacks: {
+        onopen: () => { console.log('Connected'); },
+        onmessage: (response) => { console.log('Message:', response); },
+        onerror: (error) => { console.error('Error:', error); },
+        onclose: () => { console.log('Closed'); }
+      }
+    });
+    ```
+
+## Sending Text
+
+Text can be sent using `send_realtime_input` (Python) or `sendRealtimeInput` (JavaScript).
+
+* {Python}
+
+    ```python
+    await session.send_realtime_input(text="Hello, how are you?")
+    ```
+
+* {JavaScript}
+
+    ```js
+    session.sendRealtimeInput({
+      text: 'Hello, how are you?'
+    });
+    ```
+
+## Sending Audio
+
+Audio needs to be sent as raw PCM data (raw 16-bit PCM audio, 16kHz, little-endian).
+
+* {Python}
+
+    ```python
+    # Assuming 'chunk' is your raw PCM audio bytes
+    await session.send_realtime_input(
+        audio=types.Blob(
+            data=chunk, 
+            mime_type="audio/pcm;rate=16000"
+        )
+    )
+    ```
+
+* {JavaScript}
+
+    ```js
+    // Assuming 'chunk' is a Buffer of raw PCM audio
+    session.sendRealtimeInput({
+      audio: {
+        data: chunk.toString('base64'),
+        mimeType: 'audio/pcm;rate=16000'
+      }
+    });
+    ```
+
+## Sending Video
+
+Video frames are sent as individual images (e.g., JPEG or PNG) at a specific frame rate (e.g., 1 frame per second).
+
+* {Python}
+
+    ```python
+    # Assuming 'frame' is your JPEG-encoded image bytes
+    await session.send_realtime_input(
+        video=types.Blob(
+            data=frame, 
+            mime_type="image/jpeg"
+        )
+    )
+    ```
+
+* {JavaScript}
+
+    ```js
+    // Assuming 'frame' is a Buffer of JPEG-encoded image data
+    session.sendRealtimeInput({
+      video: {
+        data: frame.toString('base64'),
+        mimeType: 'image/jpeg'
+      }
+    });
+    ```
+
+## Receiving Audio
+
+The model's audio responses are received as chunks of data.
+
+* {Python}
+
+    ```python
+    async for response in session.receive():
+        if response.server_content and response.server_content.model_turn:
+            for part in response.server_content.model_turn.parts:
+                if part.inline_data:
+                    audio_data = part.inline_data.data
+                    # Process or play the audio data
+    ```
+
+* {JavaScript}
+
+    ```js
+    // Inside the onmessage callback
+    const content = response.serverContent;
+    if (content?.modelTurn?.parts) {
+      for (const part of content.modelTurn.parts) {
+        if (part.inlineData) {
+          const audioData = part.inlineData.data;
+          // Process or play audioData (base64 encoded string)
+        }
+      }
+    }
+    ```
+
+## Receiving Text
+
+Transcriptions for both user input and model output are available in the server content.
+
+* {Python}
+
+    ```python
+    async for response in session.receive():
+        content = response.server_content
+        if content:
+            if content.input_transcription:
+                print(f"User: {content.input_transcription.text}")
+            if content.output_transcription:
+                print(f"Gemini: {content.output_transcription.text}")
+    ```
+
+* {JavaScript}
+
+    ```js
+    // Inside the onmessage callback
+    const content = response.serverContent;
+    if (content?.inputTranscription) {
+      console.log('User:', content.inputTranscription.text);
+    }
+    if (content?.outputTranscription) {
+      console.log('Gemini:', content.outputTranscription.text);
+    }
+    ```
+
+## Handling Tool Calls
+
+The API supports tool calling (function calling). When the model requests a tool call, you must execute the function and send the response back.
+
+* {Python}
+
+    ```python
+    async for response in session.receive():
+        if response.tool_call:
+            function_responses = []
+            for fc in response.tool_call.function_calls:
+                # 1. Execute the function locally
+                result = my_tool_function(**fc.args)
+                
+                # 2. Prepare the response
+                function_responses.append(types.FunctionResponse(
+                    name=fc.name,
+                    id=fc.id,
+                    response={"result": result}
+                ))
+            
+            # 3. Send the tool response back to the session
+            await session.send_tool_response(function_responses=function_responses)
+    ```
+
+* {JavaScript}
+
+    ```js
+    // Inside the onmessage callback
+    if (response.toolCall) {
+      const functionResponses = [];
+      for (const fc of response.toolCall.functionCalls) {
+        const result = myToolFunction(fc.args);
+        functionResponses.push({
+          name: fc.name,
+          id: fc.id,
+          response: { result }
+        });
+      }
+      session.sendToolResponse({ functionResponses });
+    }
+    ```
+
+## Incremental Context Updates (Conversation History)
 
 Use `send_client_content` / `sendClientContent` **only** to inject prior conversation history into the session context. All content sent this way is unconditionally appended to the conversation history and used as part of the prompt. This is useful for restoring session context or providing background turns — **not** for sending new user messages.
 
-**Python:**
-```python
-turns = [
-    {"role": "user", "parts": [{"text": "What is the capital of France?"}]},
-    {"role": "model", "parts": [{"text": "Paris"}]},
-]
-await session.send_client_content(turns=turns, turn_complete=False)
+* {Python}
 
-turns = [{"role": "user", "parts": [{"text": "What about Germany?"}]}]
-await session.send_client_content(turns=turns, turn_complete=True)
+    ```python
+    turns = [
+        {"role": "user", "parts": [{"text": "What is the capital of France?"}]},
+        {"role": "model", "parts": [{"text": "Paris"}]},
+    ]
+    await session.send_client_content(turns=turns, turn_complete=False)
+
+    turns = [{"role": "user", "parts": [{"text": "What about Germany?"}]}]
+    await session.send_client_content(turns=turns, turn_complete=True)
+    ```
+
+* {JavaScript}
+
+    ```js
+    let inputTurns = [
+      { role: 'user', parts: [{ text: 'What is the capital of France?' }] },
+      { role: 'model', parts: [{ text: 'Paris' }] },
+    ];
+    session.sendClientContent({ turns: inputTurns, turnComplete: false });
+
+    inputTurns = [{ role: 'user', parts: [{ text: 'What about Germany?' }] }];
+    session.sendClientContent({ turns: inputTurns, turnComplete: true });
+    ```
+
+---
+
+# Using Raw WebSockets
+
+## Authentication
+
+Authentication is handled by including your API key as a query parameter in the WebSocket URL.
+
+The endpoint format is:
+
+```plaintext
+wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=YOUR_API_KEY
 ```
 
-### Video Input
+Replace `YOUR_API_KEY` with your actual API key.
 
-Stream video frames as JPEG images alongside audio using `send_realtime_input`:
+## Authentication with Ephemeral Tokens
 
-**Python:**
-```python
-import base64
+If you are using [ephemeral tokens](https://ai.google.dev/gemini-api/docs/ephemeral-tokens), you need to connect to the `v1alpha` endpoint. The ephemeral token needs to be passed as an `access_token` query parameter.
 
-# Capture frame as JPEG bytes
-await session.send_realtime_input(
-    video=types.Blob(data=frame_bytes, mime_type="image/jpeg")
-)
+```plaintext
+wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token={short-lived-token}
 ```
 
-## Audio Transcriptions
+Replace `{short-lived-token}` with the actual ephemeral token.
 
-Enable transcription of model output and/or user input audio.
+## Connecting to the Live API
 
-### Output Transcription
+To start a live session, establish a WebSocket connection to the authenticated endpoint. The first message sent over the WebSocket must be a `LiveSessionRequest` containing the `config`. For the full configuration options, see the [Live API - WebSockets API reference](https://ai.google.dev/api/live).
 
-**Python:**
-```python
-config = {
-    "response_modalities": ["AUDIO"],
-    "output_audio_transcription": {}
-}
+* {Python}
 
-async with client.aio.live.connect(model=model, config=config) as session:
-    async for response in session.receive():
-        if response.server_content.output_transcription:
-            print("Transcript:", response.server_content.output_transcription.text)
-```
+    ```python
+    import asyncio
+    import websockets
+    import json
 
-**JavaScript:**
-```javascript
-const config = {
-  responseModalities: [Modality.AUDIO],
-  outputAudioTranscription: {}
-};
-// In message handler:
-if (turn.serverContent && turn.serverContent.outputTranscription) {
-  console.log('Transcript:', turn.serverContent.outputTranscription.text);
-}
-```
+    API_KEY = "YOUR_API_KEY"
+    MODEL_NAME = "gemini-2.5-flash-native-audio-preview-12-2025"
+    WS_URL = f"wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key={API_KEY}"
 
-### Input Transcription
+    async def connect_and_configure():
+        async with websockets.connect(WS_URL) as websocket:
+            print("WebSocket Connected")
 
-**Python:**
-```python
-config = {
-    "response_modalities": ["AUDIO"],
-    "input_audio_transcription": {},
-}
+            # 1. Send the initial configuration
+            config_message = {
+                "config": {
+                    "model": f"models/{MODEL_NAME}",
+                    "responseModalities": ["AUDIO"],
+                    "systemInstruction": {
+                        "parts": [{"text": "You are a helpful assistant."}]
+                    }
+                }
+            }
+            await websocket.send(json.dumps(config_message))
+            print("Configuration sent")
 
-async for msg in session.receive():
-    if msg.server_content.input_transcription:
-        print('Transcript:', msg.server_content.input_transcription.text)
-```
+            # Keep the session alive for further interactions
+            await asyncio.sleep(3600)
 
-**JavaScript:**
-```javascript
-const config = {
-  responseModalities: [Modality.AUDIO],
-  inputAudioTranscription: {}
-};
-```
+    asyncio.run(connect_and_configure())
+    ```
+
+* {JavaScript}
+
+    ```js
+    const API_KEY = "YOUR_API_KEY";
+    const MODEL_NAME = "gemini-2.5-flash-native-audio-preview-12-2025";
+    const WS_URL = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${API_KEY}`;
+
+    const websocket = new WebSocket(WS_URL);
+
+    websocket.onopen = () => {
+      console.log('WebSocket Connected');
+
+      const configMessage = {
+        config: {
+          model: `models/${MODEL_NAME}`,
+          responseModalities: ['AUDIO'],
+          systemInstruction: {
+            parts: [{ text: 'You are a helpful assistant.' }]
+          }
+        }
+      };
+      websocket.send(JSON.stringify(configMessage));
+      console.log('Configuration sent');
+    };
+
+    websocket.onmessage = (event) => {
+      const response = JSON.parse(event.data);
+      console.log('Received:', response);
+    };
+
+    websocket.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+    };
+
+    websocket.onclose = () => {
+      console.log('WebSocket Closed');
+    };
+    ```
+
+## Sending Text
+
+To send text input, construct a `LiveSessionRequest` with the `realtimeInput` field populated with text.
+
+* {Python}
+
+    ```python
+    async def send_text(websocket, text):
+        text_message = {
+            "realtimeInput": {
+                "text": text
+            }
+        }
+        await websocket.send(json.dumps(text_message))
+    ```
+
+* {JavaScript}
+
+    ```js
+    function sendTextMessage(text) {
+      if (websocket.readyState === WebSocket.OPEN) {
+        const textMessage = {
+          realtimeInput: {
+            text: text
+          }
+        };
+        websocket.send(JSON.stringify(textMessage));
+      }
+    }
+    ```
+
+## Sending Audio
+
+Audio should be sent as raw PCM data (raw 16-bit PCM audio, 16kHz, little-endian). Construct a `LiveSessionRequest` with the `realtimeInput` field, containing a `Blob` with the audio data.
+
+* {Python}
+
+    ```python
+    import base64
+
+    async def send_audio_chunk(websocket, chunk_bytes):
+        encoded_data = base64.b64encode(chunk_bytes).decode('utf-8')
+        audio_message = {
+            "realtimeInput": {
+                "audio": {
+                    "data": encoded_data,
+                    "mimeType": "audio/pcm;rate=16000"
+                }
+            }
+        }
+        await websocket.send(json.dumps(audio_message))
+    ```
+
+* {JavaScript}
+
+    ```js
+    function sendAudioChunk(chunk) {
+      if (websocket.readyState === WebSocket.OPEN) {
+        const audioMessage = {
+          realtimeInput: {
+            audio: {
+              data: chunk.toString('base64'),
+              mimeType: 'audio/pcm;rate=16000'
+            }
+          }
+        };
+        websocket.send(JSON.stringify(audioMessage));
+      }
+    }
+    ```
+
+## Sending Video
+
+Video frames are sent as individual images (e.g., JPEG or PNG). Similar to audio, use `realtimeInput` with a `Blob`, specifying the correct `mimeType`.
+
+* {Python}
+
+    ```python
+    import base64
+
+    async def send_video_frame(websocket, frame_bytes, mime_type="image/jpeg"):
+        encoded_data = base64.b64encode(frame_bytes).decode('utf-8')
+        video_message = {
+            "realtimeInput": {
+                "video": {
+                    "data": encoded_data,
+                    "mimeType": mime_type
+                }
+            }
+        }
+        await websocket.send(json.dumps(video_message))
+    ```
+
+* {JavaScript}
+
+    ```js
+    function sendVideoFrame(frame, mimeType = 'image/jpeg') {
+      if (websocket.readyState === WebSocket.OPEN) {
+        const videoMessage = {
+          realtimeInput: {
+            video: {
+              data: frame.toString('base64'),
+              mimeType: mimeType
+            }
+          }
+        };
+        websocket.send(JSON.stringify(videoMessage));
+      }
+    }
+    ```
+
+## Receiving Responses
+
+The WebSocket will send back `LiveSessionResponse` messages. You need to parse these JSON messages and handle different types of content.
+
+* {Python}
+
+    ```python
+    async def receive_loop(websocket):
+        async for message in websocket:
+            response = json.loads(message)
+
+            if "serverContent" in response:
+                server_content = response["serverContent"]
+                # Receiving Audio
+                if "modelTurn" in server_content and "parts" in server_content["modelTurn"]:
+                    for part in server_content["modelTurn"]["parts"]:
+                        if "inlineData" in part:
+                            audio_data_b64 = part["inlineData"]["data"]
+                            # Process or play the base64 encoded audio data
+
+                # Receiving Text Transcriptions
+                if "inputTranscription" in server_content:
+                    print(f"User: {server_content['inputTranscription']['text']}")
+                if "outputTranscription" in server_content:
+                    print(f"Gemini: {server_content['outputTranscription']['text']}")
+
+            # Handling Tool Calls
+            if "toolCall" in response:
+                await handle_tool_call(websocket, response["toolCall"])
+    ```
+
+* {JavaScript}
+
+    ```js
+    websocket.onmessage = (event) => {
+      const response = JSON.parse(event.data);
+
+      if (response.serverContent) {
+        const serverContent = response.serverContent;
+        // Receiving Audio
+        if (serverContent.modelTurn?.parts) {
+          for (const part of serverContent.modelTurn.parts) {
+            if (part.inlineData) {
+              const audioData = part.inlineData.data; // Base64 encoded
+              // Process or play audioData
+            }
+          }
+        }
+
+        // Receiving Text Transcriptions
+        if (serverContent.inputTranscription) {
+          console.log('User:', serverContent.inputTranscription.text);
+        }
+        if (serverContent.outputTranscription) {
+          console.log('Gemini:', serverContent.outputTranscription.text);
+        }
+      }
+
+      // Handling Tool Calls
+      if (response.toolCall) {
+        handleToolCall(response.toolCall);
+      }
+    };
+    ```
+
+## Handling Tool Calls
+
+When the model requests a tool call, the `LiveSessionResponse` will contain a `toolCall` field. You must execute the function locally and send the result back via `toolResponse`.
+
+* {Python}
+
+    ```python
+    async def handle_tool_call(websocket, tool_call):
+        function_responses = []
+        for fc in tool_call["functionCalls"]:
+            result = my_tool_function(fc.get("args", {}))
+            function_responses.append({
+                "name": fc["name"],
+                "id": fc["id"],
+                "response": {"result": result}
+            })
+
+        tool_response_message = {
+            "toolResponse": {
+                "functionResponses": function_responses
+            }
+        }
+        await websocket.send(json.dumps(tool_response_message))
+    ```
+
+* {JavaScript}
+
+    ```js
+    function handleToolCall(toolCall) {
+      const functionResponses = [];
+      for (const fc of toolCall.functionCalls) {
+        const result = myToolFunction(fc.args || {});
+        functionResponses.push({
+          name: fc.name,
+          id: fc.id,
+          response: { result }
+        });
+      }
+
+      if (websocket.readyState === WebSocket.OPEN) {
+        websocket.send(JSON.stringify({
+          toolResponse: { functionResponses }
+        }));
+      }
+    }
+    ```
+
+---
+
+# Configuration Reference
 
 ## Voice Configuration
 
 Set a custom voice from the available TTS voices. Listen to all voices in [AI Studio](https://aistudio.google.com/app/live).
 
-**Python:**
-```python
-config = {
-    "response_modalities": ["AUDIO"],
-    "speech_config": {
-        "voice_config": {"prebuilt_voice_config": {"voice_name": "Kore"}}
-    },
-}
-```
+* {Python}
 
-**JavaScript:**
-```javascript
-const config = {
-  responseModalities: [Modality.AUDIO],
-  speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } }
-};
-```
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        speech_config=types.SpeechConfig(
+            voice_config=types.VoiceConfig(
+                prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name="Kore")
+            )
+        ),
+    )
+    ```
+
+* {JavaScript}
+
+    ```js
+    const config = {
+      responseModalities: ['AUDIO'],
+      speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } }
+    };
+    ```
 
 > [!NOTE]
 > Native audio output models automatically detect and switch languages. You cannot explicitly set a language code; specify language preferences in system instructions instead.
 
+## Transcription Configuration
+
+Enable transcription of model output and/or user input audio by adding these to the session config:
+
+* {Python}
+
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        output_audio_transcription=types.AudioTranscriptionConfig(),
+        input_audio_transcription=types.AudioTranscriptionConfig(),
+    )
+    ```
+
+* {JavaScript}
+
+    ```js
+    const config = {
+      responseModalities: ['AUDIO'],
+      outputAudioTranscription: {},
+      inputAudioTranscription: {},
+    };
+    ```
+
 ## Native Audio Capabilities
 
-These features require `gemini-2.5-flash-native-audio-preview-12-2025`.
+These features require `gemini-2.5-flash-native-audio-preview-12-2025` and `v1alpha` API version.
 
 ### Affective Dialog
 
-Adapts response style to the input expression and tone. Requires `v1alpha` API version.
+Adapts response style to the input expression and tone.
 
-**Python:**
-```python
-client = genai.Client(http_options={"api_version": "v1alpha"})
+* {Python}
 
-config = types.LiveConnectConfig(
-    response_modalities=["AUDIO"],
-    enable_affective_dialog=True
-)
-```
+    ```python
+    client = genai.Client(http_options={"api_version": "v1alpha"})
 
-**JavaScript:**
-```javascript
-const ai = new GoogleGenAI({ httpOptions: {"apiVersion": "v1alpha"} });
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        enable_affective_dialog=True
+    )
+    ```
 
-const config = {
-  responseModalities: [Modality.AUDIO],
-  enableAffectiveDialog: true
-};
-```
+* {JavaScript}
+
+    ```js
+    const ai = new GoogleGenAI({ httpOptions: { apiVersion: 'v1alpha' } });
+
+    const config = {
+      responseModalities: ['AUDIO'],
+      enableAffectiveDialog: true
+    };
+    ```
 
 ### Proactive Audio
 
-Model intelligently decides when to respond (ignores irrelevant audio). Requires `v1alpha`.
+Model intelligently decides when to respond (ignores irrelevant audio).
 
-**Python:**
-```python
-client = genai.Client(http_options={"api_version": "v1alpha"})
+* {Python}
 
-config = types.LiveConnectConfig(
-    response_modalities=["AUDIO"],
-    proactivity={'proactive_audio': True}
-)
-```
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        proactivity={"proactive_audio": True}
+    )
+    ```
 
-**JavaScript:**
-```javascript
-const ai = new GoogleGenAI({ httpOptions: {"apiVersion": "v1alpha"} });
+* {JavaScript}
 
-const config = {
-  responseModalities: [Modality.AUDIO],
-  proactivity: { proactiveAudio: true }
-};
-```
+    ```js
+    const config = {
+      responseModalities: ['AUDIO'],
+      proactivity: { proactiveAudio: true }
+    };
+    ```
 
 ### Thinking
 
-The native audio model supports thinking (enabled by default). Control with `thinkingBudget`:
+The native audio model supports thinking (enabled by default). Control with `thinkingBudget` (set to `0` to disable):
 
-**Python:**
-```python
-config = types.LiveConnectConfig(
-    response_modalities=["AUDIO"],
-    thinking_config=types.ThinkingConfig(
-        thinking_budget=1024,       # Set to 0 to disable
-        include_thoughts=True       # Optional: get thought summaries
+* {Python}
+
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        thinking_config=types.ThinkingConfig(
+            thinking_budget=1024,
+            include_thoughts=True
+        )
     )
-)
-```
+    ```
 
-**JavaScript:**
-```javascript
-const config = {
-  responseModalities: [Modality.AUDIO],
-  thinkingConfig: {
-    thinkingBudget: 1024,
-    includeThoughts: true
-  },
-};
-```
+* {JavaScript}
+
+    ```js
+    const config = {
+      responseModalities: ['AUDIO'],
+      thinkingConfig: { thinkingBudget: 1024, includeThoughts: true },
+    };
+    ```
 
 ## Voice Activity Detection (VAD)
 
 VAD detects when the user is speaking and handles interruptions automatically. When an interruption is detected, ongoing generation is cancelled and a `serverContent.interrupted` signal is sent.
 
-### Handle Interruptions
+### Handling Interruptions
 
-**Python:**
-```python
-async for response in session.receive():
-    if response.server_content.interrupted is True:
-        # Stop playback, clear audio queue
-        pass
-```
+When interrupted, clear your audio playback queue:
 
-**JavaScript:**
-```javascript
-if (turn.serverContent && turn.serverContent.interrupted) {
-  // Stop playback, clear audio queue
-}
-```
+* {Python}
+
+    ```python
+    async for response in session.receive():
+        if response.server_content.interrupted is True:
+            # Stop playback, clear audio queue
+            pass
+    ```
+
+* {JavaScript}
+
+    ```js
+    if (response.serverContent?.interrupted) {
+      // Stop playback, clear audio queue
+    }
+    ```
 
 ### VAD Configuration
 
 Fine-tune VAD sensitivity:
 
-**Python:**
-```python
-from google.genai import types
+* {Python}
 
-config = {
-    "response_modalities": ["TEXT"],
-    "realtime_input_config": {
-        "automatic_activity_detection": {
-            "disabled": False,
-            "start_of_speech_sensitivity": types.StartSensitivity.START_SENSITIVITY_LOW,
-            "end_of_speech_sensitivity": types.EndSensitivity.END_SENSITIVITY_LOW,
-            "prefix_padding_ms": 20,
-            "silence_duration_ms": 100,
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        realtime_input_config=types.RealtimeInputConfig(
+            automatic_activity_detection=types.AutomaticActivityDetection(
+                disabled=False,
+                start_of_speech_sensitivity=types.StartSensitivity.START_SENSITIVITY_LOW,
+                end_of_speech_sensitivity=types.EndSensitivity.END_SENSITIVITY_LOW,
+                prefix_padding_ms=20,
+                silence_duration_ms=100,
+            )
+        )
+    )
+    ```
+
+* {JavaScript}
+
+    ```js
+    import { StartSensitivity, EndSensitivity } from '@google/genai';
+
+    const config = {
+      responseModalities: ['AUDIO'],
+      realtimeInputConfig: {
+        automaticActivityDetection: {
+          disabled: false,
+          startOfSpeechSensitivity: StartSensitivity.START_SENSITIVITY_LOW,
+          endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_LOW,
+          prefixPaddingMs: 20,
+          silenceDurationMs: 100,
         }
-    }
-}
-```
-
-**JavaScript:**
-```javascript
-import { StartSensitivity, EndSensitivity } from '@google/genai';
-
-const config = {
-  responseModalities: [Modality.TEXT],
-  realtimeInputConfig: {
-    automaticActivityDetection: {
-      disabled: false,
-      startOfSpeechSensitivity: StartSensitivity.START_SENSITIVITY_LOW,
-      endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_LOW,
-      prefixPaddingMs: 20,
-      silenceDurationMs: 100,
-    }
-  }
-};
-```
+      }
+    };
+    ```
 
 ### Audio Stream End
 
 When mic is paused for > 1 second, send `audioStreamEnd` to flush cached audio:
 
-**Python:**
-```python
-await session.send_realtime_input(audio_stream_end=True)
-```
+* {Python}
 
-**JavaScript:**
-```javascript
-session.sendRealtimeInput({ audioStreamEnd: true });
-```
+    ```python
+    await session.send_realtime_input(audio_stream_end=True)
+    ```
+
+* {JavaScript}
+
+    ```js
+    session.sendRealtimeInput({ audioStreamEnd: true });
+    ```
 
 ### Manual VAD (Disable Automatic)
 
 Disable automatic VAD and manage activity signals yourself:
 
-**Python:**
-```python
-config = {
-    "response_modalities": ["TEXT"],
-    "realtime_input_config": {"automatic_activity_detection": {"disabled": True}},
-}
+* {Python}
 
-await session.send_realtime_input(activity_start=types.ActivityStart())
-await session.send_realtime_input(audio=types.Blob(data=audio_bytes, mime_type="audio/pcm;rate=16000"))
-await session.send_realtime_input(activity_end=types.ActivityEnd())
-```
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        realtime_input_config=types.RealtimeInputConfig(
+            automatic_activity_detection=types.AutomaticActivityDetection(disabled=True)
+        )
+    )
 
-**JavaScript:**
-```javascript
-const config = {
-  responseModalities: [Modality.TEXT],
-  realtimeInputConfig: {
-    automaticActivityDetection: { disabled: true }
-  }
-};
+    await session.send_realtime_input(activity_start=types.ActivityStart())
+    await session.send_realtime_input(audio=types.Blob(data=audio_bytes, mime_type="audio/pcm;rate=16000"))
+    await session.send_realtime_input(activity_end=types.ActivityEnd())
+    ```
 
-session.sendRealtimeInput({ activityStart: {} });
-session.sendRealtimeInput({ audio: { data: base64Audio, mimeType: "audio/pcm;rate=16000" } });
-session.sendRealtimeInput({ activityEnd: {} });
-```
+* {JavaScript}
 
-## Function Calling (Tool Use)
+    ```js
+    session.sendRealtimeInput({ activityStart: {} });
+    session.sendRealtimeInput({ audio: { data: base64Audio, mimeType: 'audio/pcm;rate=16000' } });
+    session.sendRealtimeInput({ activityEnd: {} });
+    ```
 
-### Supported Tools
+## Supported Tools
 
-| Tool | Supported |
-|------|-----------|
-| **Google Search** | ✅ |
-| **Function calling** | ✅ |
-| **Google Maps** | ❌ |
-| **Code execution** | ❌ |
-| **URL context** | ❌ |
+- **Google Search** — ✅ Supported
+- **Function calling** — ✅ Supported (sync and async)
+- **Google Maps** — ❌ Not supported
+- **Code execution** — ❌ Not supported
+- **URL context** — ❌ Not supported
 
 > [!IMPORTANT]
 > Unlike the `generateContent` API, the Live API does **not** support automatic tool response handling. You must handle tool responses manually.
-
-### Synchronous Function Calling
-
-**Python:**
-```python
-turn_on_the_lights = {"name": "turn_on_the_lights"}
-turn_off_the_lights = {"name": "turn_off_the_lights"}
-
-tools = [{"function_declarations": [turn_on_the_lights, turn_off_the_lights]}]
-config = {"response_modalities": ["AUDIO"], "tools": tools}
-
-async with client.aio.live.connect(model=model, config=config) as session:
-    await session.send_realtime_input(text="Turn on the lights please")
-
-    async for response in session.receive():
-        if response.tool_call:
-            function_responses = []
-            for fc in response.tool_call.function_calls:
-                function_responses.append(types.FunctionResponse(
-                    id=fc.id, name=fc.name,
-                    response={"result": "ok"}
-                ))
-            await session.send_tool_response(function_responses=function_responses)
-```
-
-**JavaScript:**
-```javascript
-const tools = [{ functionDeclarations: [
-  { name: "turn_on_the_lights" },
-  { name: "turn_off_the_lights" }
-]}];
-
-const config = { responseModalities: [Modality.AUDIO], tools };
-
-// In message handler:
-if (turn.toolCall) {
-  const functionResponses = turn.toolCall.functionCalls.map(fc => ({
-    id: fc.id, name: fc.name,
-    response: { result: "ok" }
-  }));
-  session.sendToolResponse({ functionResponses });
-}
-```
 
 ### Asynchronous (Non-Blocking) Function Calling
 
 Mark functions as `NON_BLOCKING` so conversation continues while the function executes:
 
-**Python:**
-```python
-turn_on_the_lights = {"name": "turn_on_the_lights", "behavior": "NON_BLOCKING"}
+* {Python}
 
-# When responding, specify scheduling:
-function_response = types.FunctionResponse(
-    id=fc.id, name=fc.name,
-    response={
-        "result": "ok",
-        "scheduling": "INTERRUPT"  # or "WHEN_IDLE" or "SILENT"
-    }
-)
-```
+    ```python
+    turn_on_the_lights = {"name": "turn_on_the_lights", "behavior": "NON_BLOCKING"}
 
-**JavaScript:**
-```javascript
-import { Behavior, FunctionResponseScheduling } from '@google/genai';
+    # When responding, specify scheduling:
+    function_response = types.FunctionResponse(
+        id=fc.id, name=fc.name,
+        response={"result": "ok", "scheduling": "INTERRUPT"}
+        # scheduling options: "INTERRUPT", "WHEN_IDLE", "SILENT"
+    )
+    ```
 
-const turn_on_the_lights = { name: "turn_on_the_lights", behavior: Behavior.NON_BLOCKING };
+* {JavaScript}
 
-// When responding:
-const functionResponse = {
-  id: fc.id, name: fc.name,
-  response: {
-    result: "ok",
-    scheduling: FunctionResponseScheduling.INTERRUPT  // or WHEN_IDLE or SILENT
-  }
-};
-```
+    ```js
+    import { Behavior, FunctionResponseScheduling } from '@google/genai';
+
+    const turn_on_the_lights = { name: 'turn_on_the_lights', behavior: Behavior.NON_BLOCKING };
+
+    // When responding:
+    const functionResponse = {
+      id: fc.id, name: fc.name,
+      response: { result: 'ok', scheduling: FunctionResponseScheduling.INTERRUPT }
+      // scheduling options: INTERRUPT, WHEN_IDLE, SILENT
+    };
+    ```
 
 Scheduling options:
 - **`INTERRUPT`** — Immediately tell the user about the result
@@ -678,140 +960,134 @@ Scheduling options:
 
 ### Google Search Grounding
 
-**Python:**
-```python
-tools = [{'google_search': {}}]
-config = {"response_modalities": ["AUDIO"], "tools": tools}
-```
+* {Python}
 
-**JavaScript:**
-```javascript
-const tools = [{ googleSearch: {} }];
-const config = { responseModalities: [Modality.AUDIO], tools };
-```
+    ```python
+    tools = [{'google_search': {}}]
+    config = types.LiveConnectConfig(response_modalities=["AUDIO"], tools=tools)
+    ```
 
-### Combining Multiple Tools
+* {JavaScript}
 
-```python
-tools = [
-    {"google_search": {}},
-    {"function_declarations": [turn_on_the_lights, turn_off_the_lights]},
-]
-config = {"response_modalities": ["AUDIO"], "tools": tools}
-```
+    ```js
+    const tools = [{ googleSearch: {} }];
+    const config = { responseModalities: ['AUDIO'], tools };
+    ```
 
 ## Session Management
 
 ### Session Limits
 
-| Limit | Value |
-|-------|-------|
-| Audio-only session (no compression) | **15 minutes** |
-| Audio+video session (no compression) | **2 minutes** |
-| WebSocket connection lifetime | **~10 minutes** |
-| Context window (native audio models) | **128k tokens** |
-| Context window (other Live API models) | **32k tokens** |
-| Session resumption token validity | **2 hours** |
+- Audio-only session (no compression): **15 minutes**
+- Audio+video session (no compression): **2 minutes**
+- WebSocket connection lifetime: **~10 minutes**
+- Context window (native audio models): **128k tokens**
+- Context window (other Live API models): **32k tokens**
+- Session resumption token validity: **2 hours**
 
 ### Context Window Compression
 
 Enable sliding-window compression for unlimited session duration:
 
-**Python:**
-```python
-from google.genai import types
+* {Python}
 
-config = types.LiveConnectConfig(
-    response_modalities=["AUDIO"],
-    context_window_compression=types.ContextWindowCompressionConfig(
-        sliding_window=types.SlidingWindow(),
-    ),
-)
-```
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        context_window_compression=types.ContextWindowCompressionConfig(
+            sliding_window=types.SlidingWindow(),
+        ),
+    )
+    ```
 
-**JavaScript:**
-```javascript
-const config = {
-  responseModalities: [Modality.AUDIO],
-  contextWindowCompression: { slidingWindow: {} }
-};
-```
+* {JavaScript}
+
+    ```js
+    const config = {
+      responseModalities: ['AUDIO'],
+      contextWindowCompression: { slidingWindow: {} }
+    };
+    ```
 
 ### Session Resumption
 
 Survive WebSocket reconnections without losing session state:
 
-**Python:**
-```python
-config = types.LiveConnectConfig(
-    response_modalities=["AUDIO"],
-    session_resumption=types.SessionResumptionConfig(
-        handle=previous_session_handle  # None for new session
-    ),
-)
+* {Python}
 
-async with client.aio.live.connect(model=model, config=config) as session:
-    async for message in session.receive():
-        if message.session_resumption_update:
-            update = message.session_resumption_update
-            if update.resumable and update.new_handle:
-                # Store new_handle for reconnection
-                saved_handle = update.new_handle
-```
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        session_resumption=types.SessionResumptionConfig(
+            handle=previous_session_handle  # None for new session
+        ),
+    )
 
-**JavaScript:**
-```javascript
-const config = {
-  responseModalities: [Modality.AUDIO],
-  sessionResumption: { handle: previousSessionHandle }
-};
+    async with client.aio.live.connect(model=model, config=config) as session:
+        async for message in session.receive():
+            if message.session_resumption_update:
+                update = message.session_resumption_update
+                if update.resumable and update.new_handle:
+                    saved_handle = update.new_handle
+    ```
 
-// In message handler:
-if (turn.sessionResumptionUpdate) {
-  if (turn.sessionResumptionUpdate.resumable && turn.sessionResumptionUpdate.newHandle) {
-    const newHandle = turn.sessionResumptionUpdate.newHandle;
-    // Store for reconnection
-  }
-}
-```
+* {JavaScript}
+
+    ```js
+    const config = {
+      responseModalities: ['AUDIO'],
+      sessionResumption: { handle: previousSessionHandle }
+    };
+
+    // In message handler:
+    if (response.sessionResumptionUpdate) {
+      if (response.sessionResumptionUpdate.resumable && response.sessionResumptionUpdate.newHandle) {
+        const newHandle = response.sessionResumptionUpdate.newHandle;
+        // Store for reconnection
+      }
+    }
+    ```
 
 ### GoAway Message
 
 Server signals an impending connection termination:
 
-**Python:**
-```python
-async for response in session.receive():
-    if response.go_away is not None:
-        print(f"Connection ending in: {response.go_away.time_left}")
-        # Prepare to reconnect with session resumption
-```
+* {Python}
 
-**JavaScript:**
-```javascript
-if (turn.goAway) {
-  console.log('Time left:', turn.goAway.timeLeft);
-}
-```
+    ```python
+    async for response in session.receive():
+        if response.go_away is not None:
+            print(f"Connection ending in: {response.go_away.time_left}")
+            # Prepare to reconnect with session resumption
+    ```
+
+* {JavaScript}
+
+    ```js
+    if (response.goAway) {
+      console.log('Time left:', response.goAway.timeLeft);
+    }
+    ```
 
 ### Generation Complete
 
 Detect when the model finishes generating a response:
 
-**Python:**
-```python
-async for response in session.receive():
-    if response.server_content.generation_complete is True:
-        # Generation is done
-        pass
-```
+* {Python}
 
-**JavaScript:**
-```javascript
-if (turn.serverContent && turn.serverContent.generationComplete) {
-  // Generation is done
-}
-```
+    ```python
+    async for response in session.receive():
+        if response.server_content.generation_complete is True:
+            pass  # Generation is done
+    ```
+
+* {JavaScript}
+
+    ```js
+    if (response.serverContent?.generationComplete) {
+      // Generation is done
+    }
+    ```
 
 ## Ephemeral Tokens
 
@@ -829,72 +1105,75 @@ Ephemeral tokens provide secure, short-lived authentication for **client-to-serv
 
 ### Create an Ephemeral Token (Server-Side)
 
-**Python:**
-```python
-import datetime
+* {Python}
 
-client = genai.Client(http_options={'api_version': 'v1alpha'})
-now = datetime.datetime.now(tz=datetime.timezone.utc)
+    ```python
+    import datetime
 
-token = client.auth_tokens.create(
-    config={
-        'uses': 1,
-        'expire_time': now + datetime.timedelta(minutes=30),
-        'new_session_expire_time': now + datetime.timedelta(minutes=1),
-        'http_options': {'api_version': 'v1alpha'},
-    }
-)
-# Send token.name to the client
-```
+    client = genai.Client(http_options={'api_version': 'v1alpha'})
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
 
-**JavaScript:**
-```javascript
-const client = new GoogleGenAI({});
+    token = client.auth_tokens.create(
+        config={
+            'uses': 1,
+            'expire_time': now + datetime.timedelta(minutes=30),
+            'new_session_expire_time': now + datetime.timedelta(minutes=1),
+            'http_options': {'api_version': 'v1alpha'},
+        }
+    )
+    # Send token.name to the client
+    ```
 
-const token = await client.authTokens.create({
-  config: {
-    uses: 1,
-    expireTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    newSessionExpireTime: new Date(Date.now() + 1 * 60 * 1000),
-    httpOptions: { apiVersion: 'v1alpha' },
-  },
-});
-// Send token.name to the client
-```
+* {JavaScript}
+
+    ```js
+    const client = new GoogleGenAI({});
+
+    const token = await client.authTokens.create({
+      config: {
+        uses: 1,
+        expireTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+        newSessionExpireTime: new Date(Date.now() + 1 * 60 * 1000),
+        httpOptions: { apiVersion: 'v1alpha' },
+      },
+    });
+    // Send token.name to the client
+    ```
 
 ### Lock Token to Configuration (Optional)
 
-```python
-token = client.auth_tokens.create(
-    config={
-        'uses': 1,
-        'live_connect_constraints': {
-            'model': 'gemini-2.5-flash-native-audio-preview-12-2025',
-            'config': {
-                'session_resumption': {},
-                'temperature': 0.7,
-                'response_modalities': ['AUDIO']
-            }
-        },
-        'http_options': {'api_version': 'v1alpha'},
-    }
-)
-```
+* {Python}
+
+    ```python
+    token = client.auth_tokens.create(
+        config={
+            'uses': 1,
+            'live_connect_constraints': {
+                'model': 'gemini-2.5-flash-native-audio-preview-12-2025',
+                'config': {
+                    'session_resumption': {},
+                    'temperature': 0.7,
+                    'response_modalities': ['AUDIO']
+                }
+            },
+            'http_options': {'api_version': 'v1alpha'},
+        }
+    )
+    ```
 
 ### Use Token on Client
 
-```javascript
-const ai = new GoogleGenAI({ apiKey: token.name });
+* {JavaScript}
 
-const session = await ai.live.connect({
-  model: 'gemini-2.5-flash-native-audio-preview-12-2025',
-  config: { responseModalities: [Modality.AUDIO] },
-  callbacks: { ... },
-});
-```
+    ```js
+    const ai = new GoogleGenAI({ apiKey: token.name });
 
-> [!NOTE]
-> Without using the SDK, pass ephemeral tokens via the `access_token` query parameter or in the HTTP `Authorization` header with the `Token` auth-scheme.
+    const session = await ai.live.connect({
+      model: 'gemini-2.5-flash-native-audio-preview-12-2025',
+      config: { responseModalities: ['AUDIO'] },
+      callbacks: { ... },
+    });
+    ```
 
 ### Ephemeral Token Best Practices
 
@@ -907,62 +1186,36 @@ const session = await ai.live.connect({
 
 Control input media resolution for bandwidth/quality tradeoff:
 
-**Python:**
-```python
-config = {
-    "response_modalities": ["AUDIO"],
-    "media_resolution": types.MediaResolution.MEDIA_RESOLUTION_LOW,
-}
-```
+* {Python}
 
-**JavaScript:**
-```javascript
-import { MediaResolution } from '@google/genai';
+    ```python
+    config = types.LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        media_resolution=types.MediaResolution.MEDIA_RESOLUTION_LOW,
+    )
+    ```
 
-const config = {
-  responseModalities: [Modality.AUDIO],
-  mediaResolution: MediaResolution.MEDIA_RESOLUTION_LOW,
-};
-```
+* {JavaScript}
 
-## Token Usage
+    ```js
+    import { MediaResolution } from '@google/genai';
 
-Monitor token consumption:
-
-**Python:**
-```python
-async for message in session.receive():
-    if message.usage_metadata:
-        usage = message.usage_metadata
-        print(f"Total tokens: {usage.total_token_count}")
-        for detail in usage.response_tokens_details:
-            match detail:
-                case types.ModalityTokenCount(modality=modality, token_count=count):
-                    print(f"{modality}: {count}")
-```
-
-**JavaScript:**
-```javascript
-if (turn.usageMetadata) {
-  console.log('Total tokens:', turn.usageMetadata.totalTokenCount);
-  for (const detail of turn.usageMetadata.responseTokensDetails) {
-    console.log(detail);
-  }
-}
-```
+    const config = {
+      responseModalities: ['AUDIO'],
+      mediaResolution: MediaResolution.MEDIA_RESOLUTION_LOW,
+    };
+    ```
 
 ## Limitations
 
-| Constraint | Detail |
-|------------|--------|
-| **Response modality** | Only `TEXT` **or** `AUDIO` per session — not both |
-| **Audio-only session** | 15 min without compression |
-| **Audio+video session** | 2 min without compression |
-| **Connection lifetime** | ~10 min (use session resumption) |
-| **Context window** | 128k tokens (native audio) / 32k tokens (standard) |
-| **Code execution** | Not supported |
-| **URL context** | Not supported |
-| **Google Maps** | Not supported |
+- **Response modality** — Only `TEXT` **or** `AUDIO` per session, not both
+- **Audio-only session** — 15 min without compression
+- **Audio+video session** — 2 min without compression
+- **Connection lifetime** — ~10 min (use session resumption)
+- **Context window** — 128k tokens (native audio) / 32k tokens (standard)
+- **Code execution** — Not supported
+- **URL context** — Not supported
+- **Google Maps** — Not supported
 
 ## Best Practices
 
