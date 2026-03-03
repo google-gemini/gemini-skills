@@ -21,9 +21,9 @@ The Gemini API provides access to Google's most advanced AI models. Key capabili
 ### Gemini 3.x (Preview — latest generation)
 
 - `gemini-3.1-pro-preview`: 1M / 64k tokens, advanced reasoning, coding, research, thinking
-- `gemini-3-flash-preview`: 1M / 64k tokens, fast, balanced performance, multimodal
 - `gemini-3.1-flash-lite-preview`: 1M / 64k tokens, fast and budget-friendly
 - `gemini-3.1-flash-image-preview`: 128k / 32k tokens, image generation, 4K resolution, text rendering
+- `gemini-3-flash-preview`: 1M / 64k tokens, fast, balanced performance, multimodal
 - `gemini-3-pro-image-preview`: 65k / 32k tokens, image generation and editing
 
 ### Gemini 2.5 (Stable)
