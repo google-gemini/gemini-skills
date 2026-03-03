@@ -63,6 +63,22 @@ npx skills add google-gemini/gemini-skills --skill gemini-api-dev --global
 npx ctx7 skills install /google-gemini/gemini-skills gemini-api-dev
 ```
 
+### gemini-live-api-dev
+
+Skill for building real-time, bidirectional streaming apps with the Gemini Live
+API. Covers WebSocket-based audio/video/text streaming, voice activity
+detection, native audio features, function calling, and session management.
+
+```sh
+# Vercel skills
+npx skills add google-gemini/gemini-skills --skill gemini-live-api-dev --global
+```
+
+```sh
+# Context7 skills
+npx ctx7 skills install /google-gemini/gemini-skills gemini-live-api-dev
+```
+
 ## Disclaimer
 
 This is not an officially supported Google product. This project is not
