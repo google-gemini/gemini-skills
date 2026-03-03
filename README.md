@@ -22,7 +22,8 @@ apps powered by the Gemini API.
 
 Our evaluations found that adding this skill improved an agent's ability to
 generate correct API code following best practices to 87% with Gemini 3 Flash
-and 96% with Gemini 3 Pro.
+and 96% with Gemini 3 Pro. Gemini 3 Pro is now deprecated — use Gemini 3.1 Pro
+instead.
 
 ## Installation
 
