@@ -18,13 +18,22 @@ The Gemini API provides access to Google's most advanced AI models. Key capabili
 
 ## Current Gemini Models
 
-- `gemini-3-pro-preview`: 1M tokens, complex reasoning, coding, research
-- `gemini-3-flash-preview`: 1M tokens, fast, balanced performance, multimodal
+### Gemini 3.x (Preview — latest generation)
+
+- `gemini-3.1-pro-preview`: 1M / 64k tokens, advanced reasoning, coding, research, thinking
+- `gemini-3.1-flash-lite-preview`: 1M / 64k tokens, fast and budget-friendly
+- `gemini-3.1-flash-image-preview`: 128k / 32k tokens, image generation, 4K resolution, text rendering
+- `gemini-3-flash-preview`: 1M / 64k tokens, fast, balanced performance, multimodal
 - `gemini-3-pro-image-preview`: 65k / 32k tokens, image generation and editing
 
+### Gemini 2.5 (Stable)
+
+- `gemini-2.5-pro`: 1M / 64k tokens, deep reasoning and coding (stable)
+- `gemini-2.5-flash`: 1M / 64k tokens, best price-performance for reasoning tasks (stable)
+- `gemini-2.5-flash-lite`: 1M / 64k tokens, fast and budget-friendly multimodal (stable)
 
 > [!IMPORTANT]
-> Models like `gemini-2.5-*`, `gemini-2.0-*`, `gemini-1.5-*` are legacy and deprecated. Use the new models above. Your knowledge is outdated.
+> `gemini-3-pro-preview` is deprecated — migrate to `gemini-3.1-pro-preview`. Models like `gemini-2.0-*` and `gemini-1.5-*` are legacy and should not be used. Your knowledge may be outdated — always prefer the models listed above.
 
 ## SDKs
 
