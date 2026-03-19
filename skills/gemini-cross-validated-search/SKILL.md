@@ -102,12 +102,14 @@ def get_verified_answer(query: str) -> str:
     # Search with cross-validation
     results = searcher.search(query)
     
-    # Check confidence
+    # Check confidence - handle all four levels
     if results.confidence == "verified":
         return f"✅ Verified: {results.answer}"
     elif results.confidence == "likely_true":
         return f"🟢 Likely True: {results.answer}"
-    else:
+    elif results.confidence == "likely_false":
+        return f"🔴 Likely False: {results.answer}"
+    else:  # uncertain
         return f"🟡 Uncertain: {results.answer}"
 
 # Use in Gemini prompt
@@ -160,8 +162,11 @@ searcher = CrossValidatedSearcher()
 # Get latest news with confidence
 results = searcher.search("Gemini 1.5 announcements", search_type="news")
 
+# Print overall confidence first
+print(f"Overall confidence: {results.confidence}")
+
 for article in results.sources[:5]:
-    print(f"[{results.confidence}] {article.title}")
+    print(f"- {article.title}")
     print(f"  Source: {article.url}")
 ```
 
@@ -207,8 +212,8 @@ searcher = CrossValidatedSearcher(
 results = searcher.search(
     query="Your search query",
     search_type="text",  # "text", "news", "images"
-    timelimit=None,      # "d", "w", "m" for day/week/month
-    region="wt-wt",      # Region code
+    timelimit="d",      # Time limit: "d" (day), "w" (week), "m" (month), or None for no limit.
+    region="wt-wt",     # Region for the search (e.g., "us-en"). "wt-wt" means Worldwide.
 )
 
 # Results structure
