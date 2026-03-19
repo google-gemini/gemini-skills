@@ -26,11 +26,13 @@ pip install cross-validated-search
 ### Method 1: Function Calling
 
 ```python
-from google import genai
+import os
+import google.generativeai as genai
 from cross_validated_search import CrossValidatedSearcher
 
-# Initialize
-client = genai.Client()
+# Initialize Gemini
+# Make sure to set your GEMINI_API_KEY environment variable
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 searcher = CrossValidatedSearcher()
 
 # Define function for Gemini
@@ -53,9 +55,9 @@ def web_search(query: str, search_type: str = "text") -> dict:
     }
 
 # Use with Gemini
-response = client.models.generate_content(
-    model="gemini-3-flash-preview",
-    contents="What is the latest version of Python?",
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
+response = model.generate_content(
+    "What is the latest version of Python?",
     tools=[{"function_declarations": [{
         "name": "web_search",
         "description": "Search the web with cross-validation for accurate facts",
@@ -74,7 +76,6 @@ response = client.models.generate_content(
 ### Method 2: MCP Server
 
 ```json
-// In your Gemini MCP configuration
 {
   "mcpServers": {
     "cross-validated-search": {
@@ -88,10 +89,12 @@ response = client.models.generate_content(
 ### Method 3: Direct Integration
 
 ```python
-from google import genai
+import os
+import google.generativeai as genai
 from cross_validated_search import CrossValidatedSearcher
 
-client = genai.Client()
+# Initialize Gemini
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 searcher = CrossValidatedSearcher()
 
 # Get cross-validated results
@@ -111,15 +114,13 @@ def get_verified_answer(query: str) -> str:
 prompt = f"""
 Based on the following verified information, answer the question.
 
-{get_verified_answer("What is Gemini 3?")}
+{get_verified_answer("What is Gemini 1.5?")}
 
-Question: What are the key features of Gemini 3?
+Question: What are the key features of Gemini 1.5?
 """
 
-response = client.models.generate_content(
-    model="gemini-3-flash-preview",
-    contents=prompt
-)
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
+response = model.generate_content(prompt)
 ```
 
 ## Confidence Levels
@@ -136,8 +137,12 @@ response = client.models.generate_content(
 ### Example 1: Fact-Checking
 
 ```python
+from cross_validated_search import CrossValidatedSearcher
+
+searcher = CrossValidatedSearcher()
+
 # Check if a claim is verified
-results = searcher.search("Is Gemini 3 released?")
+results = searcher.search("Is Gemini 1.5 released?")
 
 if results.confidence == "verified":
     print(f"✅ Confirmed: {results.answer}")
@@ -148,8 +153,12 @@ else:
 ### Example 2: News Search
 
 ```python
+from cross_validated_search import CrossValidatedSearcher
+
+searcher = CrossValidatedSearcher()
+
 # Get latest news with confidence
-results = searcher.search("Gemini 3 announcements", search_type="news")
+results = searcher.search("Gemini 1.5 announcements", search_type="news")
 
 for article in results.sources[:5]:
     print(f"[{results.confidence}] {article.title}")
@@ -159,10 +168,14 @@ for article in results.sources[:5]:
 ### Example 3: Multi-Query Research
 
 ```python
+from cross_validated_search import CrossValidatedSearcher
+
+searcher = CrossValidatedSearcher()
+
 queries = [
-    "What is Gemini 3?",
-    "What are Gemini 3's capabilities?",
-    "When was Gemini 3 released?",
+    "What is Gemini 1.5?",
+    "What are Gemini 1.5's capabilities?",
+    "When was Gemini 1.5 released?",
 ]
 
 for query in queries:
