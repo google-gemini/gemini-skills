@@ -1,237 +1,104 @@
 ---
 name: gemini-cross-validated-search
-description: Use this skill when integrating cross-validated web search with Gemini models. Provides hallucination-free web search by cross-validating facts across multiple sources. Covers search integration, confidence scoring, and MCP protocol support.
+description: Use this skill when Gemini needs live web search, source-backed verification, or page-level reading. Covers search-web, browse-page, verify-claim, evidence-report, and the free dual-provider path for stronger evidence reports.
 ---
 
 # Gemini Cross-Validated Search Skill
 
 ## Overview
 
-This skill enables Gemini to perform **hallucination-free web search** using cross-validated-search. Every fact is verified against multiple independent sources before being presented.
+Use `cross-validated-search` when Gemini needs current facts, explicit source handling, or a structured support/conflict read on a factual claim.
 
-Key capabilities:
-- **Cross-validation** - Facts verified across DuckDuckGo, Bing, and Google
-- **Confidence scoring** - Verified / Likely True / Uncertain / Likely False
-- **Zero API keys** - Completely free, no configuration needed
-- **MCP protocol** - Works with Gemini API function calling
+This skill is most useful when Gemini should:
 
-## Installation
+- search the live web before answering a time-sensitive question
+- verify a claim instead of trusting a single snippet
+- read a full page when the search result preview is too thin
+- produce a compact evidence report with sources and next steps
+
+## Install
 
 ```bash
 pip install cross-validated-search
 ```
 
-## Integration with Gemini
+Canonical names in the current release:
 
-### Method 1: Function Calling
+- package: `cross-validated-search`
+- module: `cross_validated_search`
+- MCP command: `cross-validated-search-mcp`
 
-```python
-import os
-import google.generativeai as genai
-from cross_validated_search import CrossValidatedSearcher
+## Core commands
 
-# Initialize Gemini
-# Make sure to set your GEMINI_API_KEY environment variable
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-searcher = CrossValidatedSearcher()
-
-# Define function for Gemini
-def web_search(query: str, search_type: str = "text") -> dict:
-    """
-    Search the web with cross-validation for hallucination-free results.
-    
-    Args:
-        query: The search query
-        search_type: Type of search (text, news, images)
-    
-    Returns:
-        dict with 'answer', 'confidence', and 'sources'
-    """
-    results = searcher.search(query, search_type=search_type)
-    return {
-        "answer": results.answer,
-        "confidence": results.confidence,
-        "sources": [{"title": r.title, "url": r.url} for r in results.sources[:5]]
-    }
-
-# Use with Gemini
-model = genai.GenerativeModel("gemini-1.5-flash-latest")
-response = model.generate_content(
-    "What is the latest version of Python?",
-    tools=[{"function_declarations": [{
-        "name": "web_search",
-        "description": "Search the web with cross-validation for accurate facts",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "The search query"},
-                "search_type": {"type": "string", "enum": ["text", "news", "images"]}
-            },
-            "required": ["query"]
-        }
-    }]}]
-)
+```bash
+search-web "latest Python release" --type news --timelimit w
+browse-page "https://docs.python.org/3/whatsnew/"
+verify-claim "Python 3.13 is the latest stable release" --deep --max-pages 2 --json
+evidence-report "Python 3.13 stable release" --claim "Python 3.13 is the latest stable release" --deep --json
 ```
 
-### Method 2: MCP Server
+## Recommended workflow for Gemini
+
+1. Use `search-web` for current or factual questions.
+2. Use `browse-page` when snippets are not enough to support an answer.
+3. Use `verify-claim` when the question is really a factual claim that could be supported, contested, or weakly evidenced.
+4. Use `evidence-report` when Gemini should return one citation-ready artifact instead of raw search output.
+
+## MCP configuration
 
 ```json
 {
   "mcpServers": {
     "cross-validated-search": {
-      "command": "cross-validated-mcp",
+      "command": "cross-validated-search-mcp",
       "args": []
     }
   }
 }
 ```
 
-### Method 3: Direct Integration
+## What Gemini should look for
 
-```python
-import os
-import google.generativeai as genai
-from cross_validated_search import CrossValidatedSearcher
+Useful signals in the JSON output include:
 
-# Initialize Gemini
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-searcher = CrossValidatedSearcher()
+- `verdict`: such as `supported`, `contested`, or `likely_false`
+- `confidence`: evidence-weighted confidence for the current verdict
+- `provider_diversity`: whether the evidence came from more than one provider path
+- `page_aware`: whether fetched page content contributed to the analysis
+- supporting and conflicting sources that can be cited directly
 
-# Get cross-validated results
-def get_verified_answer(query: str) -> str:
-    # Search with cross-validation
-    results = searcher.search(query)
-    
-    # Check confidence - handle all four levels
-    if results.confidence == "verified":
-        return f"✅ Verified: {results.answer}"
-    elif results.confidence == "likely_true":
-        return f"🟢 Likely True: {results.answer}"
-    elif results.confidence == "likely_false":
-        return f"🔴 Likely False: {results.answer}"
-    else:  # uncertain
-        return f"🟡 Uncertain: {results.answer}"
+## Free path
 
-# Use in Gemini prompt
-prompt = f"""
-Based on the following verified information, answer the question.
+The default path starts with `ddgs` and does not require an API key.
 
-{get_verified_answer("What is Gemini 1.5?")}
+For stronger free evidence reports, pair it with self-hosted SearXNG:
 
-Question: What are the key features of Gemini 1.5?
-"""
-
-model = genai.GenerativeModel("gemini-1.5-flash-latest")
-response = model.generate_content(prompt)
+```bash
+export CROSS_VALIDATED_SEARCH_SEARXNG_URL="http://127.0.0.1:8080"
+verify-claim "Python 3.13 is the latest stable release" --deep --json
 ```
 
-## Confidence Levels
+## When to use it
 
-| Level | Meaning | When to Use |
-|-------|---------|-------------|
-| ✅ Verified | 3+ sources agree | Cite as fact |
-| 🟢 Likely True | 2 sources agree | Cite with confidence note |
-| 🟡 Uncertain | Single source | Flag as unverified |
-| 🔴 Likely False | Major contradictions | Do not use |
+- current events, versions, releases, and statistics
+- factual questions that need citations
+- claims that might be supported by some sources and contradicted by others
+- workflows where Gemini should surface uncertainty instead of flattening it
 
-## Examples
+## When not to over-trust it
 
-### Example 1: Fact-Checking
+- when only one provider is configured
+- when snippets and fetched pages are both sparse
+- when the claim requires deep domain expertise or full-document reasoning
 
-```python
-from cross_validated_search import CrossValidatedSearcher
+## Limits
 
-searcher = CrossValidatedSearcher()
+- `verify-claim` is evidence-aware and heuristic, not a proof engine
+- page-aware verification is stronger than snippets alone, but still not full entailment
+- the default path is useful, but the strongest free setup is `ddgs + self-hosted searxng`
 
-# Check if a claim is verified
-results = searcher.search("Is Gemini 1.5 released?")
-
-if results.confidence == "verified":
-    print(f"✅ Confirmed: {results.answer}")
-else:
-    print(f"⚠️ Needs verification: {results.answer}")
-```
-
-### Example 2: News Search
-
-```python
-from cross_validated_search import CrossValidatedSearcher
-
-searcher = CrossValidatedSearcher()
-
-# Get latest news with confidence
-results = searcher.search("Gemini 1.5 announcements", search_type="news")
-
-# Print overall confidence first
-print(f"Overall confidence: {results.confidence}")
-
-for article in results.sources[:5]:
-    print(f"- {article.title}")
-    print(f"  Source: {article.url}")
-```
-
-### Example 3: Multi-Query Research
-
-```python
-from cross_validated_search import CrossValidatedSearcher
-
-searcher = CrossValidatedSearcher()
-
-queries = [
-    "What is Gemini 1.5?",
-    "What are Gemini 1.5's capabilities?",
-    "When was Gemini 1.5 released?",
-]
-
-for query in queries:
-    results = searcher.search(query)
-    print(f"\n{query}")
-    print(f"Confidence: {results.confidence}")
-    print(f"Answer: {results.answer[:200]}...")
-```
-
-## Best Practices
-
-1. **Always check confidence** before using results
-2. **Cite sources** when presenting verified facts
-3. **Combine with Gemini's knowledge** for comprehensive answers
-4. **Use news search** for time-sensitive queries
-5. **Filter by confidence** when only verified facts matter
-
-## API Reference
-
-```python
-from cross_validated_search import CrossValidatedSearcher
-
-searcher = CrossValidatedSearcher(
-    engines=["duckduckgo", "bing", "google"],  # Search engines
-    min_sources=2,                              # Minimum sources for verification
-    max_results=10,                             # Maximum results
-)
-
-results = searcher.search(
-    query="Your search query",
-    search_type="text",  # "text", "news", "images"
-    timelimit="d",      # Time limit: "d" (day), "w" (week), "m" (month), or None for no limit.
-    region="wt-wt",     # Region for the search (e.g., "us-en"). "wt-wt" means Worldwide.
-)
-
-# Results structure
-results.answer       # Summary answer
-results.confidence   # "verified", "likely_true", "uncertain", "likely_false"
-results.sources      # List of Source objects
-results.sources[0].title
-results.sources[0].url
-results.sources[0].snippet
-results.sources[0].engine
-```
-
-## Links
+## Project links
 
 - GitHub: https://github.com/wd041216-bit/cross-validated-search
 - PyPI: https://pypi.org/project/cross-validated-search/
 - Documentation: https://github.com/wd041216-bit/cross-validated-search/blob/main/README.md
-
-## License
-
-MIT-0 License - Free to use with or without attribution.
