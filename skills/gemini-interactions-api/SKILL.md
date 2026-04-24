@@ -20,6 +20,8 @@ description: Use this skill when writing code that calls the Gemini API for text
 - `gemini-3.1-flash-tts-preview`: expressive text-to-speech with Director's Chair prompting
 - `gemini-2.5-pro`: 1M tokens, complex reasoning, coding, research
 - `gemini-2.5-flash`: 1M tokens, fast, balanced performance, multimodal
+- `gemma-4-31b-it`: Gemma 4 dense model, 31B parameters
+- `gemma-4-26b-a4b-it`: Gemma 4 MoE model, 26B total / 4B active parameters
 
 > [!WARNING]
 > Models like `gemini-2.0-*`, `gemini-1.5-*` are **legacy and deprecated**. Never use them.
