@@ -68,7 +68,7 @@ the server:
 
     npx add-mcp "https://gemini-api-docs-mcp.dev"
 
-This server adds a `search_documentation` function that your agent can use to
+This server adds a `search_docs` function that your agent can use to
 retrieve real-time API definitions and integration patterns from the official
 Gemini documentation files.
 

@@ -277,9 +277,9 @@ An `Interaction` response contains `outputs` — an array of typed content block
 
 ### When MCP is Installed (Preferred)
 
-If the **`search_documentation`** tool (from the Google MCP server) is available, use it as your **only** documentation source:
+If the **`search_docs`** tool (from the Google MCP server) is available, use it as your **only** documentation source:
 
-1. Call `search_documentation` with your query
+1. Call `search_docs` with your query
 2. Read the returned documentation
 2. **Trust MCP results** as source of truth for API details — they are always up-to-date.
 
