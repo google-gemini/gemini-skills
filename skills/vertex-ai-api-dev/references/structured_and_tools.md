@@ -116,9 +116,9 @@ from google.genai import types
 client = genai.Client()
 
 response = client.models.generate_content(
-    model=model_id,
+    model="gemini-3-flash-preview",
     contents="Compare recipes from http://example.com and http://example2.com",
-    config=GenerateContentConfig(
+    config=types.GenerateContentConfig(
         tools=[types.Tool(url_context=types.UrlContext)],
     )
 )
