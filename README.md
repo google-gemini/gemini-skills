@@ -26,10 +26,13 @@ and 96% with Gemini 3 Pro.
 
 ## Skills in this repo
 
+> [!IMPORTANT]
+> The `vertex-ai-api-dev` skill has moved to
+> [`google/cloud/gemini-api`](https://github.com/google/skills/blob/main/skills/cloud/gemini-api).
+
 | Skill | Description |
 | :--- | :--- |
 | [`gemini-api-dev`](skills/gemini-api-dev) | Skill for developing Gemini-powered apps. Provides the best practices for building apps that use the Gemini API. |
-| [`vertex-ai-api-dev`](skills/vertex-ai-api-dev) | Skill for developing Gemini-powered apps on Google Cloud Vertex AI using the Gen AI SDK. Covers tools, multimodal generation, caching, and batch prediction. |
 | [`gemini-live-api-dev`](skills/gemini-live-api-dev) | Skill for building real-time, bidirectional streaming apps with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection, native audio features, function calling, and session management. |
 | [`gemini-interactions-api`](skills/gemini-interactions-api) | Skill for building apps with the [Gemini Interactions API](https://ai.google.dev/gemini-api/docs/interactions?ua=chat). Covers text generation, multi-turn chat, streaming, function calling, structured output, image generation, Deep Research agents, deprecated model guardrails, and both Python and TypeScript SDKs. |
 
@@ -53,8 +56,8 @@ npx skills add google-gemini/gemini-skills --skill gemini-api-dev --global
 # Interactively browse and install skills.
 npx ctx7 skills install /google-gemini/gemini-skills
 
-# Install a specific skill (e.g., vertex-ai-api-dev).
-npx ctx7 skills install /google-gemini/gemini-skills vertex-ai-api-dev
+# Install a specific skill (e.g., gemini-api-dev).
+npx ctx7 skills install /google-gemini/gemini-skills gemini-api-dev
 ```
 
 ## Disclaimer
