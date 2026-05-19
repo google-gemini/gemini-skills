@@ -51,7 +51,7 @@ For full before/after code examples, fetch the [Migration Guide](https://ai.goog
 | Model | Status | Drop-in Replacement |
 |-------|--------|-------------------|
 | `gemini-2.0-flash` | Deprecated | `gemini-3-flash-preview` |
-| `gemini-2.0-flash-lite` | Deprecated | `gemini-3.1-flash-lite-preview` |
+| `gemini-2.0-flash-lite` | Deprecated | `gemini-3.1-flash-lite` |
 | `gemini-1.5-pro` | Deprecated | `gemini-3.1-pro-preview` |
 | `gemini-1.5-flash` | Deprecated | `gemini-3-flash-preview` |
 
