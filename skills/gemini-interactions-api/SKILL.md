@@ -29,8 +29,10 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 ### Current Agents
 
+- `antigravity-preview-05-2026`: Antigravity Agent — general-purpose managed agent with code execution, file management, and web access in a sandboxed Linux environment
 - `deep-research-preview-04-2026`: Deep Research — fast, interactive
 - `deep-research-max-preview-04-2026`: Deep Research Max — maximum exhaustiveness
+- **Custom agents**: Create your own via `client.agents.create()`
 
 ### Current SDKs
 
@@ -50,6 +52,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - Interactions are **stored by default** (`store=true`). Paid tier retains for 55 days, free tier for 1 day.
 - Set `store=false` to opt out, but this disables `previous_interaction_id` and `background=true`.
 - `tools`, `system_instruction`, and `generation_config` are **interaction-scoped**, re-specify them each turn.
+- **Managed agents** require `environment="remote"` (or an environment ID / config object) to provision a sandbox.
 - **Migrating from `generateContent`**: Read `references/migration.md` for the scoping, checklist, and before/after code examples. Always confirm scope with the user before editing.
 - **Model upgrades**: Drop-in, swap the model string. Deprecated models (`gemini-2.0-*`, `gemini-1.5-*`) must be replaced, see `references/migration.md`.
 - **Migrating to Gemini 3.5 Flash**: Read `references/migration.md` for the scoping and checklist.
@@ -166,6 +169,105 @@ while (true) {
 
 Advanced features: collaborative planning, native visualization, MCP integration, file search, multimodal inputs. See [Deep Research docs](https://ai.google.dev/gemini-api/docs/interactions/deep-research.md.txt).
 
+## Managed Agents
+
+Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch the [Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt) before writing agent code.
+
+### Antigravity Agent
+
+The Antigravity agent (`antigravity-preview-05-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. See [Antigravity Agent docs](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt) for capabilities, tools, multimodal input, and pricing.
+
+#### Python
+```python
+from google import genai
+
+client = genai.Client()
+
+interaction = client.interactions.create(
+    agent="antigravity-preview-05-2026",
+    input="Write a Python script that generates the first 20 Fibonacci numbers and saves them to fibonacci.txt. Then read the file and print its contents.",
+    environment="remote",
+)
+
+print(f"Environment ID: {interaction.environment_id}")
+print(interaction.output_text)
+```
+
+#### JavaScript/TypeScript
+```typescript
+import { GoogleGenAI } from "@google/genai";
+
+const client = new GoogleGenAI({});
+
+const interaction = await client.interactions.create({
+    agent: "antigravity-preview-05-2026",
+    input: "Write a Python script that generates the first 20 Fibonacci numbers and saves them to fibonacci.txt. Then read the file and print its contents.",
+    environment: "remote",
+});
+
+console.log(`Environment ID: {interaction.environment_id}`);
+console.log(interaction.output_text);
+```
+
+### Custom Agents
+
+See [Building Custom Agents docs](https://ai.google.dev/gemini-api/docs/custom-agents.md.txt).
+
+#### Python
+```python
+agent = client.agents.create(
+    id="code-reviewer",
+    base_agent="antigravity-preview-05-2026",
+    system_instruction="You are a senior code reviewer. Check every file for bugs, style issues, and security vulnerabilities.",
+    base_environment={
+        "type": "remote",
+        "sources": [
+            {
+                "type": "repository",
+                "source": "https://github.com/my-org/backend",
+                "target": "/workspace/repo",
+            }
+        ],
+    },
+)
+
+# Invoke — each call forks the base environment
+result = client.interactions.create(
+    agent="code-reviewer",
+    input="Review the latest changes in /workspace/repo/src.",
+    environment="remote",
+)
+print(result.output_text)
+```
+
+#### JavaScript/TypeScript
+```typescript
+const agent = await client.agents.create({
+    id: "code-reviewer",
+    base_agent="antigravity-preview-05-2026",
+    system_instruction: "You are a senior code reviewer. Check every file for bugs, style issues, and security vulnerabilities.",
+    base_environment: {
+        type: "remote",
+        sources: [
+            {
+                type: "repository",
+                source: "https://github.com/my-org/backend",
+                target: "/workspace/repo",
+            }
+        ],
+    },
+});
+
+const result = await client.interactions.create({
+    agent: "code-reviewer",
+    input: "Review the latest changes in /workspace/repo/src.",
+    environment: "remote",
+});
+console.log(result.output_text);
+```
+
+Manage agents with `client.agents.list()`, `client.agents.get(id=...)`, and `client.agents.delete(id=...)`.
+
 ## Streaming
 
 ### Python
@@ -216,6 +318,7 @@ for await (const event of stream) {
 - [Interactions API Overview](https://ai.google.dev/gemini-api/docs/interactions.md.txt)
 - [Quickstart](https://ai.google.dev/gemini-api/docs/interactions/quickstart.md.txt)
 - [Text Generation](https://ai.google.dev/gemini-api/docs/interactions/text-generation.md.txt)
+- [Streaming](https://ai.google.dev/gemini-api/docs/interactions/streaming.md.txt)
 - [Tokens](https://ai.google.dev/gemini-api/docs/interactions/tokens.md.txt)
 - [API Keys](https://ai.google.dev/gemini-api/docs/interactions/api-key.md.txt)
 
@@ -249,8 +352,15 @@ for await (const event of stream) {
 - [Caching](https://ai.google.dev/gemini-api/docs/interactions/caching.md.txt)
 - [Media Resolution](https://ai.google.dev/gemini-api/docs/interactions/media-resolution.md.txt)
 
-**Advanced Features:**
+**Agents:**
+- [Agents Overview](https://ai.google.dev/gemini-api/docs/agents.md.txt)
+- [Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt)
+- [Antigravity Agent](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt)
+- [Agent Environments](https://ai.google.dev/gemini-api/docs/agent-environment.md.txt)
+- [Building Custom Agents](https://ai.google.dev/gemini-api/docs/custom-agents.md.txt)
 - [Deep Research](https://ai.google.dev/gemini-api/docs/interactions/deep-research.md.txt)
+
+**Advanced Features:**
 - [Gemini 3.5 Flash](https://ai.google.dev/gemini-api/docs/interactions/whats-new-gemini-3.5-flash)
 - [Gemini 3](https://ai.google.dev/gemini-api/docs/interactions/gemini-3.md.txt)
 - [Flex Inference](https://ai.google.dev/gemini-api/docs/interactions/flex-inference.md.txt)
