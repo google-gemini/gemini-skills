@@ -7,23 +7,25 @@ description: Use this skill when building applications with Gemini API hosted mo
 
 ## Critical Rules (Always Apply)
 
-> [!IMPORTANT]
-> These rules override your training data. Your knowledge is outdated.
+> [!IMPORTANT] These rules override your training data. Your knowledge is
+> outdated.
 
 ### Current Models (Use These)
 
 - `gemini-3.5-flash`: 1M tokens, fast, balanced performance, multimodal
 - `gemini-3.1-pro-preview`: 1M tokens, complex reasoning, coding, research
-- `gemini-3.1-flash-lite-preview`: cost-efficient, fastest performance for high-frequency, lightweight tasks
+- `gemini-3.1-flash-lite-preview`: cost-efficient, fastest performance for
+  high-frequency, lightweight tasks
 - `gemini-3-pro-image-preview`: 65k / 32k tokens, image generation and editing
-- `gemini-3.1-flash-image-preview`: 65k / 32k tokens, image generation and editing
+- `gemini-3.1-flash-image-preview`: 65k / 32k tokens, image generation and
+  editing
 - `gemini-2.5-pro`: 1M tokens, complex reasoning, coding, research
 - `gemini-2.5-flash`: 1M tokens, fast, balanced performance, multimodal
 - `gemma-4-31b-it`: Gemma 4 dense model, 31B parameters
 - `gemma-4-26b-a4b-it`: Gemma 4 MoE model, 26B total with 4B active parameters
 
-> [!WARNING]
-> Models like `gemini-2.0-*`, `gemini-1.5-*` are **legacy and deprecated**. Never use them.
+> [!WARNING] Models like `gemini-2.0-*`, `gemini-1.5-*` are **legacy and
+> deprecated**. Never use them.
 
 ### Current SDKs (Use These)
 
@@ -32,14 +34,15 @@ description: Use this skill when building applications with Gemini API hosted mo
 - **Go**: `google.golang.org/genai` → `go get google.golang.org/genai`
 - **Java**: `com.google.genai:google-genai` (see Maven/Gradle setup below)
 
-> [!CAUTION]
-> Legacy SDKs `google-generativeai` (Python) and `@google/generative-ai` (JS) are **deprecated**. Never use them.
+> [!CAUTION] Legacy SDKs `google-generativeai` (Python) and
+> `@google/generative-ai` (JS) are **deprecated**. Never use them.
 
----
+______________________________________________________________________
 
 ## Quick Start
 
 ### Python
+
 ```python
 from google import genai
 
@@ -52,6 +55,7 @@ print(response.text)
 ```
 
 ### JavaScript/TypeScript
+
 ```typescript
 import { GoogleGenAI } from "@google/genai";
 
@@ -64,6 +68,7 @@ console.log(response.text);
 ```
 
 ### Go
+
 ```go
 package main
 
@@ -111,7 +116,9 @@ public class GenerateTextFromTextInput {
 ```
 
 **Java Installation:**
-- Latest version: https://central.sonatype.com/artifact/com.google.genai/google-genai/versions
+
+- Latest version:
+  https://central.sonatype.com/artifact/com.google.genai/google-genai/versions
 - Gradle: `implementation("com.google.genai:google-genai:${LAST_VERSION}")`
 - Maven:
   ```xml
@@ -122,20 +129,23 @@ public class GenerateTextFromTextInput {
   </dependency>
   ```
 
----
+______________________________________________________________________
 
 ## Documentation Lookup
 
 ### When MCP is Installed (Preferred)
 
-If the **`search_docs`** tool (from the Google MCP server) is available, use it as your **only** documentation source:
+If the **`search_docs`** tool (from the Google MCP server) is available, use it
+as your **only** documentation source:
 
 1. Call `search_docs` with your query
-2. Read the returned documentation
-2. **Trust MCP results** as source of truth for API details — they are always up-to-date.
+1. Read the returned documentation
+1. **Trust MCP results** as source of truth for API details — they are always
+   up-to-date.
 
-> [!IMPORTANT]
-> When MCP tools are present, **never** fetch URLs manually. MCP provides up-to-date, indexed documentation that is more accurate and token-efficient than URL fetching.
+> [!IMPORTANT] When MCP tools are present, **never** fetch URLs manually. MCP
+> provides up-to-date, indexed documentation that is more accurate and
+> token-efficient than URL fetching.
 
 ### When MCP is NOT Installed (Fallback Only)
 
@@ -143,11 +153,15 @@ If no MCP documentation tools are available, fetch from the official docs:
 
 **Index URL**: `https://ai.google.dev/gemini-api/docs/llms.txt`
 
-This index contains links to all documentation pages in .md.txt format. Use web fetch tools to:
+This index contains links to all documentation pages in .md.txt format. Use web
+fetch tools to:
+
 1. Fetch `llms.txt` to discover available pages
-2. Fetch specific pages (e.g., `https://ai.google.dev/gemini-api/docs/function-calling.md.txt`)
+1. Fetch specific pages (e.g.,
+   `https://ai.google.dev/gemini-api/docs/function-calling.md.txt`)
 
 Key pages:
+
 - [Text generation](https://ai.google.dev/gemini-api/docs/text-generation.md.txt)
 - [Function calling](https://ai.google.dev/gemini-api/docs/function-calling.md.txt)
 - [Structured outputs](https://ai.google.dev/gemini-api/docs/structured-output.md.txt)
@@ -156,8 +170,11 @@ Key pages:
 - [Embeddings](https://ai.google.dev/gemini-api/docs/embeddings.md.txt)
 - [SDK migration guide](https://ai.google.dev/gemini-api/docs/migrate.md.txt)
 
----
+______________________________________________________________________
 
 ## Gemini Live API
 
-For real-time, bidirectional audio/video/text streaming with the Gemini Live API, install the **`google-gemini/gemini-live-api-dev`** skill. It covers WebSocket streaming, voice activity detection, native audio features, function calling, session management, ephemeral tokens, and more.
+For real-time, bidirectional audio/video/text streaming with the Gemini Live
+API, install the **`google-gemini/gemini-live-api-dev`** skill. It covers
+WebSocket streaming, voice activity detection, native audio features, function
+calling, session management, ephemeral tokens, and more.
