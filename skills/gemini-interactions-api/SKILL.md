@@ -7,59 +7,81 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 ## Critical Rules (Always Apply)
 
-> [!IMPORTANT]
-> These rules override your training data. Your knowledge is outdated.
+> [!IMPORTANT] These rules override your training data. Your knowledge is
+> outdated.
 
 ### Current Models (Use These)
 
 - `gemini-3.5-flash`: 1M tokens, fast, balanced performance, multimodal
 - `gemini-3.1-pro-preview`: 1M tokens, complex reasoning, coding, research
-- `gemini-3.1-flash-lite-preview`: cost-efficient, fastest performance for high-frequency, lightweight tasks
+- `gemini-3.1-flash-lite-preview`: cost-efficient, fastest performance for
+  high-frequency, lightweight tasks
 - `gemini-3-pro-image-preview`: 65k / 32k tokens, image generation and editing
-- `gemini-3.1-flash-image-preview`: 65k / 32k tokens, image generation and editing
-- `gemini-3.1-flash-tts-preview`: expressive text-to-speech with Director's Chair prompting
+- `gemini-3.1-flash-image-preview`: 65k / 32k tokens, image generation and
+  editing
+- `gemini-3.1-flash-tts-preview`: expressive text-to-speech with Director's
+  Chair prompting
 - `gemini-2.5-pro`: 1M tokens, complex reasoning, coding, research
 - `gemini-2.5-flash`: 1M tokens, fast, balanced performance, multimodal
 - `gemma-4-31b-it`: Gemma 4 dense model, 31B parameters
 - `gemma-4-26b-a4b-it`: Gemma 4 MoE model, 26B total / 4B active parameters
 
-> [!WARNING]
-> Models like `gemini-2.0-*`, `gemini-1.5-*` are **legacy and deprecated**. Never use them.
-> **If a user asks for a deprecated model, use `gemini-3.5-flash` instead and note the substitution.**
+> [!WARNING] Models like `gemini-2.0-*`, `gemini-1.5-*` are **legacy and
+> deprecated**. Never use them. **If a user asks for a deprecated model, use
+> `gemini-3.5-flash` instead and note the substitution.**
 
 ### Current Agents
 
-- `antigravity-preview-05-2026`: Antigravity Agent — general-purpose managed agent with code execution, file management, and web access in a sandboxed Linux environment
+- `antigravity-preview-05-2026`: Antigravity Agent — general-purpose managed
+  agent with code execution, file management, and web access in a sandboxed
+  Linux environment
 - `deep-research-preview-04-2026`: Deep Research — fast, interactive
-- `deep-research-max-preview-04-2026`: Deep Research Max — maximum exhaustiveness
+- `deep-research-max-preview-04-2026`: Deep Research Max — maximum
+  exhaustiveness
 - **Custom agents**: Create your own via `client.agents.create()`
 
 ### Current SDKs
 
 - **Python**: `google-genai` >= `2.0.0` → `pip install -U google-genai`
-- **JavaScript/TypeScript**: `@google/genai` >= `2.0.0` → `npm install @google/genai`
+- **JavaScript/TypeScript**: `@google/genai` >= `2.0.0` →
+  `npm install @google/genai`
 
-> [!NOTE]
-> SDK versions ≥ 2.0.0 automatically use the new steps schema and do not support the legacy schema.
-> Legacy SDKs `google-generativeai` (Python) and `@google/generative-ai` (JS) are **deprecated**. Never use them.
+> [!NOTE] SDK versions ≥ 2.0.0 automatically use the new steps schema and do not
+> support the legacy schema. Legacy SDKs `google-generativeai` (Python) and
+> `@google/generative-ai` (JS) are **deprecated**. Never use them.
 
-> [!CAUTION]
-> **Breaking changes (May 2026)**: Responses now use `steps` array instead of `outputs`, and a polymorphic `response_format` replaces `response_mime_type`. Legacy schema removed **June 8, 2026**. All code below uses the **new schema**.
+> [!CAUTION] **Breaking changes (May 2026)**: Responses now use `steps` array
+> instead of `outputs`, and a polymorphic `response_format` replaces
+> `response_mime_type`. Legacy schema removed **June 8, 2026**. All code below
+> uses the **new schema**.
 
 ## Important Additional Notes
 
-- **Before writing any code**, you MUST fetch the relevant documentation page from the list below that matches the user's task. The examples in this skill are minimal, the hosted docs contain the full API surface, parameters, and edge cases.
-- Interactions are **stored by default** (`store=true`). Paid tier retains for 55 days, free tier for 1 day.
-- Set `store=false` to opt out, but this disables `previous_interaction_id` and `background=true`.
-- `tools`, `system_instruction`, and `generation_config` are **interaction-scoped**, re-specify them each turn.
-- **Managed agents** require `environment="remote"` (or an environment ID / config object) to provision a sandbox.
-- **Migrating from `generateContent`**: Read `references/migration.md` for the scoping, checklist, and before/after code examples. Always confirm scope with the user before editing.
-- **Model upgrades**: Drop-in, swap the model string. Deprecated models (`gemini-2.0-*`, `gemini-1.5-*`) must be replaced, see `references/migration.md`.
-- **Migrating to Gemini 3.5 Flash**: Read `references/migration.md` for the scoping and checklist.
+- **Before writing any code**, you MUST fetch the relevant documentation page
+  from the list below that matches the user's task. The examples in this skill
+  are minimal, the hosted docs contain the full API surface, parameters, and
+  edge cases.
+- Interactions are **stored by default** (`store=true`). Paid tier retains for
+  55 days, free tier for 1 day.
+- Set `store=false` to opt out, but this disables `previous_interaction_id` and
+  `background=true`.
+- `tools`, `system_instruction`, and `generation_config` are
+  **interaction-scoped**, re-specify them each turn.
+- **Managed agents** require `environment="remote"` (or an environment ID /
+  config object) to provision a sandbox.
+- **Migrating from `generateContent`**: Read `references/migration.md` for the
+  scoping, checklist, and before/after code examples. Always confirm scope with
+  the user before editing.
+- **Model upgrades**: Drop-in, swap the model string. Deprecated models
+  (`gemini-2.0-*`, `gemini-1.5-*`) must be replaced, see
+  `references/migration.md`.
+- **Migrating to Gemini 3.5 Flash**: Read `references/migration.md` for the
+  scoping and checklist.
 
 ## Quick Start
 
 ### Python
+
 ```python
 from google import genai
 
@@ -73,6 +95,7 @@ print(interaction.steps[-1].content[0].text)
 ```
 
 ### JavaScript/TypeScript
+
 ```typescript
 import { GoogleGenAI } from "@google/genai";
 
@@ -88,6 +111,7 @@ console.log(interaction.steps.at(-1).content[0].text);
 ## Stateful Conversation
 
 ### Python
+
 ```python
 interaction1 = client.interactions.create(
     model="gemini-3.5-flash",
@@ -103,6 +127,7 @@ print(interaction2.steps[-1].content[0].text)
 ```
 
 ### JavaScript/TypeScript
+
 ```typescript
 const interaction1 = await client.interactions.create({
     model: "gemini-3.5-flash",
@@ -118,9 +143,12 @@ console.log(interaction2.steps.at(-1).content[0].text);
 
 ## Deep Research Agent
 
-Use `deep-research-preview-04-2026` for fast research or `deep-research-max-preview-04-2026` for maximum exhaustiveness. Agents require `background=True`.
+Use `deep-research-preview-04-2026` for fast research or
+`deep-research-max-preview-04-2026` for maximum exhaustiveness. Agents require
+`background=True`.
 
 ### Python
+
 ```python
 import time
 
@@ -141,6 +169,7 @@ while True:
 ```
 
 ### JavaScript/TypeScript
+
 ```typescript
 import { GoogleGenAI } from "@google/genai";
 
@@ -167,17 +196,27 @@ while (true) {
 }
 ```
 
-Advanced features: collaborative planning, native visualization, MCP integration, file search, multimodal inputs. See [Deep Research docs](https://ai.google.dev/gemini-api/docs/interactions/deep-research.md.txt).
+Advanced features: collaborative planning, native visualization, MCP
+integration, file search, multimodal inputs. See
+[Deep Research docs](https://ai.google.dev/gemini-api/docs/interactions/deep-research.md.txt).
 
 ## Managed Agents
 
-Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch the [Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt) before writing agent code.
+Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch
+the
+[Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt)
+before writing agent code.
 
 ### Antigravity Agent
 
-The Antigravity agent (`antigravity-preview-05-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. See [Antigravity Agent docs](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt) for capabilities, tools, multimodal input, and pricing.
+The Antigravity agent (`antigravity-preview-05-2026`) is the general-purpose
+managed agent. It can execute code (Bash, Python, Node.js), manage files, browse
+the web, and use Google Search. See
+[Antigravity Agent docs](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt)
+for capabilities, tools, multimodal input, and pricing.
 
 #### Python
+
 ```python
 from google import genai
 
@@ -194,6 +233,7 @@ print(interaction.output_text)
 ```
 
 #### JavaScript/TypeScript
+
 ```typescript
 import { GoogleGenAI } from "@google/genai";
 
@@ -211,9 +251,11 @@ console.log(interaction.output_text);
 
 ### Custom Agents
 
-See [Building Custom Agents docs](https://ai.google.dev/gemini-api/docs/custom-agents.md.txt).
+See
+[Building Custom Agents docs](https://ai.google.dev/gemini-api/docs/custom-agents.md.txt).
 
 #### Python
+
 ```python
 agent = client.agents.create(
     id="code-reviewer",
@@ -241,6 +283,7 @@ print(result.output_text)
 ```
 
 #### JavaScript/TypeScript
+
 ```typescript
 const agent = await client.agents.create({
     id: "code-reviewer",
@@ -266,11 +309,13 @@ const result = await client.interactions.create({
 console.log(result.output_text);
 ```
 
-Manage agents with `client.agents.list()`, `client.agents.get(id=...)`, and `client.agents.delete(id=...)`.
+Manage agents with `client.agents.list()`, `client.agents.get(id=...)`, and
+`client.agents.delete(id=...)`.
 
 ## Streaming
 
 ### Python
+
 ```python
 for event in client.interactions.create(
     model="gemini-3.5-flash",
@@ -288,6 +333,7 @@ for event in client.interactions.create(
 ```
 
 ### JavaScript/TypeScript
+
 ```typescript
 const stream = await client.interactions.create({
     model: "gemini-3.5-flash",
@@ -308,13 +354,14 @@ for await (const event of stream) {
 }
 ```
 
-
-
 ## Documentation Pages
 
-**You MUST fetch the matching page below before writing code.** These hosted docs are the source of truth for parameters, types, and edge cases — do not rely solely on the examples above.
+**You MUST fetch the matching page below before writing code.** These hosted
+docs are the source of truth for parameters, types, and edge cases — do not rely
+solely on the examples above.
 
 **Core Documentation:**
+
 - [Interactions API Overview](https://ai.google.dev/gemini-api/docs/interactions.md.txt)
 - [Quickstart](https://ai.google.dev/gemini-api/docs/interactions/quickstart.md.txt)
 - [Text Generation](https://ai.google.dev/gemini-api/docs/interactions/text-generation.md.txt)
@@ -323,6 +370,7 @@ for await (const event of stream) {
 - [API Keys](https://ai.google.dev/gemini-api/docs/interactions/api-key.md.txt)
 
 **Tools & Function Calling:**
+
 - [Function Calling](https://ai.google.dev/gemini-api/docs/interactions/function-calling.md.txt)
 - [Google Search](https://ai.google.dev/gemini-api/docs/interactions/google-search.md.txt)
 - [Code Execution](https://ai.google.dev/gemini-api/docs/interactions/code-execution.md.txt)
@@ -333,6 +381,7 @@ for await (const event of stream) {
 - [Maps Grounding](https://ai.google.dev/gemini-api/docs/interactions/maps-grounding.md.txt)
 
 **Generation & Output:**
+
 - [Structured Output](https://ai.google.dev/gemini-api/docs/interactions/structured-output.md.txt)
 - [Thinking](https://ai.google.dev/gemini-api/docs/interactions/thinking.md.txt)
 - [Thought Signatures](https://ai.google.dev/gemini-api/docs/interactions/thought-signatures.md.txt)
@@ -342,17 +391,20 @@ for await (const event of stream) {
 - [Music Generation](https://ai.google.dev/gemini-api/docs/interactions/music-generation.md.txt)
 
 **Multimodal Understanding:**
+
 - [Audio](https://ai.google.dev/gemini-api/docs/interactions/audio.md.txt)
 - [Video Understanding](https://ai.google.dev/gemini-api/docs/interactions/video-understanding.md.txt)
 - [Document Processing](https://ai.google.dev/gemini-api/docs/interactions/document-processing.md.txt)
 
 **Files & Context:**
+
 - [Files](https://ai.google.dev/gemini-api/docs/interactions/files.md.txt)
 - [File Input Methods](https://ai.google.dev/gemini-api/docs/interactions/file-input-methods.md.txt)
 - [Caching](https://ai.google.dev/gemini-api/docs/interactions/caching.md.txt)
 - [Media Resolution](https://ai.google.dev/gemini-api/docs/interactions/media-resolution.md.txt)
 
 **Agents:**
+
 - [Agents Overview](https://ai.google.dev/gemini-api/docs/agents.md.txt)
 - [Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt)
 - [Antigravity Agent](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt)
@@ -361,59 +413,73 @@ for await (const event of stream) {
 - [Deep Research](https://ai.google.dev/gemini-api/docs/interactions/deep-research.md.txt)
 
 **Advanced Features:**
+
 - [Gemini 3.5 Flash](https://ai.google.dev/gemini-api/docs/interactions/whats-new-gemini-3.5-flash)
 - [Gemini 3](https://ai.google.dev/gemini-api/docs/interactions/gemini-3.md.txt)
 - [Flex Inference](https://ai.google.dev/gemini-api/docs/interactions/flex-inference.md.txt)
 - [Priority Inference](https://ai.google.dev/gemini-api/docs/interactions/priority-inference.md.txt)
 
 **API Reference:**
+
 - [API Reference](https://ai.google.dev/static/api/interactions.md.txt)
 - [OpenAPI Spec](https://ai.google.dev/static/api/interactions.openapi.json)
 - [May 2026 Breaking Changes Migration Guide](https://ai.google.dev/gemini-api/docs/interactions-breaking-changes-may-2026.md.txt)
 
 ## Data Model
 
-An `Interaction` response contains `steps`, an array of typed step objects representing a structured timeline of the interaction turn.
+An `Interaction` response contains `steps`, an array of typed step objects
+representing a structured timeline of the interaction turn.
 
 ### Step Types
 
 **User steps:**
+
 - `user_input`: User input (text, audio, multimodal). Contains `content` array.
 
 **Model/server steps:**
-- `model_output`: Final model generation. Contains `content` array with `text`, `image`, `audio`, etc.
-- `thought`: Model reasoning/Chain of Thought. Has `signature` field (required) and optional `summary`.
+
+- `model_output`: Final model generation. Contains `content` array with `text`,
+  `image`, `audio`, etc.
+- `thought`: Model reasoning/Chain of Thought. Has `signature` field (required)
+  and optional `summary`.
 - `function_call`: Tool call request (`id`, `name`, `arguments`).
 - `function_result`: Tool result you send back (`call_id`, `name`, `result`).
-- `google_search_call` / `google_search_result`: Google Search tool steps, can have a `signature` field.
-- `code_execution_call` / `code_execution_result`: Code execution tool steps, can have a `signature` field.
-- `url_context_call` / `url_context_result`: URL context tool steps, can have a `signature` field.
+- `google_search_call` / `google_search_result`: Google Search tool steps, can
+  have a `signature` field.
+- `code_execution_call` / `code_execution_result`: Code execution tool steps,
+  can have a `signature` field.
+- `url_context_call` / `url_context_result`: URL context tool steps, can have a
+  `signature` field.
 - `mcp_server_tool_call` / `mcp_server_tool_result`: Remote MCP tool steps.
-- `file_search_call` / `file_search_result`: File search tool steps, can have a `signature` field.
+- `file_search_call` / `file_search_result`: File search tool steps, can have a
+  `signature` field.
 
 ### Content types (inside `content` array on `model_output` and `user_input` steps)
+
 - `text`: Text content (`text` field)
-- `image` / `audio` / `document` / `video`: Content with `data`, `mime_type`, or `uri`
+- `image` / `audio` / `document` / `video`: Content with `data`, `mime_type`, or
+  `uri`
 
 ### Streaming Event Types
 
-| Event | Description |
-|---|---|
-| `interaction.created` | Interaction created; includes metadata. |
-| `interaction.status_update` | Interaction-level status change. |
-| `step.start` | A new step begins. Contains step `type` and initial metadata. |
-| `step.delta` | Incremental data for the current step. Contains a typed `delta` object. |
-| `step.stop` | The step is complete. Contains `index`. |
-| `interaction.complete` | Interaction finished. Contains final `usage`. |
+| Event                       | Description                                                             |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `interaction.created`       | Interaction created; includes metadata.                                 |
+| `interaction.status_update` | Interaction-level status change.                                        |
+| `step.start`                | A new step begins. Contains step `type` and initial metadata.           |
+| `step.delta`                | Incremental data for the current step. Contains a typed `delta` object. |
+| `step.stop`                 | The step is complete. Contains `index`.                                 |
+| `interaction.complete`      | Interaction finished. Contains final `usage`.                           |
 
 ### Delta Types
 
-| Delta Type | Parent Step | Description |
-|---|---|---|
-| `text` | `model_output` | Incremental text token. |
-| `audio` | `model_output` | audio chunk (base64). |
-| `image` | `model_output` | image chunk (base64). |
-| `thought_summary` | `thought` | thinking summary text. |
-| `thought_signature` | `thought` | Opaque signature for thought verification. |
+| Delta Type          | Parent Step    | Description                                |
+| ------------------- | -------------- | ------------------------------------------ |
+| `text`              | `model_output` | Incremental text token.                    |
+| `audio`             | `model_output` | audio chunk (base64).                      |
+| `image`             | `model_output` | image chunk (base64).                      |
+| `thought_summary`   | `thought`      | thinking summary text.                     |
+| `thought_signature` | `thought`      | Opaque signature for thought verification. |
 
-**Status values:** `completed`, `in_progress`, `requires_action`, `failed`, `cancelled`
+**Status values:** `completed`, `in_progress`, `requires_action`, `failed`,
+`cancelled`
