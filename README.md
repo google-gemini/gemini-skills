@@ -10,9 +10,9 @@ and best practices evolve quickly.
 
 This leaves a knowledge gap that language models can't solve on their own. For
 example, models don't know about themselves when they're trained, and they
-aren't necessarily aware of subtle changes in best practices (like [thought
-circulation](https://ai.google.dev/gemini-api/docs/thought-signatures)) or SDK
-changes.
+aren't necessarily aware of subtle changes in best practices (like
+[thought circulation](https://ai.google.dev/gemini-api/docs/thought-signatures))
+or SDK changes.
 
 [Skills](https://agentskills.io/) are a lightweight technique for adding
 relevant context to your agents. This repo contains skills related to building
@@ -22,24 +22,25 @@ apps powered by the Gemini API.
 
 Our evaluations found that adding this skill improved an agent's ability to
 generate correct API code following best practices to 87% with Gemini 3 Flash
-and 96% with Gemini 3.1 Pro. For more details, see our blog post: 
+and 96% with Gemini 3.1 Pro. For more details, see our blog post:
 [Closing the knowledge gap with agent skills](https://developers.googleblog.com/closing-the-knowledge-gap-with-agent-skills/).
 
 ## Skills in this repo
 
-> [!IMPORTANT]
-> The `vertex-ai-api-dev` skill has moved to
+> [!IMPORTANT] The `vertex-ai-api-dev` skill has moved to
 > [skills/cloud/gemini-api](https://github.com/google/skills/tree/main/skills/cloud/gemini-api).
 
-| Skill | Description |
-| :--- | :--- |
-| [`gemini-api-dev`](skills/gemini-api-dev) | Skill for developing Gemini-powered apps. Provides the best practices for building apps that use the Gemini API. |
-| [`gemini-live-api-dev`](skills/gemini-live-api-dev) | Skill for building real-time, bidirectional streaming apps with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection, native audio features, function calling, and session management. |
+| Skill                                                       | Description                                                                                                                                                                                                                                                                                                                |
+| :---------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`gemini-api-dev`](skills/gemini-api-dev)                   | Skill for developing Gemini-powered apps. Provides the best practices for building apps that use the Gemini API.                                                                                                                                                                                                           |
+| [`gemini-live-api-dev`](skills/gemini-live-api-dev)         | Skill for building real-time, bidirectional streaming apps with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection, native audio features, function calling, and session management.                                                                                         |
 | [`gemini-interactions-api`](skills/gemini-interactions-api) | Skill for building apps with the [Gemini Interactions API](https://ai.google.dev/gemini-api/docs/interactions?ua=chat). Covers text generation, multi-turn chat, streaming, function calling, structured output, image generation, Deep Research agents, deprecated model guardrails, and both Python and TypeScript SDKs. |
 
 ## Installation
 
-You can browse and install skills using either the [Vercel skills CLI](https://skills.sh) or the [Context7 skills CLI](https://context7.com).
+You can browse and install skills using either the
+[Vercel skills CLI](https://skills.sh) or the
+[Context7 skills CLI](https://context7.com).
 
 ### Using [Vercel skills CLI](https://skills.sh)
 
@@ -61,14 +62,14 @@ npx ctx7 skills install /google-gemini/gemini-skills
 npx ctx7 skills install /google-gemini/gemini-skills gemini-interactions-api
 ```
 
-
 ## More info
 
 You can find additional information about setting up your coding assistant with
-Gemini API MCP and Skills in [the docs](https://ai.google.dev/gemini-api/docs/coding-agents).
+Gemini API MCP and Skills in
+[the docs](https://ai.google.dev/gemini-api/docs/coding-agents).
 
 ## Disclaimer
 
-This is not an officially supported Google product. This project is not
-eligible for the [Google Open Source Software Vulnerability Rewards
-Program](https://bughunters.google.com/open-source-security).
+This is not an officially supported Google product. This project is not eligible
+for the
+[Google Open Source Software Vulnerability Rewards Program](https://bughunters.google.com/open-source-security).
