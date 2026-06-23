@@ -12,15 +12,18 @@ fi
 
 VENV_DIR="$DIR/.venv"
 
-# Create virtual environment if it doesn't exist
-if [ ! -d "$VENV_DIR" ]; then
+# Create virtual environment if it doesn't exist or is incomplete
+if [ ! -x "$VENV_DIR/bin/python" ] || [ ! -x "$VENV_DIR/bin/pip" ]; then
   echo "Creating Python virtual environment in $VENV_DIR..."
+  rm -rf "$VENV_DIR"
   python3 -m venv "$VENV_DIR"
 fi
 
-# Install mdformat and plugins if not already installed, or ensure they are present
-echo "Ensuring mdformat and plugins are installed..."
-"$VENV_DIR/bin/pip" install -q mdformat mdformat-gfm mdformat-frontmatter
+# Install mdformat and plugins if not already installed
+if [ ! -x "$VENV_DIR/bin/mdformat" ]; then
+  echo "Installing mdformat and plugins..."
+  "$VENV_DIR/bin/pip" install -q mdformat mdformat-gfm mdformat-frontmatter
+fi
 
 # Run the python formatter script, passing along all arguments
 "$VENV_DIR/bin/python" "$DIR/format.py" "$@"
