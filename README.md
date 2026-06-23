@@ -36,6 +36,7 @@ and 96% with Gemini 3.1 Pro. For more details, see our blog post:
 | [`gemini-api-dev`](skills/gemini-api-dev) | Skill for developing Gemini-powered apps. Provides the best practices for building apps that use the Gemini API. |
 | [`gemini-live-api-dev`](skills/gemini-live-api-dev) | Skill for building real-time, bidirectional streaming apps with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection, native audio features, function calling, and session management. |
 | [`gemini-interactions-api`](skills/gemini-interactions-api) | Skill for building apps with the [Gemini Interactions API](https://ai.google.dev/gemini-api/docs/interactions?ua=chat). Covers text generation, multi-turn chat, streaming, function calling, structured output, image generation, Deep Research agents, deprecated model guardrails, and both Python and TypeScript SDKs. |
+| [`gemini-nano-dev`](skills/gemini-nano-dev) | Skill for building web apps and Chrome Extensions with Chrome's built-in AI powered by Gemini Nano. Covers the Prompt API (LanguageModel), Summarizer, Writer, Rewriter, Proofreader, Language Detector, and Translator APIs for client-side, on-device AI inference. |
 
 ## Installation
 
