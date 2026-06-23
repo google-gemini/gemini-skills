@@ -47,8 +47,8 @@ You can browse and install skills using either the [Vercel skills CLI](https://s
 # Interactively browse and install skills.
 npx skills add google-gemini/gemini-skills --list
 
-# Install a specific skill (e.g., gemini-api-dev).
-npx skills add google-gemini/gemini-skills --skill gemini-api-dev --global
+# Install a specific skill (e.g., gemini-interactions-api).
+npx skills add google-gemini/gemini-skills --skill gemini-interactions-api
 ```
 
 ### Using [Context7 skills CLI](https://context7.com)
@@ -57,27 +57,10 @@ npx skills add google-gemini/gemini-skills --skill gemini-api-dev --global
 # Interactively browse and install skills.
 npx ctx7 skills install /google-gemini/gemini-skills
 
-# Install a specific skill (e.g., gemini-api-dev).
-npx ctx7 skills install /google-gemini/gemini-skills gemini-api-dev
+# Install a specific skill (e.g., gemini-interactions-api).
+npx ctx7 skills install /google-gemini/gemini-skills gemini-interactions-api
 ```
 
-## Gemini API docs MCP
-
-A public Model Context Protocol (MCP) server for the Gemini API is available at
-`https://gemini-api-docs-mcp.dev`. Connecting your coding agent to this server ensures that
-all queries have access to the latest APIs, code updates, and optimal configuration examples.
-
-Run the following command in your agent's terminal or project root to install
-the server:
-
-    npx add-mcp "https://gemini-api-docs-mcp.dev"
-
-This server adds a `search_docs` tool that your agent can use to
-retrieve real-time API definitions and integration patterns from the official
-Gemini API documentation.
-
-Note that the `gemini-api-dev` skill works with or without the MCP server, so
-we recommend installing them both.
 
 ## More info
 

@@ -1,6 +1,6 @@
 ---
 name: gemini-live-api-dev
-description: Use this skill when building real-time, bidirectional streaming applications with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection (VAD), native audio features, function calling, session management, ephemeral tokens for client-side auth, and all Live API configuration options. SDKs covered - google-genai (Python), @google/genai (JavaScript/TypeScript).
+description: Use this skill when building real-time, bidirectional streaming applications with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection (VAD), native audio features, function calling, session management, ephemeral tokens for client-side auth, live translation, and all Live API configuration options. SDKs covered - google-genai (Python), @google/genai (JavaScript/TypeScript).
 ---
 
 # Gemini Live API Development Skill
@@ -27,6 +27,7 @@ Key capabilities:
 ## Models
 
 - `gemini-3.1-flash-live-preview` — Optimized for low-latency, real-time dialogue. Native audio output, thinking (via `thinkingLevel`). 128k context window. **This is the recommended model for all Live API use cases.**
+- `gemini-3.5-live-translate-preview` — Real-time streaming translation model.
 
 > [!WARNING]
 > The following Live API models are **deprecated** and will be shut down. Migrate to `gemini-3.1-flash-live-preview`.
@@ -208,9 +209,50 @@ if (content?.interrupted) { /* Stop playback, clear audio queue */ }
 
 ---
 
+## Live Translation (Gemini Live Translate)
+
+The Live API supports real-time, low-latency streaming translation of speech (audio) across 70+ languages. For full details on options and capabilities, see the [Live Translate Guide](https://ai.google.dev/gemini-api/docs/live-api/live-translate.md.txt).
+
+### Model
+- `gemini-3.5-live-translate-preview` — The recommended translation model for all Live Translate use cases.
+
+### Configuration (`TranslationConfig`)
+
+To enable translation, specify a `TranslationConfig` object inside your live session setup:
+
+- **Python SDK**: Configure the connection using `translation_config` on `LiveConnectConfig`:
+  ```python
+  config = types.LiveConnectConfig(
+      response_modalities=[types.Modality.AUDIO],
+      translation_config=types.TranslationConfig(
+          target_language_code="es",  # Target language code (e.g. es, fr, pl)
+          echo_target_language=True,
+      ),
+      input_audio_transcription=types.AudioTranscriptionConfig(),
+      output_audio_transcription=types.AudioTranscriptionConfig(),
+  )
+  ```
+- **Raw WebSockets**: Place `translationConfig` inside `generationConfig`:
+  ```json
+  {
+    "setup": {
+      "model": "models/gemini-3.5-live-translate-preview",
+      "generationConfig": {
+        "responseModalities": ["AUDIO"],
+        "translationConfig": {
+          "targetLanguageCode": "es",
+          "echoTargetLanguage": true
+        }
+      }
+    }
+  }
+  ```
+
+---
+
 ## Limitations
 
-- **Response modality** — Only `TEXT` **or** `AUDIO` per session, not both
+- **Response modality** — Only `TEXT` **or** `AUDIO` per session, not both. Native audio models only support audio.
 - **Audio-only session** — 15 min without compression
 - **Audio+video session** — 2 min without compression
 - **Connection lifetime** — ~10 min (use session resumption)
@@ -274,6 +316,7 @@ This index contains links to all documentation pages in `.md.txt` format. Use we
 > Those are not all the documentation pages. Use the `llms.txt` index to discover available documentation pages
 
 - [Live API Overview](https://ai.google.dev/gemini-api/docs/live.md.txt) — getting started, raw WebSocket usage
+- [Live Translate](https://ai.google.dev/gemini-api/docs/live-api/live-translate.md.txt) — configuration options and capabilities for translation
 - [Live API Capabilities Guide](https://ai.google.dev/gemini-api/docs/live-guide.md.txt) — voice config, transcription config, native audio (thinking), VAD configuration, media resolution
 - [Live API Tool Use](https://ai.google.dev/gemini-api/docs/live-tools.md.txt) — function calling (sync and async), Google Search grounding
 - [Session Management](https://ai.google.dev/gemini-api/docs/live-session.md.txt) — context window compression, session resumption, GoAway signals

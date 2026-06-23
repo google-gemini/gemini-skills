@@ -12,9 +12,10 @@ description: Use this skill when building applications with Gemini API hosted mo
 
 ### Current Models (Use These)
 
+- `gemini-3.5-flash`: 1M tokens, fast, balanced performance, multimodal
 - `gemini-3.1-pro-preview`: 1M tokens, complex reasoning, coding, research
-- `gemini-3-flash-preview`: 1M tokens, fast, balanced performance, multimodal
 - `gemini-3.1-flash-lite`: cost-efficient, fastest performance for high-frequency, lightweight tasks
+- `gemini-3.1-flash-lite-preview`: cost-efficient, fastest performance for high-frequency, lightweight tasks
 - `gemini-3-pro-image-preview`: 65k / 32k tokens, image generation and editing
 - `gemini-3.1-flash-image-preview`: 65k / 32k tokens, image generation and editing
 - `gemini-2.5-pro`: 1M tokens, complex reasoning, coding, research
@@ -40,30 +41,33 @@ description: Use this skill when building applications with Gemini API hosted mo
 ## Quick Start
 
 ### Python
+
 ```python
 from google import genai
 
 client = genai.Client()
 response = client.models.generate_content(
-    model="gemini-3-flash-preview",
+    model="gemini-3.5-flash",
     contents="Explain quantum computing"
 )
 print(response.text)
 ```
 
 ### JavaScript/TypeScript
+
 ```typescript
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({});
 const response = await ai.models.generateContent({
-  model: "gemini-3-flash-preview",
-  contents: "Explain quantum computing"
+  model: "gemini-3.5-flash",
+  contents: "Explain quantum computing",
 });
 console.log(response.text);
 ```
 
 ### Go
+
 ```go
 package main
 
@@ -81,7 +85,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	resp, err := client.Models.GenerateContent(ctx, "gemini-3-flash-preview", genai.Text("Explain quantum computing"), nil)
+	resp, err := client.Models.GenerateContent(ctx, "gemini-3.5-flash", genai.Text("Explain quantum computing"), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,7 +105,7 @@ public class GenerateTextFromTextInput {
     Client client = new Client();
     GenerateContentResponse response =
         client.models.generateContent(
-            "gemini-3-flash-preview",
+            "gemini-3.5-flash",
             "Explain quantum computing",
             null);
 
@@ -111,6 +115,7 @@ public class GenerateTextFromTextInput {
 ```
 
 **Java Installation:**
+
 - Latest version: https://central.sonatype.com/artifact/com.google.genai/google-genai/versions
 - Gradle: `implementation("com.google.genai:google-genai:${LAST_VERSION}")`
 - Maven:
@@ -132,7 +137,7 @@ If the **`search_docs`** tool (from the Google MCP server) is available, use it 
 
 1. Call `search_docs` with your query
 2. Read the returned documentation
-2. **Trust MCP results** as source of truth for API details — they are always up-to-date.
+3. **Trust MCP results** as source of truth for API details — they are always up-to-date.
 
 > [!IMPORTANT]
 > When MCP tools are present, **never** fetch URLs manually. MCP provides up-to-date, indexed documentation that is more accurate and token-efficient than URL fetching.
@@ -144,10 +149,12 @@ If no MCP documentation tools are available, fetch from the official docs:
 **Index URL**: `https://ai.google.dev/gemini-api/docs/llms.txt`
 
 This index contains links to all documentation pages in .md.txt format. Use web fetch tools to:
+
 1. Fetch `llms.txt` to discover available pages
 2. Fetch specific pages (e.g., `https://ai.google.dev/gemini-api/docs/function-calling.md.txt`)
 
 Key pages:
+
 - [Text generation](https://ai.google.dev/gemini-api/docs/text-generation.md.txt)
 - [Function calling](https://ai.google.dev/gemini-api/docs/function-calling.md.txt)
 - [Structured outputs](https://ai.google.dev/gemini-api/docs/structured-output.md.txt)
