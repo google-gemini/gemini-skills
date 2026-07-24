@@ -363,6 +363,7 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt)
 - [Antigravity Agent](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt)
 - [Agent Environments](https://ai.google.dev/gemini-api/docs/agent-environment.md.txt)
+- [Agent Hooks](https://ai.google.dev/gemini-api/docs/agent-hooks.md.txt)
 - [Building Custom Agents](https://ai.google.dev/gemini-api/docs/custom-agents.md.txt)
 - [Deep Research](https://ai.google.dev/gemini-api/docs/interactions/deep-research.md.txt)
 
