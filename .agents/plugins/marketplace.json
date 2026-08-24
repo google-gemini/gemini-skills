@@ -1,0 +1,22 @@
+{
+  "name": "gemini-skills",
+  "interface": {
+    "displayName": "Gemini API Skills"
+  },
+  "plugins": [
+    {
+      "name": "gemini-skills",
+      "version": "1.1.0",
+      "description": "A library of skills for the Gemini API, SDK and model interactions.",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
