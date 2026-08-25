@@ -23,6 +23,8 @@ description: Use this skill when writing code that calls the Gemini API for text
 - `gemini-omni-flash-preview`: video generation, image-referenced video generation, first-frame-to-video, and video editing
 - `gemma-4-31b-it`: Gemma 4 dense model, 31B parameters
 - `gemma-4-26b-a4b-it`: Gemma 4 MoE model, 26B total / 4B active parameters
+- `gemini-embedding-2`: Multimodal embedding model (text, images, video, audio, documents)
+- `gemini-embedding-001`: Text-only embedding model
 
 > [!WARNING]
 > Models like `gemini-2.5-*`, `gemini-2.0-*`, `gemini-1.5-*` are **legacy and deprecated**. Never use them.
@@ -346,6 +348,7 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Image Understanding](https://ai.google.dev/gemini-api/docs/interactions/image-understanding.md.txt)
 - [Speech Generation](https://ai.google.dev/gemini-api/docs/interactions/speech-generation.md.txt)
 - [Music Generation](https://ai.google.dev/gemini-api/docs/interactions/music-generation.md.txt)
+- [Embeddings](https://ai.google.dev/gemini-api/docs/embeddings.md.txt)
 
 **Multimodal Understanding:**
 - [Audio](https://ai.google.dev/gemini-api/docs/interactions/audio.md.txt)

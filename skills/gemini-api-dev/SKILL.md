@@ -22,6 +22,8 @@ description: Use this skill when building applications with Gemini API hosted mo
 - `gemini-2.5-flash`: 1M tokens, fast, balanced performance, multimodal
 - `gemma-4-31b-it`: Gemma 4 dense model, 31B parameters
 - `gemma-4-26b-a4b-it`: Gemma 4 MoE model, 26B total with 4B active parameters
+- `gemini-embedding-2`: Multimodal embedding model (text, images, video, audio, documents)
+- `gemini-embedding-001`: Text-only embedding model
 
 > [!WARNING]
 > Models like `gemini-2.0-*`, `gemini-1.5-*` are **legacy and deprecated**. Never use them.
