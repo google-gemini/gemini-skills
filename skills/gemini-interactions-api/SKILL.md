@@ -1,9 +1,9 @@
 ---
 name: gemini-interactions-api
-description: Use this skill when writing code that calls the Gemini API for text generation, multi-turn chat, multimodal understanding, image generation, video generation, streaming responses, background research tasks, function calling, structured output, or migrating from the old generateContent API. This skill covers the Interactions API, the recommended way to use Gemini models and agents in Python and TypeScript.
+description: Use this skill when writing code that calls the Gemini API for text generation, multi-turn chat, multimodal understanding, image generation, video generation, streaming responses, background research tasks, function calling, structured output, or migrating from the old generateContent API. Covers SDK usage and best practices for Gemini models and agents in Python and TypeScript.
 ---
 
-# Gemini Interactions API Skill
+# Gemini API Development Skill
 
 ## Critical Rules (Always Apply)
 
@@ -215,7 +215,7 @@ const interaction = await client.interactions.create({
     environment: "remote",
 });
 
-console.log(`Environment ID: {interaction.environment_id}`);
+console.log(`Environment ID: ${interaction.environment_id}`);
 console.log(interaction.output_text);
 ```
 
@@ -254,7 +254,7 @@ print(result.output_text)
 ```typescript
 const agent = await client.agents.create({
     id: "code-reviewer",
-    base_agent="antigravity-preview-05-2026",
+    base_agent: "antigravity-preview-05-2026",
     system_instruction: "You are a senior code reviewer. Check every file for bugs, style issues, and security vulnerabilities.",
     base_environment: {
         type: "remote",
@@ -309,14 +309,12 @@ for await (const event of stream) {
             process.stdout.write(event.delta.text);
         }
     } else if (event.event_type === "interaction.completed") {
-        console.log(`\n\nTotal Tokens: ${event.interaction.usage.total_tokens}`);
+        console.log(`\n\nTotal Tokens: ${event.interaction?.usage?.total_tokens}`);
     }
 }
 ```
 
 For streaming with tools, thinking, agents, and image generation see the full [Streaming guide](https://ai.google.dev/gemini-api/docs/interactions/streaming.md.txt).
-
-
 
 ## Documentation Pages
 
@@ -425,3 +423,4 @@ An `Interaction` response contains `steps`, an array of typed step objects repre
 | `thought_signature` | `thought` | Opaque signature for thought verification. |
 
 **Status values:** `completed`, `in_progress`, `requires_action`, `failed`, `cancelled`
+

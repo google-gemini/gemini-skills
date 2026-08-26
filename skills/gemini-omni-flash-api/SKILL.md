@@ -31,7 +31,7 @@ This skill uses the Gemini Omni Flash model (`gemini-omni-flash-preview`) to per
 
 * **Interactions API**: All operations and state management for the Gemini Omni Flash model (`gemini-omni-flash-preview`) are handled via the [Interactions API](https://ai.google.dev/gemini-api/docs/interactions-overview).
 * **Files API**: Input media files (such as reference images and videos) must be uploaded via the [Files API](https://ai.google.dev/gemini-api/docs/interactions/files) first before being referenced in generations. The uploaded file URI and MIME type are then included in the `interactions.create` input parts array.
-* **[Interactions API Skill Reference](https://github.com/google-gemini/gemini-skills/blob/main/skills/gemini-interactions-api/SKILL.md)**: Platform-wide guidelines, current model specifications, and SDK usage rules for the Interactions API.
+* **[Gemini API Skill Reference](https://github.com/google-gemini/gemini-skills/blob/main/skills/gemini-api-dev/SKILL.md)**: Platform-wide guidelines, current model specifications, and SDK usage rules for the Gemini API.
 
 ## Dependencies and Prerequisites
 
