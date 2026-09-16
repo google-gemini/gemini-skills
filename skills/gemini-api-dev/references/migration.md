@@ -32,7 +32,7 @@ The core changes when migrating from `generateContent` to the Interactions API:
 | What | `generateContent` | Interactions API |
 |------|----------------|-----------------|
 | **SDK method** | `client.models.generate_content()` | `client.interactions.create()` |
-| **Response text** | `response.text` | `interaction.output_text` (or `interaction.steps[-1].content[0].text`) |
+| **Response text** | `response.text` | `interaction.output_text` |
 | **Response image** | `response.candidates[0].content.parts[0].inline_data` | `interaction.output_image` (object with `.data` and `.mime_type`) |
 | **Response audio** | `response.candidates[0].content.parts[0].inline_data` | `interaction.output_audio` (object with `.data` and `.mime_type`) |
 | **Multi-turn** | Manual history array or `client.chats.create()` | `previous_interaction_id=interaction.id` |
@@ -78,7 +78,7 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 
 - [ ] Updated SDK: `google-genai` ≥ 2.0.0 (Python) / `@google/genai` ≥ 2.0.0 (JS)
 - [ ] Replaced `client.models.generate_content()` → `client.interactions.create()`
-- [ ] Replaced `response.text` → `interaction.output_text` (SDK convenience helper) or `interaction.steps[-1].content[0].text`
+- [ ] Replaced `response.text` → `interaction.output_text`
 - [ ] Replaced image/audio response extraction → `interaction.output_image` / `interaction.output_audio`
 - [ ] Replaced `response.candidates[0].content.parts` → iterate `interaction.steps`
 - [ ] Replaced `client.chats.create()` / manual history → `previous_interaction_id`
