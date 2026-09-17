@@ -32,7 +32,9 @@ The core changes when migrating from `generateContent` to the Interactions API:
 | What | `generateContent` | Interactions API |
 |------|----------------|-----------------|
 | **SDK method** | `client.models.generate_content()` | `client.interactions.create()` |
-| **Response text** | `response.text` | `interaction.steps[-1].content[0].text` |
+| **Response text** | `response.text` | `interaction.output_text` |
+| **Response image** | `response.candidates[0].content.parts[0].inline_data` | `interaction.output_image` (object with `.data` and `.mime_type`) |
+| **Response audio** | `response.candidates[0].content.parts[0].inline_data` | `interaction.output_audio` (object with `.data` and `.mime_type`) |
 | **Multi-turn** | Manual history array or `client.chats.create()` | `previous_interaction_id=interaction.id` |
 | **Streaming** | `generate_content_stream()` / `:streamGenerateContent` | `stream=True` + `step.delta` events |
 | **Structured output** | `config.response_format` inside `GenerateContentConfig` | Top-level `response_format` array |
@@ -82,7 +84,8 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 
 - [ ] Updated SDK: `google-genai` ≥ 2.0.0 (Python) / `@google/genai` ≥ 2.0.0 (JS)
 - [ ] Replaced `client.models.generate_content()` → `client.interactions.create()`
-- [ ] Replaced `response.text` → `interaction.steps[-1].content[0].text`
+- [ ] Replaced `response.text` → `interaction.output_text`
+- [ ] Replaced image/audio response extraction → `interaction.output_image` / `interaction.output_audio`
 - [ ] Replaced `response.candidates[0].content.parts` → iterate `interaction.steps`
 - [ ] Replaced `client.chats.create()` / manual history → `previous_interaction_id`
 - [ ] Removed all `types.*` wrappers (`GenerateContentConfig`, `Tool`, `Content`, `Part`) — Interactions API uses plain dicts. Check feature docs for exact format.
@@ -128,7 +131,7 @@ After updating, run a spot-check to confirm the Interactions API is working:
 
 1. Make a single `client.interactions.create()` call with a simple input
 2. Assert `interaction.steps` is not empty
-3. Assert at least one step has `type == "model_output"` with non-empty text
+3. Assert `interaction.output_text` is non-empty (or inspect `step.type == "model_output"`)
 4. For multi-turn, verify `previous_interaction_id` preserves context across turns
 
 For verification code snippets, fetch the [Migration Guide](https://ai.google.dev/gemini-api/docs/migrate-to-interactions.md.txt).
