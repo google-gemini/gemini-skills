@@ -1,11 +1,17 @@
 {
-  "name": "gemini-skills",
+  "name": "gemini-dev",
+  "displayName": "Gemini API",
   "version": "2.1.0",
-  "description": "A library of skills for the Gemini API, SDK and model interactions.",
+  "description": "Build applications with the Gemini API and SDKs using modern best practices, canonical docs, and current models.",
   "author": {
     "name": "Google"
   },
   "skills": "./skills",
+  "mcpServers": {
+    "gemini-api-docs": {
+      "url": "https://gemini-api-docs-mcp.dev"
+    }
+  },
   "repository": "https://github.com/google-gemini/gemini-skills",
   "license": "Apache-2.0",
   "keywords": [
