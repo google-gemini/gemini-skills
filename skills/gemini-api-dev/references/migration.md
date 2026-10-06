@@ -54,6 +54,7 @@ For full before/after code examples, fetch the [Migration Guide](https://ai.goog
 | `gemini-2.0-flash-lite` | Deprecated | `gemini-3.5-flash-lite` |
 | `gemini-1.5-pro` | Deprecated | `gemini-3.8-flash` |
 | `gemini-1.5-flash` | Deprecated | `gemini-3.8-flash` |
+| `gemini-3.1-flash-image` | Deprecated (shutdown October 29, 2026) | `gemini-nano-banana-2.1` |
 
 ### Active Legacy Models (migration recommended)
 
@@ -64,6 +65,7 @@ For full before/after code examples, fetch the [Migration Guide](https://ai.goog
 | `gemini-2.5-flash-lite` or `gemini-3.1-flash-lite` | `gemini-3.5-flash-lite` | Latest Flash-lite with Interactions API support |
 | `gemini-2.5-pro` | `gemini-3.1-pro-preview` | Latest Pro with 1M context, complex reasoning |
 | `gemini-3.1-flash-tts-preview` or `gemini-2.5-*-tts` | `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts` | Latest TTS models with Voice Design, Voice Replication, structured `speech_metadata`, and default WAV (`audio/wav`) output |
+| `gemini-3.1-flash-image` or older image generation models | `gemini-nano-banana-2.1` | Latest Nano Banana image generation model: 131k context, multi-image fusion (up to 14 reference images), enhanced visual quality, and text rendering |
 | Legacy audio understanding / ASR | `gemini-3.5-transcribe` | Dedicated speech-to-text with auto language detection, diarization, word timestamps, and smart formatting |
 | Legacy Live API (`gemini-3.1-flash-live-preview`, `gemini-2.5-flash-native-audio-*`, `gemini-2.0-flash-live-001`) | `gemini-3.8-live` or `gemini-3.8-live-extended-thinking` | Install `google-gemini/gemini-live-api-dev` skill and see its `references/migration.md` for Live API protocol changes |
 
@@ -109,6 +111,7 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Consider upgrading `gemini-2.5-flash-lite` → `gemini-3.5-flash-lite` or `gemini-3.1-flash-lite`
 - [ ] Consider upgrading `gemini-2.5-pro` → `gemini-3.1-pro-preview`
 - [ ] Consider upgrading `gemini-3.1-flash-tts-preview` → `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`
+- [ ] Consider upgrading `gemini-3.1-flash-image` → `gemini-nano-banana-2.1`
 
 ### Agent Updates
 
@@ -132,6 +135,17 @@ For full migration details, output formats, and prompting guide, fetch the [Spee
 - [ ] Accounted for default WAV (`audio/wav` with RIFF header) output on unary requests: remove manual WAV header wrappers (`wave` / `ffmpeg`), or explicitly set `response_format={"type": "audio", "mime_type": "audio/l16"}` (or `"audio/mulaw"` / `"audio/alaw"`). Streaming (`stream=True`) still defaults to headerless `audio/l16`.
 - [ ] Kept inline tags (`<laugh>`, `<sigh>`, `<cough>`, `<breath>`, `<short pause>`) and pipe backchannels (`|mhm|`) only for point-in-time vocal events; avoid sound-effect tags
 - [ ] Replaced multi-paragraph `"Audio Profile"` / `"Director's Notes"` blocks with a custom voice created via [Voice Design](https://ai.google.dev/gemini-api/docs/voice-design.md.txt) (`client.voices.create()` → `voice_...`)
+
+### Migrate to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)
+
+For full image generation details, resolutions, aspect ratios, and multi-image referencing, fetch the [Image Generation guide](https://ai.google.dev/gemini-api/docs/image-generation.md.txt) and [Gemini Nano Banana 2.1 model page](https://ai.google.dev/gemini-api/docs/models/gemini-nano-banana-2.1).
+
+- [ ] Updated model name to `gemini-nano-banana-2.1`
+- [ ] Take advantage of expanded 131,072 input token limit (65k on previous generation) and 32,768 output token limit
+- [ ] Multi-image reference support: up to 14 reference images (character consistency for up to 4 characters, object fidelity for up to 10 objects)
+- [ ] Support for wide / panoramic aspect ratios (`1:4`, `4:1`, `1:8`, `8:1`) and output resolutions (`1K` default, `2K`, `4K`)
+- [ ] Grounding with Google Web and Image Search supported natively
+- [ ] Configurable thinking levels (`minimal`, `medium` default, `high`)
 
 ---
 
