@@ -29,8 +29,8 @@ description: Use this skill when writing code that calls the Gemini API for text
 - `gemini-embedding-001`: Text-only embedding model, uses `client.models.embed_content`
 
 > [!WARNING]
-> Models like `gemini-2.5-*`, `gemini-2.0-*`, `gemini-1.5-*`, and `gemini-3.1-flash-image` are **legacy and deprecated**. Never use them.
-> **If a user asks for a deprecated model, use `gemini-3.8-flash` (or `gemini-nano-banana-2.1` for image generation) instead and note the substitution.**
+> Models like `gemini-2.5-*`, `gemini-2.0-*`, `gemini-1.5-*` are **legacy and deprecated**. Never use them.
+> **If a user asks for a deprecated model, use `gemini-3.8-flash` instead and note the substitution.**
 
 ### Current Agents
 
@@ -56,7 +56,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - `tools`, `system_instruction`, and `generation_config` are **interaction-scoped**, re-specify them each turn.
 - **Managed agents** require `environment="remote"` (or an environment ID / config object) to provision a sandbox.
 - **Migrating from `generateContent`**: Read `references/migration.md` for the scoping, checklist, and before/after code examples. Always confirm scope with the user before editing.
-- **Model upgrades**: Drop-in, swap the model string. Deprecated models (`gemini-2.0-*`, `gemini-1.5-*`, `gemini-3.1-flash-image`) must be replaced, see `references/migration.md`.
+- **Model upgrades**: Drop-in, swap the model string. Deprecated models (`gemini-2.0-*`, `gemini-1.5-*`) must be replaced, see `references/migration.md`.
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
