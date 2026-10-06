@@ -138,7 +138,7 @@ For full migration details, output formats, and prompting guide, fetch the [Spee
 
 ### Migrate to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)
 
-For full image generation details, resolutions, aspect ratios, and multi-image referencing, fetch the [Image Generation guide](https://ai.google.dev/gemini-api/docs/image-generation.md.txt) and [Gemini Nano Banana 2.1 model page](https://ai.google.dev/gemini-api/docs/models/gemini-nano-banana-2.1).
+For full image generation details, resolutions, aspect ratios, and multi-image referencing, fetch the [Image Generation guide](https://ai.google.dev/gemini-api/docs/image-generation.md.txt) and [Gemini Nano Banana 2.1 model page](https://ai.google.dev/gemini-api/docs/models/gemini-nano-banana-2.1.md.txt).
 
 - [ ] Updated model name to `gemini-nano-banana-2.1`
 - [ ] Take advantage of expanded 131,072 input token limit (65k on previous generation) and 32,768 output token limit
