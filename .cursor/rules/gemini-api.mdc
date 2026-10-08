@@ -1,0 +1,23 @@
+---
+description: Use Google Gen AI SDK and modern Gemini API development patterns
+globs: "**/*.{ts,js,py,go}"
+alwaysApply: false
+---
+
+# Gemini API Guidelines
+
+When writing or modifying code that interacts with the Gemini API (importing `google-genai`, `@google/genai`, or `google.golang.org/genai`):
+
+1. **Documentation Source of Truth**:
+   - If the [Gemini Docs MCP tool](https://gemini-api-docs-mcp.dev) (`gemini_search_docs` or `gemini_get_doc`) is connected, call it first for real-time parameter definitions, current models, and migration paths. MCP results override training data.
+   - For Gemini API documentation, refer to `ai.google.dev/gemini-api/docs/llms.txt` for all canonical docs.
+
+2. **SDK & API Conventions**:
+   - Use the modern Google Gen AI SDK (`google-genai` for Python, `@google/genai` for TypeScript).
+   - Use the Interactions API (`client.interactions.create`) as the standard entrypoint.
+   - Avoid deprecated packages (`google-generativeai`, `@google/generative-ai`) and legacy `generateContent` methods.
+   - When targeting current models, suggest using `gemini-flash-latest` (or `gemini-3.8-flash`).
+
+3. **Skills Reference**:
+   - Refer to the `gemini-api-dev` skill for detailed code patterns, stateful conversations, and migration checklists.
+   - For WebSocket streaming and voice/video sessions, refer to the `gemini-live-api-dev` skill.
