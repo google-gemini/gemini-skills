@@ -32,8 +32,10 @@ def is_retryable_api_error(err):
     code = getattr(err, "code", None)
     if code in NON_RETRYABLE_HTTP_CODES:
         return False
-    if code == 429 and "quota_exceeded" in str(getattr(err, "details", "")):
-        return False
+    if code == 429:
+        err_str = (str(getattr(err, "message", "")) + str(getattr(err, "details", ""))).lower()
+        if "quota_exceeded" in err_str:
+            return False
     return True
 
 def sanitize_error(err):

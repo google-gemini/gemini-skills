@@ -60,12 +60,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
-- **Error handling**: Branch on `error.code`, not the HTTP status (429 alone is ambiguous).
-  - Retry with backoff only: `rate_limit_exceeded`, `too_many_requests`, `service_unavailable` (503), `api_error` (500). The SDKs already retry these, so do not wrap SDK calls in another retry loop.
-  - Never retry: `quota_exceeded` (daily quota, resets at midnight Pacific), `payment_required` (402), `authentication` (401), `permission_denied` (403), `invalid_request`, `failed_precondition`, `model_not_found`. Stop and tell the user the code, what it means, and the fix.
-  - Blocked or malformed output (`safety`, `recitation`, `malformed_function_call`, ...): change the input, do not resend the same request.
-  - Streaming: errors arrive as an event with `event_type: "error"`, not as an HTTP status.
-  - Full list: see the **Errors & Limits** docs below.
+- **Errors**: Branch on `error.code`, not the HTTP status (429 can be a rate limit or `quota_exceeded`). The SDKs already retry transient errors (rate limits, 5xx), so don't add another retry loop. Never retry `quota_exceeded`, `payment_required`, `authentication` or `permission_denied`; tell the user the code and the fix. See **Errors & Limits** docs below.
 
 ## Quick Start
 
