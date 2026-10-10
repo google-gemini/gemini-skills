@@ -25,6 +25,17 @@ def strip_query_params(url):
     parsed = urllib.parse.urlparse(url)
     return urllib.parse.urlunparse(parsed._replace(query=""))
 
+NON_RETRYABLE_HTTP_CODES = {400, 401, 402, 403, 404}
+
+def is_retryable_api_error(err):
+    """Returns False for errors that will fail again on retry (bad request, auth, billing, not found, daily quota)."""
+    code = getattr(err, "code", None)
+    if code in NON_RETRYABLE_HTTP_CODES:
+        return False
+    if code == 429 and "quota_exceeded" in str(getattr(err, "details", "")):
+        return False
+    return True
+
 def sanitize_error(err):
     """Sanitizes error messages by redacting API keys, tokens, query parameters, internal provider URLs, and raw response bodies."""
     if not err:
@@ -224,6 +235,9 @@ def wait_for_active(file_name, poll_interval=3, max_attempts=60, backoff_factor=
         try:
             file_obj = client.files.get(name=file_name)
         except errors.APIError as e:
+            if not is_retryable_api_error(e):
+                raise RuntimeError(f"Error: Non-retryable API error checking status ({sanitize_error(e)}). Exiting.")
+
             consecutive_errors += 1
             if consecutive_errors >= max_consecutive_errors:
                 raise RuntimeError(f"Error: Too many consecutive API errors checking status ({sanitize_error(e)}). Exiting.")
