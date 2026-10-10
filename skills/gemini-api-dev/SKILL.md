@@ -60,7 +60,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
-- **Errors**: Branch on `error.code`, not the HTTP status (429 can be a rate limit or `quota_exceeded`). The SDKs already retry transient errors (rate limits, 5xx), so don't add another retry loop. Never retry `quota_exceeded`, `payment_required`, `authentication` or `permission_denied`; tell the user the code and the fix. See **Errors & Limits** docs below.
+- **Errors**: Branch on the error code in the response body (e.g. `quota_exceeded`), not just the HTTP status (429 can be a rate limit or `quota_exceeded`). The Python SDK already retries transient errors (rate limits, 5xx); in TypeScript, configure `httpOptions.retryOptions` rather than writing your own loop. If it still fails after those retries, stop and report it. Never retry `quota_exceeded`, `payment_required`, `authentication` or `permission_denied`; tell the user the code and the fix. See **Errors & Limits** docs below.
 
 ## Quick Start
 
