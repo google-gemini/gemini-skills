@@ -12,9 +12,9 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 ### Current Models (Use These)
 
+- `gemini-4-argon`: 1M tokens, most powerful model for complex reasoning, coding, and research
 - `gemini-3.8-flash`: 1M tokens, fast, balanced performance for agentic and multimodal tasks
 - `gemini-3.5-flash-lite`: 1M tokens, fastest, lowest-cost 3.5 model for high-throughput execution
-- `gemini-3.1-pro-preview`: 1M tokens, complex reasoning, coding, research
 - `gemini-3.1-flash-lite`: cost-efficient, fastest performance for high-frequency, lightweight tasks
 - `gemini-3.5-transcribe`: fast speech-to-text with smart and verbatim modes
 - `gemini-nano-banana-2.1` (Nano Banana 2.1): 131k / 32k tokens, default high-efficiency image generation and conversational editing
@@ -41,8 +41,8 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 ### Current SDKs
 
-- **Python**: `google-genai` >= `2.25.0` → `pip install -U google-genai`
-- **JavaScript/TypeScript**: `@google/genai` >= `2.3.0` → `npm install @google/genai`
+- **Python**: `google-genai` >= `2.30.1` → `pip install -U google-genai`
+- **JavaScript/TypeScript**: `@google/genai` >= `2.29.1` → `npm install @google/genai`
 
 > [!NOTE]
 > SDK versions ≥ 2.0.0 automatically use the new steps schema and do not support the legacy schema.
@@ -189,7 +189,7 @@ Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch 
 
 ### Antigravity Agent
 
-The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. See [Antigravity Agent docs](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt) for capabilities, tools, multimodal input, and pricing.
+The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. It uses `gemini-3.8-flash` by default and also supports `gemini-4-argon` via `agent_config={"type": "antigravity", "model": "gemini-4-argon"}`. See [Antigravity Agent docs](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt) for capabilities, tools, multimodal input, and pricing.
 
 #### Python
 ```python
@@ -366,6 +366,7 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 **Files & Context:**
 - [Files](https://ai.google.dev/gemini-api/docs/files.md.txt)
 - [File Input Methods](https://ai.google.dev/gemini-api/docs/file-input-methods.md.txt)
+- [Long Context](https://ai.google.dev/gemini-api/docs/long-context.md.txt)
 - [Caching](https://ai.google.dev/gemini-api/docs/caching.md.txt)
 - [Media Resolution](https://ai.google.dev/gemini-api/docs/media-resolution.md.txt)
 
@@ -380,7 +381,8 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Deep Research](https://ai.google.dev/gemini-api/docs/deep-research.md.txt)
 
 **Advanced Features:**
-- [Latest Models (3.8 Flash & 3.5 Flash-Lite)](https://ai.google.dev/gemini-api/docs/latest-model.md.txt)
+- [Latest Model (Gemini 4 Argon)](https://ai.google.dev/gemini-api/docs/latest-model.md.txt)
+- [Background Execution](https://ai.google.dev/gemini-api/docs/background-execution.md.txt)
 - [Flex Inference](https://ai.google.dev/gemini-api/docs/flex-inference.md.txt)
 - [Priority Inference](https://ai.google.dev/gemini-api/docs/priority-inference.md.txt)
 
@@ -434,7 +436,7 @@ An `Interaction` response contains `steps`, an array of typed step objects repre
 | `thought_summary` | `thought` | thinking summary text. |
 | `thought_signature` | `thought` | Opaque signature for thought verification. |
 
-**Status values:** `completed`, `in_progress`, `requires_action`, `failed`, `cancelled`
+**Status values:** `completed`, `in_progress`, `queued`, `requires_action`, `incomplete`, `failed`, `cancelled`
 
 ## Gemini Live API
 
