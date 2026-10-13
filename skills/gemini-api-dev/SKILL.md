@@ -382,11 +382,7 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 
 **Advanced Features:**
 - [Latest Model (Gemini 4 Argon)](https://ai.google.dev/gemini-api/docs/latest-model.md.txt)
-- [Gemini 4 Argon Model Reference](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon.md.txt)
-- [Long Decode](https://ai.google.dev/gemini-api/docs/long-decode.md.txt)
-- [Long Decode (generateContent)](https://ai.google.dev/gemini-api/docs/generate-content/long-decode.md.txt)
 - [Background Execution](https://ai.google.dev/gemini-api/docs/background-execution.md.txt)
-- [What's New in Gemini 3.8 Flash](https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.8.md.txt)
 - [Flex Inference](https://ai.google.dev/gemini-api/docs/flex-inference.md.txt)
 - [Priority Inference](https://ai.google.dev/gemini-api/docs/priority-inference.md.txt)
 
