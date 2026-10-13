@@ -18,7 +18,7 @@ Even imperative requests like "migrate my code", "upgrade to gemini 3", "migrate
 **Sizing the scope (large repos).** Before asking, get a per-directory count:
 
 ```sh
-rg -l "generate_content|generateContent|gemini-1\.5|gemini-2\.0|gemini-2\.5|gemini-3\.1-flash-lite|gemini-3\.1-flash-tts|gemini-3\.5|gemini-3\.6|gemini-3\.7|gemini-3-flash|thinking_budget|temperature" --type-not md | cut -d/ -f1 | sort | uniq -c | sort -rn
+rg -l "generate_content|generateContent|gemini-1\.5|gemini-2\.0|gemini-2\.5|gemini-3\.1-pro|gemini-3\.1-flash-lite|gemini-3\.1-flash-tts|gemini-3\.5|gemini-3\.6|gemini-3\.7|gemini-3-flash|thinking_budget|temperature" --type-not md | cut -d/ -f1 | sort | uniq -c | sort -rn
 ```
 
 Present the breakdown in your question (e.g. *"Found 42 references across 3 directories: src/ (28), tests/ (10), scripts/ (4). Which to migrate?"*).
@@ -40,7 +40,7 @@ The core changes when migrating from `generateContent` to the Interactions API:
 | **Search grounding** | `groundingMetadata` on candidates | `google_search_call`/`google_search_result` steps + inline `annotations` |
 | **Config/types** | `types.GenerateContentConfig(...)`, `types.Tool(...)`, `types.Content(...)`, `types.Part.*` | Not used. Interactions API uses plain Python dicts and direct params. Check the feature docs for exact format. |
 | **REST endpoint** | `POST /v1beta/models/{model}:generateContent` | `POST /v1beta/interactions` |
-| **SDK package** | `google-genai` ≥ 1.x or legacy `google-generativeai` | `google-genai` ≥ 2.0.0 |
+| **SDK package** | `google-genai` ≥ 1.x or legacy `google-generativeai` | `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS) |
 
 For full before/after code examples, fetch the [Migration Guide](https://ai.google.dev/gemini-api/docs/migrate-to-interactions.md.txt) or read the Interactions API documentation pages for each feature.
 
@@ -63,7 +63,7 @@ For full before/after code examples, fetch the [Migration Guide](https://ai.goog
 | `gemini-3.7-flash`, `gemini-3.6-flash`, `gemini-3.5-flash`, or `gemini-3-flash-preview` | `gemini-3.8-flash` | Latest Flash: stronger agentic/multimodal performance, reduced token usage/loop spiraling |
 | `gemini-2.5-flash` | `gemini-3.8-flash` or `gemini-3.5-flash-lite` | Latest Flash with Interactions API support, or latest Flash-Lite for cheaper/simpler tasks. |
 | `gemini-2.5-flash-lite` or `gemini-3.1-flash-lite` | `gemini-3.5-flash-lite` | Latest Flash-lite with Interactions API support |
-| `gemini-2.5-pro` | `gemini-3.1-pro-preview` | Latest Pro with 1M context, complex reasoning |
+| `gemini-3.1-pro-preview` or `gemini-2.5-pro` | `gemini-4-argon` | Most powerful model with 1M unified context window, long decode up to 1M tokens, complex reasoning, coding, and research |
 | `gemini-3.1-flash-tts-preview` or `gemini-2.5-*-tts` | `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts` | Latest TTS models with Voice Design, Voice Replication, structured `speech_metadata`, and default WAV (`audio/wav`) output |
 | `gemini-3.1-flash-image` or older image generation models | `gemini-nano-banana-2.1` | Latest Nano Banana image generation model: 131k context, multi-image fusion (up to 14 reference images), enhanced visual quality, and text rendering |
 | Legacy audio understanding / ASR | `gemini-3.5-transcribe` | Dedicated speech-to-text with auto language detection, diarization, word timestamps, and smart formatting |
@@ -73,7 +73,8 @@ For full before/after code examples, fetch the [Migration Guide](https://ai.goog
 
 | Agent | Status | Drop-in Replacement | Notes |
 |-------|--------|---------------------|-------|
-| `antigravity-preview-05-2026` | Deprecated (October 5, 2026) | `antigravity-preview-09-2026` | Requests redirect to `antigravity-preview-09-2026` after October 5, 2026. |
+| `antigravity-preview-05-2026` | Deprecated (October 5, 2026) | `antigravity-preview-09-2026` | Requests redirect to `antigravity-preview-09-2026` after October 5, 2026. Supports `gemini-4-argon` via `agent_config={"type": "antigravity", "model": "gemini-4-argon"}`. |
+| `deep-research-pro-preview-12-2025` | Deprecated (shutdown October 23, 2026) | `deep-research-preview-04-2026` or `deep-research-max-preview-04-2026` | Update `agent` parameter in `interactions.create`. |
 
 > **Note:** Within the Interactions API, model upgrades are generally drop-in — change the model string and verify. The breaking changes are at the **API level** (generateContent → Interactions) and parameter deprecations (`temperature`, `top_p`, `top_k`).
 
@@ -83,9 +84,9 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 
 ### API Migration (generateContent → Interactions)
 
-- [ ] Updated SDK: `google-genai` ≥ 2.0.0 (Python) / `@google/genai` ≥ 2.0.0 (JS)
+- [ ] Updated SDK: `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS)
 - [ ] Replaced `client.models.generate_content()` → `client.interactions.create()`
-- [ ] Replaced `response.text` → `interaction.steps[-1].content[0].text`
+- [ ] Replaced `response.text` → `interaction.output_text` (or join `model_output` steps for multi-hop long decode)
 - [ ] Replaced `response.candidates[0].content.parts` → iterate `interaction.steps`
 - [ ] Replaced `client.chats.create()` / manual history → `previous_interaction_id`
 - [ ] Removed all `types.*` wrappers (`GenerateContentConfig`, `Tool`, `Content`, `Part`) — Interactions API uses plain dicts. Check feature docs for exact format.
@@ -94,8 +95,8 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Updated function calling: candidates-based → step-based tool lifecycle
 - [ ] REST: Changed endpoint to `/v1beta/interactions`
 - [ ] REST: Add `Api-Revision: 2026-05-20` header (SDK ≥ 2.0.0 sets it automatically)
-- [ ] Replaced `google-generativeai` (Python) → `google-genai` ≥ 2.0.0
-- [ ] Replaced `@google/generative-ai` (JS) → `@google/genai` ≥ 2.0.0
+- [ ] Replaced `google-generativeai` (Python) → `google-genai` ≥ 2.30.1
+- [ ] Replaced `@google/generative-ai` (JS) → `@google/genai` ≥ 2.29.1
 - [ ] Updated all import statements to match new package names
 
 ### Model String Updates
@@ -109,17 +110,36 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Consider upgrading `gemini-2.5-flash` → `gemini-3.8-flash`
 - [ ] Consider upgrading `gemini-3.1-flash-lite` → `gemini-3.5-flash-lite`
 - [ ] Consider upgrading `gemini-2.5-flash-lite` → `gemini-3.5-flash-lite` or `gemini-3.1-flash-lite`
-- [ ] Consider upgrading `gemini-2.5-pro` → `gemini-3.1-pro-preview`
+- [ ] Consider upgrading `gemini-3.1-pro-preview` → `gemini-4-argon`
+- [ ] Consider upgrading `gemini-2.5-pro` → `gemini-4-argon`
 - [ ] Consider upgrading `gemini-3.1-flash-tts-preview` → `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`
 - [ ] Consider upgrading `gemini-3.1-flash-image` → `gemini-nano-banana-2.1`
 
 ### Agent Updates
 
 - [ ] Upgrade `antigravity-preview-05-2026` → `antigravity-preview-09-2026` (deprecated October 5, 2026; redirected afterwards)
+- [ ] Upgrade `deep-research-pro-preview-12-2025` → `deep-research-preview-04-2026` or `deep-research-max-preview-04-2026` (deprecated, shutdown October 23, 2026)
+
+### Migrate to Gemini 4 Argon
+
+Use this checklist when migrating to `gemini-4-argon`. For full details on supported APIs, context window sizes per API, parameter changes, and continuation patterns, fetch [What's new in Gemini 4 Argon (Interactions API)](https://ai.google.dev/gemini-api/docs/latest-model.md.txt) (or [generateContent What's new](https://ai.google.dev/gemini-api/docs/generate-content/latest-model.md.txt)), the [Gemini 4 Argon model page](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon.md.txt), the [Long Decode guide (Interactions API)](https://ai.google.dev/gemini-api/docs/long-decode.md.txt) (or [generateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode.md.txt)), and the [Background Execution guide](https://ai.google.dev/gemini-api/docs/background-execution.md.txt).
+
+- [ ] **Check for unsupported APIs before migrating**: Look up which APIs and features are unsupported in [What's new in Gemini 4 Argon](https://ai.google.dev/gemini-api/docs/latest-model.md.txt) and the [Gemini 4 Argon model page](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon.md.txt) (for example, explicit context caching via `caches.create` / `cachedContents` / `cached_content` is not supported and returns an error; implicit caching is enabled by default for prompts ≥ 4,096 tokens with a 95% discount; long decode is not supported on the OpenAI compatibility endpoint), ensure they are not used, and flag any unsupported usage to the user before migrating
+- [ ] **Upgrade SDKs**: Update to `google-genai >= 2.30.1` (Python) or `@google/genai >= 2.29.1` (JavaScript/TypeScript)
+- [ ] Updated model name to `gemini-4-argon`
+- [ ] Replaced `thinking_budget` (returns a `400` error on Interactions API or when combined with `thinking_level`) with `thinking_level` (`low`, `medium` default, `high`; `minimal` is not supported and returns a `400` error); use [thinking levels](https://ai.google.dev/gemini-api/docs/thinking.md.txt) rather than `max_output_tokens` to control token spend
+- [ ] Reviewed `max_output_tokens`: raise any existing limit below `32,768` to at least `32,768` (`gemini-4-argon` can spend more of `max_output_tokens` on internal thinking than earlier models). Default single-request caps without long decode are `65,536` tokens on Interactions API (`background=False`) and `generateContent` streaming/SDK calls, and `32,768` tokens on direct non-streaming `generateContent` REST calls
+- [ ] Removed deprecated sampling parameters (`temperature`, `top_p`, `top_k`, `candidate_count`)
+- [ ] **Decide whether long context / long decode is needed**: Refer to [What's new in Gemini 4 Argon](https://ai.google.dev/gemini-api/docs/latest-model.md.txt) and the [Long Decode guide](https://ai.google.dev/gemini-api/docs/long-decode.md.txt) (or [generateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode.md.txt)) for supported APIs and context/output window sizes per API (input, thinking, and output share a single `1,048,576` token window, dynamically clamped to `1,048,576 - input_tokens`). Only if needed for the workload:
+  - [ ] Set `max_output_tokens` explicitly above `65,536` (for example, `131,072` or `262,144`, up to `1,048,576` minus input tokens)
+  - [ ] **Interactions API**: Enable [long decode](https://ai.google.dev/gemini-api/docs/long-decode.md.txt) via server-side [background execution](https://ai.google.dev/gemini-api/docs/background-execution.md.txt) (`background=True`, requires `store=True`), poll while `interaction.status in ("in_progress", "queued")` (or stream and reconnect with `last_event_id`), and join text across **all** `model_output` steps in `interaction.steps`
+  - [ ] **`generateContent` API**: Enable [generateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode.md.txt) via SDK automatic continuation (`automatic_continuation=True`, enabled by default in `google-genai >= 2.30.1` and `@google/genai >= 2.29.1`) or a client `continuation_token` loop while `finish_reason == "CONTINUATION"` (resend the original request without appending partial output to `contents`; treat empty-text thinking hops with `CONTINUATION` as normal progress)
+  - [ ] **Token counting & context compaction**: Do not use summed `total_input_tokens` (Interactions API) or `prompt_token_count` (`generateContent`) for context compaction, as they sum input tokens across all continuation hops; use `prompt_tokens + total_output_tokens + total_thought_tokens` (Interactions API) or `usage_metadata.initial_prompt_token_count` (`generateContent` SDK) instead
+  - [ ] Increase HTTP client read timeouts to at least 15–20 minutes (`timeout=1_200_000` ms) for long-running reasoning or long-decode streams
 
 ### Migrate to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite
 
-Use this checklist if the user requests to migrate to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite. For full documentation of the changes, fetch the [Latest Gemini models guide](https://ai.google.dev/gemini-api/docs/latest-model.md.txt) and look for the migration section.
+Use this checklist if the user requests to migrate to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite. For full documentation of the changes, fetch the [What's new in Gemini 3.8 Flash guide](https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.8.md.txt) and look for the migration section.
 
 - [ ] Updated model name to `gemini-3.8-flash` or `gemini-3.5-flash-lite` (depending on user request)
 - [ ] Removed `temperature`, `top_p`, `top_k` from config
