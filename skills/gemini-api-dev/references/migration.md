@@ -86,7 +86,7 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 
 - [ ] Updated SDK: `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS)
 - [ ] Replaced `client.models.generate_content()` → `client.interactions.create()`
-- [ ] Replaced `response.text` → `interaction.output_text` (or join `model_output` steps for multi-hop long decode)
+- [ ] Replaced `response.text` → `interaction.output_text` 
 - [ ] Replaced `response.candidates[0].content.parts` → iterate `interaction.steps`
 - [ ] Replaced `client.chats.create()` / manual history → `previous_interaction_id`
 - [ ] Removed all `types.*` wrappers (`GenerateContentConfig`, `Tool`, `Content`, `Part`) — Interactions API uses plain dicts. Check feature docs for exact format.
