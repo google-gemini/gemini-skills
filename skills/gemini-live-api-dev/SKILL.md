@@ -353,7 +353,7 @@ For step-by-step migration checklists and protocol deltas when upgrading from `g
 
 1. **Use headphones** when testing mic audio to prevent echo/self-interruption
 2. **Enable context window compression** for sessions longer than 15 minutes
-3. **Implement session resumption** to handle connection resets gracefully
+3. **Implement session resumption** to handle connection resets gracefully: store the latest `SessionResumptionUpdate.newHandle` (valid 2 h) and reconnect with it on `GoAway` or disconnect. If the session hit its length limit, enable context window compression instead of just reconnecting
 4. **Use ephemeral tokens** for client-side deployments — never expose API keys in browsers
 5. **Use `send_realtime_input`** for real-time user input (audio, video, text). Use `send_client_content` with explicit `user`/`model` roles to inject context turns mid-stream
 6. **Send `audioStreamEnd` / `audio_stream_end`** (Hybrid VAD) when the mic is paused or user finishes speaking
