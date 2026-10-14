@@ -209,7 +209,7 @@ interaction = client.interactions.create(
 
 # The interaction steps will include function_call steps, and the final response
 # will adhere to the SearchResult schema
-print(f"Query: {interaction.output_text}")
+print(f"Search Result: {interaction.output_text}")
 ```
 
 > **Note**: The exact behavior of how function call results feed into the structured output depends on the model's flow. In practice, you may need to handle function call execution and pass results back through the interaction loop.
