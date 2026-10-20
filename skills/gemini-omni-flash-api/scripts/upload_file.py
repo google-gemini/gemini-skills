@@ -33,8 +33,9 @@ def is_retryable_api_error(err):
     if code in NON_RETRYABLE_HTTP_CODES:
         return False
     if code == 429:
-        err_str = (str(getattr(err, "message", "")) + str(getattr(err, "details", ""))).lower()
-        if "quota_exceeded" in err_str:
+        # A daily quota shows up as a QuotaFailure whose quotaId contains "PerDay"; per-minute limits are retryable.
+        err_str = str(getattr(err, "message", "")) + str(getattr(err, "details", ""))
+        if "PerDay" in err_str or "quota_exceeded" in err_str.lower():
             return False
     return True
 

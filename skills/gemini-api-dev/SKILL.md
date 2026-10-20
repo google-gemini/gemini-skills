@@ -60,7 +60,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
-- **Errors**: Branch on the error code in the response body (e.g. `quota_exceeded`), not just the HTTP status (429 can be a rate limit or `quota_exceeded`). The Python SDK already retries transient errors (rate limits, 5xx); in TypeScript, configure `httpOptions.retryOptions` rather than writing your own loop. If it still fails after those retries, stop and report it. Never retry `quota_exceeded`, `payment_required`, `authentication` or `permission_denied`; tell the user the code and the fix. See **Errors & Limits** docs below.
+- **Errors**: If an API call still fails after one re-run (503, daily-quota 429, or 400/401/403), stop and tell the user the error and the fix; don't switch models or debug the environment. A per-minute 429 (quotaId `PerMinute`) is fine to retry after its `retryDelay`.
 
 ## Quick Start
 
@@ -384,11 +384,6 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Latest Models (3.8 Flash & 3.5 Flash-Lite)](https://ai.google.dev/gemini-api/docs/latest-model.md.txt)
 - [Flex Inference](https://ai.google.dev/gemini-api/docs/flex-inference.md.txt)
 - [Priority Inference](https://ai.google.dev/gemini-api/docs/priority-inference.md.txt)
-
-**Errors & Limits:**
-- [API Errors](https://ai.google.dev/gemini-api/docs/api-errors.md.txt)
-- [Troubleshooting](https://ai.google.dev/gemini-api/docs/troubleshooting.md.txt)
-- [Rate Limits](https://ai.google.dev/gemini-api/docs/rate-limits.md.txt)
 
 **API Reference:**
 - [API Reference](https://ai.google.dev/static/api/interactions.md.txt)

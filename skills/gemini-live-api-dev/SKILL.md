@@ -353,13 +353,14 @@ For step-by-step migration checklists and protocol deltas when upgrading from `g
 
 1. **Use headphones** when testing mic audio to prevent echo/self-interruption
 2. **Enable context window compression** for sessions longer than 15 minutes
-3. **Implement session resumption** to handle connection resets gracefully: store the latest `SessionResumptionUpdate.newHandle` (valid 2 h) and reconnect with it on `GoAway` or disconnect. If the session hit its length limit, enable context window compression instead of just reconnecting
+3. **Implement session resumption** to handle connection resets gracefully
 4. **Use ephemeral tokens** for client-side deployments — never expose API keys in browsers
 5. **Use `send_realtime_input`** for real-time user input (audio, video, text). Use `send_client_content` with explicit `user`/`model` roles to inject context turns mid-stream
 6. **Send `audioStreamEnd` / `audio_stream_end`** (Hybrid VAD) when the mic is paused or user finishes speaking
 7. **Clear audio playback queues** on interruption signals (`interrupted: true`)
 8. **Process all parts** in each server event — events can contain multiple content parts
 9. **Monitor `interaction_status`** (`IN_PROGRESS` vs `IDLE`) when using `gemini-3.8-live-extended-thinking` rather than relying on `turn_complete` alone
+10. **Errors**: If connecting still fails after one retry (503, daily-quota 429, or 400/401/403), stop and tell the user the error and the fix; don't switch models or debug the environment. A per-minute 429 (quotaId `PerMinute`) is fine to retry after its `retryDelay`.
 
 ## Documentation Lookup
 
