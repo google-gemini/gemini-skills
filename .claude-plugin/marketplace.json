@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "A library of skills for the Gemini API, SDK and model interactions.",
-    "version": "2.1.0"
+    "version": "2.2.0"
   },
   "plugins": [
     {
       "name": "gemini-skills",
       "description": "A library of skills for the Gemini API, SDK and model interactions.",
-      "version": "2.1.0",
+      "version": "2.2.0",
       "source": "./"
     }
   ]
