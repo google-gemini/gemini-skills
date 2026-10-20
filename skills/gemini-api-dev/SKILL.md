@@ -387,6 +387,11 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Flex Inference](https://ai.google.dev/gemini-api/docs/flex-inference.md.txt)
 - [Priority Inference](https://ai.google.dev/gemini-api/docs/priority-inference.md.txt)
 
+**Errors & Limits:**
+- [API Errors](https://ai.google.dev/gemini-api/docs/api-errors.md.txt)
+- [Troubleshooting](https://ai.google.dev/gemini-api/docs/troubleshooting.md.txt)
+- [Rate Limits](https://ai.google.dev/gemini-api/docs/rate-limits.md.txt)
+
 **API Reference:**
 - [API Reference](https://ai.google.dev/static/api/interactions.md.txt)
 - [OpenAPI Spec](https://ai.google.dev/static/api/interactions.openapi.json)
