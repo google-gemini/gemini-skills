@@ -5,7 +5,7 @@ import subprocess
 import sys
 from inspect_video import inspect_video, format_size
 
-def parse_timecode(time_str, total_duration=None):
+def parse_timecode(time_str, total_duration=None, target_duration=10.0):
     """Parses a time string (seconds, MM:SS, HH:MM:SS, or 'last') into float seconds."""
     if not time_str:
         return 0.0
@@ -14,7 +14,7 @@ def parse_timecode(time_str, total_duration=None):
     if time_str == "last":
         if total_duration is None:
             raise ValueError("Total duration is required to calculate 'last' starting point.")
-        target_dur = 10.0
+        target_dur = float(target_duration) if target_duration and target_duration > 0 else 10.0
         if total_duration <= target_dur:
             return 0.0
         return total_duration - target_dur
@@ -23,16 +23,25 @@ def parse_timecode(time_str, total_duration=None):
         parts = time_str.split(":")
         if len(parts) == 2:  # MM:SS
             m, s = map(float, parts)
+            if m < 0 or s < 0 or s >= 60.0:
+                raise ValueError(f"Invalid timecode values in '{time_str}'. Minutes and seconds must be non-negative and seconds < 60.")
             return m * 60.0 + s
         elif len(parts) == 3:  # HH:MM:SS
             h, m, s = map(float, parts)
+            if h < 0 or m < 0 or s < 0 or m >= 60.0 or s >= 60.0:
+                raise ValueError(f"Invalid timecode values in '{time_str}'. Time components must be non-negative and minutes/seconds < 60.")
             return h * 3600.0 + m * 60.0 + s
         else:
             raise ValueError(f"Invalid timecode format: '{time_str}'. Use HH:MM:SS or MM:SS.")
     
     try:
-        return float(time_str)
-    except ValueError:
+        val = float(time_str)
+        if val < 0:
+            raise ValueError(f"Timecode cannot be negative: {val}")
+        return val
+    except ValueError as e:
+        if "cannot be negative" in str(e):
+            raise
         raise ValueError(f"Invalid timecode: '{time_str}'. Must be float seconds, HH:MM:SS, or 'last'.")
 
 def prep_video(input_path, output_path, start_time_str=None, duration=10, fps=None, resolution=None, strip_audio=False):
@@ -75,7 +84,7 @@ def prep_video(input_path, output_path, start_time_str=None, duration=10, fps=No
             start_time_str = "0"
 
     try:
-        start_seconds = parse_timecode(start_time_str, total_duration)
+        start_seconds = parse_timecode(start_time_str, total_duration, target_duration=duration)
     except Exception as e:
         raise ValueError(f"Timecode parsing failed: {e}")
 
