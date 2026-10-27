@@ -11,7 +11,8 @@ sys.path.insert(0, str(SCRIPTS_DIR))
 sys.path.insert(0, str(VIDEO_DIR))
 
 from inspect_video import format_size, parse_fps
-from prep_video import parse_timecode
+from prep_video import parse_timecode, prep_video
+from unittest.mock import patch
 from generate_video import (
     normalize_file_uri,
     parse_and_validate_resolution,
@@ -126,6 +127,26 @@ class TestVideoScripts(unittest.TestCase):
         err_token = "Unauthorized: Bearer ya29.a0AfH6SMTestToken123456"
         sanitized_token = sanitize_error(err_token)
         self.assertNotIn("ya29.a0AfH6SMTestToken123456", sanitized_token)
+
+    @patch("prep_video.subprocess.run")
+    @patch("prep_video.inspect_video")
+    @patch("os.path.exists", return_value=True)
+    def test_prep_video_validation_guards(self, mock_exists, mock_inspect, mock_run):
+        # 1. Non-positive duration guard
+        mock_inspect.return_value = {"has_video": True, "duration_seconds": 30.0}
+        with self.assertRaises(ValueError) as cm:
+            prep_video("input.mp4", "output.mp4", duration=0)
+        self.assertIn("Duration must be a positive number", str(cm.exception))
+
+        with self.assertRaises(ValueError) as cm:
+            prep_video("input.mp4", "output.mp4", duration=-5)
+        self.assertIn("Duration must be a positive number", str(cm.exception))
+
+        # 2. Audio-only / no video stream guard
+        mock_inspect.return_value = {"has_video": False, "duration_seconds": 30.0}
+        with self.assertRaises(ValueError) as cm:
+            prep_video("audio_only.mp4", "output.mp4", duration=10)
+        self.assertIn("does not contain a valid video stream", str(cm.exception))
 
 
 if __name__ == "__main__":

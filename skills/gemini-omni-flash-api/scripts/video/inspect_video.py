@@ -28,6 +28,8 @@ def parse_fps(fps_str):
     """Parses fractional frame rates like '30/1' or '24000/1001' into floats."""
     if not fps_str:
         return "Unknown"
+
+    val = None
     if "/" in fps_str:
         try:
             parts = fps_str.split("/")
@@ -35,23 +37,19 @@ def parse_fps(fps_str):
                 num, den = map(float, parts)
                 if den != 0:
                     val = num / den
-                    if val <= 0:
-                        return "Unknown"
-                    if val.is_integer():
-                        return f"{int(val)} fps"
-                    return f"{val:.2f} fps"
-                return "Unknown"
         except (ValueError, ZeroDivisionError):
             pass
-    try:
-        val = float(fps_str)
-        if val <= 0:
-            return "Unknown"
-        if val.is_integer():
-            return f"{int(val)} fps"
-        return f"{val:.2f} fps"
-    except ValueError:
+    else:
+        try:
+            val = float(fps_str)
+        except ValueError:
+            pass
+
+    if val is None or val <= 0:
         return "Unknown"
+    if val.is_integer():
+        return f"{int(val)} fps"
+    return f"{val:.2f} fps"
 
 def inspect_video(file_path, raw=False):
     """Runs ffprobe on the video file and returns parsed metadata dictionary."""

@@ -83,6 +83,11 @@ def prep_video(input_path, output_path, start_time_str=None, duration=10, fps=No
         else:
             start_time_str = "0"
 
+    if duration <= 0:
+        raise ValueError(f"Duration must be a positive number, got {duration}")
+    if not source_info.get("has_video", False):
+        raise ValueError(f"Input file '{input_path}' does not contain a valid video stream.")
+
     try:
         start_seconds = parse_timecode(start_time_str, total_duration, target_duration=duration)
     except Exception as e:
