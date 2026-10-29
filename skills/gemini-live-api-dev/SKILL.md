@@ -380,7 +380,7 @@ If no MCP documentation tools are available, fetch from the official docs index:
 
 **llms.txt URL**: `https://aistudio.google.com/llms.txt`
 
-This index contains links to all documentation pages in `.md.txt` format. Use web fetch tools to:
+This index contains links to all documentation pages in `.md` format. Use web fetch tools to:
 
 1. Fetch `llms.txt` to discover available documentation pages
 2. Fetch specific pages (e.g., `https://aistudio.google.com/docs/live-api/session-management.md`)
