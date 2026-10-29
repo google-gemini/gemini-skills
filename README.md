@@ -11,7 +11,7 @@ and best practices evolve quickly.
 This leaves a knowledge gap that language models can't solve on their own. For
 example, models don't know about themselves when they're trained, and they
 aren't necessarily aware of subtle changes in best practices (like [thought
-circulation](https://aistudio.google.com/docs/thought-signatures)) or SDK
+circulation](https://aistudio.google.com/docs/thought-signatures.md)) or SDK
 changes.
 
 [Skills](https://agentskills.io/) are a lightweight technique for adding
@@ -104,7 +104,7 @@ codex plugin add gemini-skills@gemini-skills
 ## More info
 
 You can find additional information about setting up your coding assistant with
-Gemini API MCP and Skills in [the docs](https://aistudio.google.com/docs/coding-agents).
+Gemini API MCP and Skills in [the docs](https://aistudio.google.com/docs/coding-agents.md).
 
 ## Disclaimer
 
