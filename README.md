@@ -11,7 +11,7 @@ and best practices evolve quickly.
 This leaves a knowledge gap that language models can't solve on their own. For
 example, models don't know about themselves when they're trained, and they
 aren't necessarily aware of subtle changes in best practices (like [thought
-circulation](https://ai.google.dev/gemini-api/docs/thought-signatures)) or SDK
+circulation](https://aistudio.google.com/docs/thought-signatures.md)) or SDK
 changes.
 
 [Skills](https://agentskills.io/) are a lightweight technique for adding
@@ -33,7 +33,7 @@ and 96% with Gemini 3.1 Pro. For more details, see our blog post:
 
 | Skill | Description |
 | :--- | :--- |
-| [`gemini-api-dev`](skills/gemini-api-dev) | Skill for building apps with the [Gemini API](https://ai.google.dev/gemini-api/docs/interactions?ua=chat) (Interactions API). Covers text generation, multi-turn chat, streaming, function calling, structured output, image generation, speech generation (TTS), Voice Design, Voice Replication, managed agents, Deep Research, deprecated model guardrails, and both Python and TypeScript SDKs. |
+| [`gemini-api-dev`](skills/gemini-api-dev) | Skill for building apps with the [Gemini API](https://aistudio.google.com/docs/interactions-overview) (Interactions API). Covers text generation, multi-turn chat, streaming, function calling, structured output, image generation, speech generation (TTS), Voice Design, Voice Replication, managed agents, Deep Research, deprecated model guardrails, and both Python and TypeScript SDKs. |
 | [`gemini-live-api-dev`](skills/gemini-live-api-dev) | Skill for building real-time, bidirectional streaming apps with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection, native audio features, function calling, and session management. |
 | [`gemini-omni-flash-api`](skills/gemini-omni-flash-api) | Specialized generative AI video skill focused on Gemini Omni 1.1 Flash (`gemini-omni-1.1-flash`), video editing, image and video referenced generation, first and last frame transitions, and video extensions using the Interactions API. |
 
@@ -104,7 +104,7 @@ codex plugin add gemini-skills@gemini-skills
 ## More info
 
 You can find additional information about setting up your coding assistant with
-Gemini API MCP and Skills in [the docs](https://ai.google.dev/gemini-api/docs/coding-agents).
+Gemini API MCP and Skills in [the docs](https://aistudio.google.com/docs/coding-agents.md).
 
 ## Disclaimer
 
