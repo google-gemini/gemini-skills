@@ -60,6 +60,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
+- **Errors**: If an API call still fails after one re-run (503, daily-quota 429, or 400/401/403), stop and tell the user the error and the fix; don't switch models or debug the environment. A per-minute 429 (quotaId `PerMinute`) is fine to retry after its `retryDelay`.
 
 ## Quick Start
 
@@ -385,6 +386,11 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Background Execution](https://aistudio.google.com/docs/background-execution.md)
 - [Flex Inference](https://aistudio.google.com/docs/flex-inference.md)
 - [Priority Inference](https://aistudio.google.com/docs/priority-inference.md)
+
+**Errors & Limits:**
+- [API Errors](https://ai.google.dev/gemini-api/docs/api-errors.md.txt)
+- [Troubleshooting](https://ai.google.dev/gemini-api/docs/troubleshooting.md.txt)
+- [Rate Limits](https://ai.google.dev/gemini-api/docs/rate-limits.md.txt)
 
 **API Reference:**
 - [API Reference](https://aistudio.google.com/api-reference/interactions-api.md)
