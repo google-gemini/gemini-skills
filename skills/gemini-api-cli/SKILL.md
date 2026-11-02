@@ -3,8 +3,6 @@ name: gemini-api-cli
 description: Call the Gemini API from the shell with gemini-api. Use for media generation (images, TTS, music, video), file or YouTube analysis and transcription, Deep Research, and sandboxed agents.
 ---
 
-# Gemini API CLI (`gemini-api`)
-
 The `gemini-api` CLI exposes every Gemini API resource as a shell subcommand. Compared to `curl`: media and transcription commands decode output to disk and print only the file path, `-i` attaches local files or `files/<id>` URIs, `--jq` extracts fields in-process (raw strings by default, no external `jq`), `--dry-run` previews redacted HTTP requests offline, and list endpoints auto-paginate with `--all` (cap pages with `--max-pages N`; `--page-size` sets server page size).
 
 ## CLI vs SDK
