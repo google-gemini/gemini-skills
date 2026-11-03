@@ -181,15 +181,15 @@ while (true) {
 }
 ```
 
-Advanced features: collaborative planning, native visualization, MCP integration, file search, multimodal inputs. See [Deep Research docs](https://ai.google.dev/gemini-api/docs/deep-research.md.txt).
+Advanced features: collaborative planning, native visualization, MCP integration, file search, multimodal inputs. See [Deep Research docs](https://aistudio.google.com/docs/deep-research.md).
 
 ## Managed Agents
 
-Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch the [Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt) before writing agent code.
+Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch the [Managed Agents Quickstart](https://aistudio.google.com/docs/managed-agents-quickstart.md) before writing agent code.
 
 ### Antigravity Agent
 
-The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. It uses `gemini-3.8-flash` by default and also supports `gemini-4-argon` via `agent_config={"type": "antigravity", "model": "gemini-4-argon"}`. See [Antigravity Agent docs](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt) for capabilities, tools, multimodal input, and pricing.
+The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. It uses `gemini-3.8-flash` by default and also supports `gemini-4-argon` via `agent_config={"type": "antigravity", "model": "gemini-4-argon"}`. See [Antigravity Agent docs](https://aistudio.google.com/docs/antigravity-agent.md) for capabilities, tools, multimodal input, and pricing.
 
 #### Python
 ```python
@@ -225,7 +225,7 @@ console.log(interaction.output_text);
 
 ### Custom Agents
 
-See [Building Custom Agents docs](https://ai.google.dev/gemini-api/docs/custom-agents.md.txt).
+See [Building Custom Agents docs](https://aistudio.google.com/docs/custom-agents.md).
 
 #### Python
 ```python
@@ -318,7 +318,7 @@ for await (const event of stream) {
 }
 ```
 
-For streaming with tools, thinking, agents, and image generation see the full [Streaming guide](https://ai.google.dev/gemini-api/docs/streaming.md.txt).
+For streaming with tools, thinking, agents, and image generation see the full [Streaming guide](https://aistudio.google.com/docs/streaming.md).
 
 
 
@@ -327,69 +327,69 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 **You MUST fetch the matching page below before writing code.** These hosted docs are the source of truth for parameters, types, and edge cases — do not rely solely on the examples above.
 
 **Core Documentation:**
-- [Interactions API Overview](https://ai.google.dev/gemini-api/docs/interactions.md.txt)
-- [Quickstart](https://ai.google.dev/gemini-api/docs/quickstart.md.txt)
-- [Text Generation](https://ai.google.dev/gemini-api/docs/text-generation.md.txt)
-- [Streaming](https://ai.google.dev/gemini-api/docs/streaming.md.txt)
-- [Tokens](https://ai.google.dev/gemini-api/docs/tokens.md.txt)
-- [API Keys](https://ai.google.dev/gemini-api/docs/api-key.md.txt)
+- [Interactions API Overview](https://aistudio.google.com/docs/interactions-overview.md)
+- [Quickstart](https://aistudio.google.com/docs/get-started.md)
+- [Text Generation](https://aistudio.google.com/docs/text-generation.md)
+- [Streaming](https://aistudio.google.com/docs/streaming.md)
+- [Tokens](https://aistudio.google.com/docs/tokens.md)
+- [API Keys](https://aistudio.google.com/docs/api-key.md)
 
 **Tools & Function Calling:**
-- [Function Calling](https://ai.google.dev/gemini-api/docs/function-calling.md.txt)
-- [Google Search](https://ai.google.dev/gemini-api/docs/google-search.md.txt)
-- [Code Execution](https://ai.google.dev/gemini-api/docs/code-execution.md.txt)
-- [URL Context](https://ai.google.dev/gemini-api/docs/url-context.md.txt)
-- [File Search](https://ai.google.dev/gemini-api/docs/file-search.md.txt)
-- [Tool Combination](https://ai.google.dev/gemini-api/docs/tool-combination.md.txt)
-- [Computer Use](https://ai.google.dev/gemini-api/docs/computer-use.md.txt)
-- [Maps Grounding](https://ai.google.dev/gemini-api/docs/maps-grounding.md.txt)
+- [Function Calling](https://aistudio.google.com/docs/function-calling.md)
+- [Google Search](https://aistudio.google.com/docs/google-search.md)
+- [Code Execution](https://aistudio.google.com/docs/code-execution.md)
+- [URL Context](https://aistudio.google.com/docs/url-context.md)
+- [File Search](https://aistudio.google.com/docs/file-search.md)
+- [Tool Combination](https://aistudio.google.com/docs/tool-combination.md)
+- [Computer Use](https://aistudio.google.com/docs/computer-use.md)
+- [Maps Grounding](https://aistudio.google.com/docs/maps-grounding.md)
 
 **Generation & Output:**
-- [Structured Output](https://ai.google.dev/gemini-api/docs/structured-output.md.txt)
-- [Thinking](https://ai.google.dev/gemini-api/docs/thinking.md.txt)
-- [Thought Signatures](https://ai.google.dev/gemini-api/docs/thought-signatures.md.txt)
-- [Image Generation](https://ai.google.dev/gemini-api/docs/image-generation.md.txt)
-- [Image Understanding](https://ai.google.dev/gemini-api/docs/image-understanding.md.txt)
-- [Video Generation & Editing (Omni Flash)](https://ai.google.dev/gemini-api/docs/omni.md.txt)
-- [Speech Generation (TTS)](https://ai.google.dev/gemini-api/docs/speech-generation.md.txt)
-- [Voice Design](https://ai.google.dev/gemini-api/docs/voice-design.md.txt)
-- [Voice Replication](https://ai.google.dev/gemini-api/docs/voice-replication.md.txt)
-- [Music Generation](https://ai.google.dev/gemini-api/docs/music-generation.md.txt)
-- [Embeddings](https://ai.google.dev/gemini-api/docs/embeddings.md.txt)
+- [Structured Output](https://aistudio.google.com/docs/structured-output.md)
+- [Thinking](https://aistudio.google.com/docs/thinking.md)
+- [Thought Signatures](https://aistudio.google.com/docs/thought-signatures.md)
+- [Image Generation](https://aistudio.google.com/docs/image-generation.md)
+- [Image Understanding](https://aistudio.google.com/docs/image-understanding.md)
+- [Video Generation & Editing (Omni Flash)](https://aistudio.google.com/docs/omni.md)
+- [Speech Generation (TTS)](https://aistudio.google.com/docs/speech-generation.md)
+- [Voice Design](https://aistudio.google.com/docs/voice-design.md)
+- [Voice Replication](https://aistudio.google.com/docs/voice-replication.md)
+- [Music Generation](https://aistudio.google.com/docs/music-generation.md)
+- [Embeddings](https://aistudio.google.com/docs/embeddings.md)
 
 **Multimodal Understanding:**
-- [Audio](https://ai.google.dev/gemini-api/docs/audio.md.txt)
-- [Audio Transcription](https://ai.google.dev/gemini-api/docs/transcribe.md.txt)
-- [Video Understanding](https://ai.google.dev/gemini-api/docs/video-understanding.md.txt)
-- [Document Processing](https://ai.google.dev/gemini-api/docs/document-processing.md.txt)
+- [Audio](https://aistudio.google.com/docs/audio.md)
+- [Audio Transcription](https://aistudio.google.com/docs/transcribe.md)
+- [Video Understanding](https://aistudio.google.com/docs/video-understanding.md)
+- [Document Processing](https://aistudio.google.com/docs/document-processing.md)
 
 **Files & Context:**
-- [Files](https://ai.google.dev/gemini-api/docs/files.md.txt)
-- [File Input Methods](https://ai.google.dev/gemini-api/docs/file-input-methods.md.txt)
-- [Long Context](https://ai.google.dev/gemini-api/docs/long-context.md.txt)
-- [Caching](https://ai.google.dev/gemini-api/docs/caching.md.txt)
-- [Media Resolution](https://ai.google.dev/gemini-api/docs/media-resolution.md.txt)
+- [Files](https://aistudio.google.com/docs/files.md)
+- [File Input Methods](https://aistudio.google.com/docs/file-input-methods.md)
+- [Long Context](https://aistudio.google.com/docs/long-context.md)
+- [Caching](https://aistudio.google.com/docs/caching.md)
+- [Media Resolution](https://aistudio.google.com/docs/media-resolution.md)
 
 **Agents:**
-- [Agents Overview](https://ai.google.dev/gemini-api/docs/agents.md.txt)
-- [Managed Agents Quickstart](https://ai.google.dev/gemini-api/docs/managed-agents-quickstart.md.txt)
-- [Antigravity Agent](https://ai.google.dev/gemini-api/docs/antigravity-agent.md.txt)
-- [Agent Environments](https://ai.google.dev/gemini-api/docs/agent-environment.md.txt)
-- [Agent Hooks](https://ai.google.dev/gemini-api/docs/agent-hooks.md.txt)
-- [Agent Credentials](https://ai.google.dev/gemini-api/docs/agent-credentials.md.txt)
-- [Building Custom Agents](https://ai.google.dev/gemini-api/docs/custom-agents.md.txt)
-- [Deep Research](https://ai.google.dev/gemini-api/docs/deep-research.md.txt)
+- [Agents Overview](https://aistudio.google.com/docs/agents.md)
+- [Managed Agents Quickstart](https://aistudio.google.com/docs/managed-agents-quickstart.md)
+- [Antigravity Agent](https://aistudio.google.com/docs/antigravity-agent.md)
+- [Agent Environments](https://aistudio.google.com/docs/agent-environment.md)
+- [Agent Hooks](https://aistudio.google.com/docs/agent-hooks.md)
+- [Agent Credentials](https://aistudio.google.com/docs/agent-credentials.md)
+- [Building Custom Agents](https://aistudio.google.com/docs/custom-agents.md)
+- [Deep Research](https://aistudio.google.com/docs/deep-research.md)
 
 **Advanced Features:**
-- [Latest Model (Gemini 4 Argon)](https://ai.google.dev/gemini-api/docs/latest-model.md.txt)
-- [Background Execution](https://ai.google.dev/gemini-api/docs/background-execution.md.txt)
-- [Flex Inference](https://ai.google.dev/gemini-api/docs/flex-inference.md.txt)
-- [Priority Inference](https://ai.google.dev/gemini-api/docs/priority-inference.md.txt)
+- [Latest Model (Gemini 4 Argon)](https://aistudio.google.com/docs/latest-model.md)
+- [Background Execution](https://aistudio.google.com/docs/background-execution.md)
+- [Flex Inference](https://aistudio.google.com/docs/flex-inference.md)
+- [Priority Inference](https://aistudio.google.com/docs/priority-inference.md)
 
 **API Reference:**
-- [API Reference](https://ai.google.dev/static/api/interactions.md.txt)
-- [OpenAPI Spec](https://ai.google.dev/static/api/interactions.openapi.json)
-- [May 2026 Breaking Changes Migration Guide](https://ai.google.dev/gemini-api/docs/interactions-breaking-changes-may-2026.md.txt)
+- [API Reference](https://aistudio.google.com/api-reference/interactions-api.md)
+- [OpenAPI Spec](https://aistudio.google.com/api-reference/interactions.openapi.json)
+- [May 2026 Breaking Changes Migration Guide](https://aistudio.google.com/docs/interactions-breaking-changes-may-2026.md)
 
 ## Data Model
 
