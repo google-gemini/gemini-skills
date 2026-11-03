@@ -37,6 +37,7 @@ and 96% with Gemini 3.1 Pro. For more details, see our blog post:
 | [`gemini-api-cli`](skills/gemini-api-cli) | Skill for calling the Gemini API from the shell with [`gemini-api`](https://github.com/google-gemini/gemini-api-cli). Covers text and media generation (`image`, `tts`, `music`, `video`), file and YouTube analysis, transcription, Deep Research, Antigravity sandboxes, and `--jq` / `--body` scripting. |
 | [`gemini-live-api-dev`](skills/gemini-live-api-dev) | Skill for building real-time, bidirectional streaming apps with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection, native audio features, function calling, and session management. |
 | [`gemini-omni-flash-api`](skills/gemini-omni-flash-api) | Specialized generative AI video skill focused on Gemini Omni 1.1 Flash (`gemini-omni-1.1-flash`), video editing, image and video referenced generation, first and last frame transitions, and video extensions using the Interactions API. |
+| [`gemini-structured-output-dev`](skills/gemini-structured-output-dev) | Use this skill when you need consistent, type-safe JSON output from the Gemini API, and when to combine structured output with function calling for agent workflows. Covers schema design, when to use each approach, and practical Python and TypeScript examples. |
 
 ## Installation
 
