@@ -176,7 +176,7 @@ For full video generation, editing, extension, and reference parameters, fetch t
 - [ ] Reviewed `response_format.duration`: supports `"3s"` to `"15s"` in 1-second increments (`"10s"` default) for text-to-video, single-frame image-to-video, reference-to-video, and per-turn video extensions (up to `40s` cumulative length); two-frame keyframe interpolation (start + end frame) supports `"3s"` to `"10s"`
 - [ ] Removed deprecated `<FIRST_FRAME>`, `<LAST_FRAME>`, `<IMAGE_REF_*>`, `<VIDEO_REF_*>`, and `[# Sources ...]` prompt tags in favor of natural-language descriptions of uploaded media
 - [ ] Kept `generation_config.video_config.task` unset by default (use only as a fallback if natural-language prompting is ambiguous, as `task` adds strict media-count constraints)
-- [ ] Verified video reference (`reference_to_video`) constraints: video references apply to generation only (not video editing or extension), and `"15s"` R2V clips support at most 1 video reference (up to 3 video references for shorter clips)
+- [ ] Verified reference media rules: **reference images** (up to 6, including on `"15s"` clips) work across new video generation (R2V), video editing, and prompt-based video extension; **only reference videos** are restricted to new video generation (not video editing or extension) and capped at **1 reference video** on `"15s"` clips (up to 3 reference videos on `"3s"`–`"14s"` clips)
 
 ---
 

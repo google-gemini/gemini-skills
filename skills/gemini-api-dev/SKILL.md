@@ -60,7 +60,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
-- **Migrating to Gemini Omni 1.2 Flash (`gemini-omni-1.2-flash`)**: Read `references/migration.md` for upgrading from `gemini-omni-1.1-flash` (`3s`–`15s` durations, `3s`–`10s` two-frame keyframe cap, natural-language media binding without deprecated `<FIRST_FRAME>` / `<IMAGE_REF_*>` tags, and R2V-only video reference constraints).
+- **Migrating to Gemini Omni 1.2 Flash (`gemini-omni-1.2-flash`)**: Read `references/migration.md` for upgrading from `gemini-omni-1.1-flash` (`3s`–`15s` durations, `3s`–`10s` two-frame keyframe cap, natural-language media binding without deprecated `<FIRST_FRAME>` / `<IMAGE_REF_*>` tags, and reference media rules: up to 6 reference images across generation, editing, and extension including `15s` clips, while only reference videos are restricted to new video generation with max 1 reference video on `15s` clips).
 
 ## Quick Start
 

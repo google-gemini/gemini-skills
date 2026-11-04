@@ -5,9 +5,9 @@ Uses the official `google-genai` Interactions API and Files API to perform:
   - Text-to-video generation (3s–15s, default 10s)
   - First-frame image-to-video generation (3s–15s)
   - First-and-last-frame keyframe interpolation (3s–10s) and seamless loops
-  - Reference-to-video (R2V) generation with image and video references
-  - Video extensions (3s–15s per turn, up to 40s total) with optional image references
-  - Single-turn and multi-turn (`previous_interaction_id`) video editing
+  - Reference-to-video (R2V) generation with reference images (up to 6) and reference videos (new generation only)
+  - Video extensions (3s–15s per turn, up to 40s total) with optional reference images
+  - Single-turn and multi-turn (`previous_interaction_id`) video editing with optional reference images
   - Parallel batch execution (`--batch` JSON or `--prompts-file`) with single-instance locking
   - Offline payload validation (`--dry-run`) without spending API quota
 """
@@ -63,6 +63,7 @@ from config import (  # noqa: E402
     MAX_KEYFRAME_DURATION_SECONDS,
     MAX_LOGGED_PROMPT_LENGTH,
     MAX_RECOMMENDED_REF_VIDEOS,
+    MAX_REF_IMAGES,
     MAX_SANITIZED_ERROR_LENGTH,
     MAX_SLUG_LENGTH,
     MAX_TOTAL_EXTENDED_SECONDS,
@@ -419,26 +420,41 @@ def validate_video_reference_constraints(
     ref_videos,
     video_paths,
     extend_video=None,
+    previous_interaction_id=None,
     task=None,
     duration=None,
+    ref_images=None,
 ):
-    """Validates Omni 1.2 Flash reference-video constraints before uploading or calling the API."""
+    """Validates Omni 1.2 Flash reference media constraints before uploading or calling the API."""
+    if ref_images and len(ref_images) > MAX_REF_IMAGES:
+        logger.warning(
+            "%d reference images provided; up to %d reference images (--image) are recommended.",
+            len(ref_images),
+            MAX_REF_IMAGES,
+        )
+
     if not ref_videos:
         return
 
-    if video_paths or extend_video or task in ("edit", "extend"):
+    if (
+        video_paths
+        or extend_video
+        or previous_interaction_id
+        or task in ("edit", "extend")
+    ):
         raise ValueError(
-            "Video references (--video-reference) are supported only for reference-to-video (R2V) "
-            "generation and cannot be combined with video editing (--video / task='edit') or "
-            "video extension (--extend / task='extend'). Use image references (--image) instead "
-            "when guiding edits or extensions."
+            "Reference videos (--video-reference) are supported only when generating a new video "
+            "and cannot be combined with video editing (--video / task='edit'), video extension "
+            "(--extend / task='extend'), or multi-turn editing/extension (--previous-interaction-id). "
+            "Reference images (--image) ARE supported for editing and extension—use --image instead."
         )
 
     if duration == f"{MAX_DURATION_SECONDS}s" and len(ref_videos) > MAX_15S_REF_VIDEOS:
         raise ValueError(
-            f"{MAX_DURATION_SECONDS}-second reference-to-video (R2V) generations support at most "
+            f"{MAX_DURATION_SECONDS}-second video generations support at most "
             f"{MAX_15S_REF_VIDEOS} reference video (--video-reference); got {len(ref_videos)}. "
-            f"Reduce --duration to {MAX_DURATION_SECONDS - 1}s or fewer, or pass a single reference video."
+            f"Reduce --duration to {MAX_DURATION_SECONDS - 1}s or fewer, pass a single reference video, "
+            f"or use reference images (--image, up to {MAX_REF_IMAGES} supported on {MAX_DURATION_SECONDS}s clips)."
         )
 
     if len(ref_videos) > MAX_RECOMMENDED_REF_VIDEOS:
@@ -844,8 +860,10 @@ def generate_video(
         ref_videos=ref_videos,
         video_paths=source_videos,
         extend_video=extend_video,
+        previous_interaction_id=previous_interaction_id,
         task=resolved_task,
         duration=validated_duration,
+        ref_images=ref_images,
     )
 
     if not dry_run and not get_api_key():
@@ -934,7 +952,7 @@ def generate_video(
         )
         input_parts.append({"type": "video", "uri": vid_uri, "mime_type": vid_mime})
 
-    # 5. Reference videos (R2V generation only)
+    # 5. Reference videos (new video generation only; unlike --image, not used for edit/extend)
     for ref_vid in ref_videos:
         rv_uri, rv_mime = resolve_or_upload_asset(
             ref_vid,
@@ -1260,7 +1278,11 @@ def build_arg_parser():
         "-i",
         action="append",
         dest="image",
-        help="Optional local image path or File API URI for reference-guided generation or extension (repeatable)",
+        help=(
+            "Optional local image path or File API URI for reference-guided generation (R2V), "
+            f"video editing, or video extension (repeatable, up to {MAX_REF_IMAGES} images "
+            f"including {MAX_DURATION_SECONDS}s clips)"
+        ),
     )
     parser.add_argument(
         "--video",
@@ -1283,8 +1305,11 @@ def build_arg_parser():
         action="append",
         dest="video_reference",
         help=(
-            "Optional local video path or File API URI for reference-to-video (R2V) generation "
-            "(repeatable; ~3s ideal; up to 3 for <=14s clips, max 1 for 15s clips; R2V generation only)"
+            "Optional local video path or File API URI to guide new video generation "
+            f"(repeatable; ~3s ideal; up to {MAX_RECOMMENDED_REF_VIDEOS} for "
+            f"<={MAX_DURATION_SECONDS - 1}s clips, max {MAX_15S_REF_VIDEOS} for "
+            f"{MAX_DURATION_SECONDS}s clips; new video generation only — unlike --image, "
+            "not supported for editing or extension)"
         ),
     )
     parser.add_argument(
@@ -1293,7 +1318,7 @@ def build_arg_parser():
         default=None,
         help=(
             "Optional fallback video task mode (leave unset by default so natural-language prompting "
-            "and reference-image extensions work without strict task media-count gates)"
+            "and reference-image edits/extensions work without strict task media-count gates)"
         ),
     )
     parser.add_argument(

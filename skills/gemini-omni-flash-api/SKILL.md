@@ -17,7 +17,7 @@ This skill uses the Gemini Omni 1.2 Flash model (`gemini-omni-1.2-flash`) to per
 3. **First and last frame transition**: Generating videos (`3s`–`10s`) interpolating between a starting image and a final image (`--first-frame` and `--last-frame`; note: `--last-frame` must be used with `--first-frame`).
 4. **Video extensions**: Extending existing videos by `3` to `15` seconds per turn (`10s` default), up to a cumulative length of `40` seconds (`--extend` or `--previous-interaction-id`).
 5. **Video editing and refinement**: Editing existing videos (uploaded source video up to `10` seconds), applying stylistic changes, or performing object addition/removal while keeping everything else consistent.
-6. **Image and video referenced generation (R2V)**: Guiding video generation (`3s`–`15s`) with style, character, object, or motion references from uploaded images (`--image`) or videos (`--video-reference`).
+6. **Reference-to-video (R2V) & image-guided editing/extension**: Guiding new video generation (`3s`–`15s`) with reference images (`--image`, up to 6, including `15s` clips) or reference videos (`--video-reference`, up to 3 for `3s`–`14s` clips and max 1 for `15s` clips). **Reference images** (`--image`) also work during **video editing** and **prompt-based video extension**, whereas **only reference videos** (`--video-reference`) are restricted to new video generation.
 
 ## Workflow
 
@@ -121,9 +121,9 @@ Use the following Python scripts to upload media with the Files API, prepare inp
      ./scripts/video/generate_video.py "A cybernetic warrior walking through a rain-soaked street in the painterly style of the reference image" --image reference.png --output media/warrior.mp4
      ```
 
-   * **Video-referenced video generation (R2V)**:
+   * **Video-referenced video generation**:
 
-     Provide reference video(s) (`--video-reference` / `-vr`) to guide character appearance, object details, or camera/motion style (ideal reference clip duration is ~3s; up to 3 reference videos for `3s`–`14s` clips, and at most **1** reference video for `15s` clips):
+     Provide reference video(s) (`--video-reference` / `-vr`) when generating a **new** video to guide character appearance, object details, or camera/motion style (ideal reference clip duration is ~3s; up to 3 reference videos for `3s`–`14s` clips, and at most **1** reference video for `15s` clips; unlike `--image`, `--video-reference` cannot be used for video editing or extension):
 
      ```bash
      ./scripts/video/generate_video.py "A cellist performing on stage with the expressive camera movement and lighting style of the reference video" --video-reference ref_camera.mp4 --output media/cello.mp4
@@ -137,16 +137,19 @@ Use the following Python scripts to upload media with the Files API, prepare inp
 
    * **Video extension with reference images**:
 
-     Prompt-based extension (omitting `--task`) supports passing **reference images** (`--image`) to introduce new characters, objects, or styles into the extended scene (note: `--video-reference` is supported for R2V generation only, not for video editing or extension):
+     Prompt-based extension (omitting `--task`) supports passing **reference images** (`--image`, up to 6 images including on `15s` extensions) to introduce new characters, objects, or styles into the extended scene (only reference videos `--video-reference` are restricted to new video generation):
 
      ```bash
      ./scripts/video/generate_video.py "Extend this video: the character shown in the reference image walks into the frame and waves." --extend media/sunset.mp4 --image character.png --output media/sunset_extended_with_ref.mp4
      ```
 
-   * **Video editing (keep original audio)**:
+   * **Video editing (keep original audio, optionally with reference images)**:
 
      ```bash
      ./scripts/video/generate_video.py "Transform the style to Japanese anime. Keep everything else the same." --video input.mp4 --output media/anime_style.mp4
+
+     # Guide an edit with a reference image (--image works for editing too; only --video-reference is restricted):
+     ./scripts/video/generate_video.py "Replace the coat with the red coat from the reference image. Keep everything else the same." --video input.mp4 --image red_coat.png --output media/coat_swap.mp4
      ```
 
    * **Video editing (regenerate all audio from scratch)**:
@@ -400,8 +403,8 @@ When extending, apply these guidelines:
 
 * **Uploaded source video limit**: Uploaded input videos for editing or extension must be `10` seconds or shorter (multi-turn extensions via `previous_interaction_id` can extend clips up to `40s` total).
 * **Two-frame keyframe cap**: First-and-last-frame interpolation (`--first-frame` + `--last-frame`) supports `3s` to `10s` (`11s`–`15s` requires single-frame, text-to-video, R2V, or extension).
-* **Video references (`--video-reference`) are R2V-only**: Reference videos are supported **only** for reference-to-video (R2V) generation — they are **not** supported during video editing (`--video`) or video extension (`--extend`). Use reference images (`--image`) when guiding edits or extensions.
-* **15-second R2V reference video limit**: `15s` R2V generations support at most **1** reference video (`--video-reference`). Shorter R2V clips (`3s`–`14s`) support up to **3** reference videos (ideal reference clip length is ~`3s`; trim longer clips with `prep_video.py --duration 3`).
+* **Reference images (`--image`) work across generation, editing, and extension**: You can pass up to **6** reference images (including on `15s` clips) for standard reference-to-video (R2V) generation, **video editing** (`--video` or `--previous-interaction-id`), and **prompt-based video extension** (`--extend` or `--previous-interaction-id`, when `--task` is omitted).
+* **Only reference videos (`--video-reference`) are restricted**: Unlike reference images, reference videos are supported **only** when generating a new video — **not** during video editing (`--video` or `--previous-interaction-id`) or video extension (`--extend` or `--previous-interaction-id`) — and `15s` video generations support at most **1** reference video (up to **3** reference videos for `3s`–`14s` clips; ideal reference clip length is ~`3s`, trim longer clips with `prep_video.py --duration 3`).
 * **Spoken dialogue on uploaded videos**: You cannot extend an uploaded video where someone is already speaking in order to add new spoken dialogue (multi-turn voice extension via `previous_interaction_id` is supported).
 * **`task` parameter is fallback-only**: Rely on natural-language prompting by default and pass `--task` (`generation_config.video_config.task`) **only** as a fallback when natural-language prompting alone fails to select the intended mode.
 
