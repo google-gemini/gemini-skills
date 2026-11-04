@@ -18,7 +18,7 @@ Even imperative requests like "migrate my code", "upgrade to gemini 3", "migrate
 **Sizing the scope (large repos).** Before asking, get a per-directory count:
 
 ```sh
-rg -l "generate_content|generateContent|gemini-1\.5|gemini-2\.0|gemini-2\.5|gemini-3\.1-pro|gemini-3\.1-flash-lite|gemini-3\.1-flash-tts|gemini-3\.5|gemini-3\.6|gemini-3\.7|gemini-3-flash|thinking_budget|temperature" --type-not md | cut -d/ -f1 | sort | uniq -c | sort -rn
+rg -l "generate_content|generateContent|gemini-1\.5|gemini-2\.0|gemini-2\.5|gemini-3\.1-pro|gemini-3\.1-flash-lite|gemini-3\.1-flash-tts|gemini-3\.5|gemini-3\.6|gemini-3\.7|gemini-3-flash|gemini-omni-1\.1|gemini-omni-flash-preview|thinking_budget|temperature" --type-not md | cut -d/ -f1 | sort | uniq -c | sort -rn
 ```
 
 Present the breakdown in your question (e.g. *"Found 42 references across 3 directories: src/ (28), tests/ (10), scripts/ (4). Which to migrate?"*).
@@ -66,6 +66,7 @@ For full before/after code examples, fetch the [Migration Guide](https://aistudi
 | `gemini-3.1-pro-preview` or `gemini-2.5-pro` | `gemini-4-argon` | Most powerful model with 1M context, complex reasoning, coding, and research |
 | `gemini-3.1-flash-tts-preview` or `gemini-2.5-*-tts` | `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts` | Latest TTS models with Voice Design, Voice Replication, structured `speech_metadata`, and default WAV (`audio/wav`) output |
 | `gemini-3.1-flash-image` or older image generation models | `gemini-nano-banana-2.1` | Latest Nano Banana image generation model: 131k context, multi-image fusion (up to 14 reference images), enhanced visual quality, and text rendering |
+| `gemini-omni-1.1-flash` or `gemini-omni-flash-preview` | `gemini-omni-1.2-flash` | Latest Omni Flash video model: `3s`–`15s` generation and extension (`10s` default; `3s`–`10s` two-frame keyframe interpolation), improved motion/character consistency, and natural-language media binding |
 | Legacy audio understanding / ASR | `gemini-3.5-transcribe` | Dedicated speech-to-text with auto language detection, diarization, word timestamps, and smart formatting |
 | Legacy Live API (`gemini-3.1-flash-live-preview`, `gemini-2.5-flash-native-audio-*`, `gemini-2.0-flash-live-001`) | `gemini-3.8-live` or `gemini-3.8-live-extended-thinking` | Install `google-gemini/gemini-live-api-dev` skill and see its `references/migration.md` for Live API protocol changes |
 
@@ -114,6 +115,7 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Consider upgrading `gemini-2.5-pro` → `gemini-4-argon`
 - [ ] Consider upgrading `gemini-3.1-flash-tts-preview` → `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`
 - [ ] Consider upgrading `gemini-3.1-flash-image` → `gemini-nano-banana-2.1`
+- [ ] Consider upgrading `gemini-omni-1.1-flash` → `gemini-omni-1.2-flash`
 
 ### Agent Updates
 
@@ -165,6 +167,16 @@ For full image generation details, resolutions, aspect ratios, and multi-image r
 - [ ] Support for wide / panoramic aspect ratios (`1:4`, `4:1`, `1:8`, `8:1`) and output resolutions (`1K` default, `2K`, `4K`)
 - [ ] Grounding with Google Web and Image Search supported natively
 - [ ] Configurable thinking levels (`minimal`, `medium` default, `high`)
+
+### Migrate to Gemini Omni 1.2 Flash (`gemini-omni-1.2-flash`)
+
+For full video generation, editing, extension, and reference parameters, fetch the [Video Generation & Editing guide](https://aistudio.google.com/docs/omni.md).
+
+- [ ] Updated model name from `gemini-omni-1.1-flash` (or `gemini-omni-flash-preview`) to `gemini-omni-1.2-flash`
+- [ ] Reviewed `response_format.duration`: supports `"3s"` to `"15s"` in 1-second increments (`"10s"` default) for text-to-video, single-frame image-to-video, reference-to-video, and per-turn video extensions (up to `40s` cumulative length); two-frame keyframe interpolation (start + end frame) supports `"3s"` to `"10s"`
+- [ ] Removed deprecated `<FIRST_FRAME>`, `<LAST_FRAME>`, `<IMAGE_REF_*>`, `<VIDEO_REF_*>`, and `[# Sources ...]` prompt tags in favor of natural-language descriptions of uploaded media
+- [ ] Kept `generation_config.video_config.task` unset by default (use only as a fallback if natural-language prompting is ambiguous, as `task` adds strict media-count constraints)
+- [ ] Verified video reference (`reference_to_video`) constraints: video references apply to generation only (not video editing or extension), and `"15s"` R2V clips support at most 1 video reference (up to 3 video references for shorter clips)
 
 ---
 
