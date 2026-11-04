@@ -360,6 +360,7 @@ For step-by-step migration checklists and protocol deltas when upgrading from `g
 7. **Clear audio playback queues** on interruption signals (`interrupted: true`)
 8. **Process all parts** in each server event — events can contain multiple content parts
 9. **Monitor `interaction_status`** (`IN_PROGRESS` vs `IDLE`) when using `gemini-3.8-live-extended-thinking` rather than relying on `turn_complete` alone
+10. **Errors**: If connecting still fails after one retry (503, daily-quota 429, or 400/401/403), stop and tell the user the error and the fix; don't switch models or debug the environment. A per-minute 429 (quotaId `PerMinute`) is fine to retry after its `retryDelay`.
 
 ## Documentation Lookup
 
