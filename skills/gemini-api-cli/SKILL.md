@@ -39,7 +39,7 @@ Run `gemini-api --help` to list commands, or `<subcommand> --help` for flags and
 | `image [prompt]` | `-m`, `-i`, `--aspect-ratio`, `--image-size` (512..4K), `--previous-interaction-id`, `--out`, `--body` | `gemini-nano-banana-2.1`; writes image, prints path |
 | `tts [text]` | `-m`, `-f`, `--stdin`, `-v`/`--voice` (default Kore), `--multi-speaker`, `--language`, `--out` | `gemini-3.8-flash-tts`; writes 24 kHz WAV, prints path (unstored) |
 | `music [prompt]` | `-m`, `-f`, `--stdin`, `--out`, `--body` | `lyria-3.5`; writes audio track, prints path |
-| `video [prompt]` | `-m`, `-i`, `--aspect-ratio`, `--resolution` (360p..4k), `--previous-interaction-id`, `--async`, `--resume`, `--out`, `--body` | `gemini-omni-1.1-flash`; polls until done, writes MP4, prints path (`upscale` via `--body`) |
+| `video [prompt]` | `-m`, `-i`, `--aspect-ratio`, `--resolution` (360p..4k), `--previous-interaction-id`, `--async`, `--resume`, `--out`, `--body` | pass `-m gemini-omni-1.2-flash` (`≤ v0.4.5` preset defaults to `gemini-omni-1.1-flash`); polls until done, writes MP4, prints path (`upscale` via `--body`) |
 | `analyze [question]` | `-i` (required, repeatable), `--stdin`, `--system`, `-m` | `gemini-3.8-flash`; answers over PDFs, media, CSV/text, YouTube URLs (unstored) |
 | `transcribe` | `-m`, `-i` (required, repeatable), `--format` (md, text, json, srt), `--no-speakers`, `--no-timestamps`, `--out` | `gemini-3.5-transcribe` (audio; 30m speaker/timestamp cap) or `gemini-3.8-flash` (video); writes `--out` (or `./transcript-*`), prints path (unstored) |
 | `agent` | `run`, `status`, `cancel`, `delete-interaction`; `create`, `list`, `get`, `delete` | Runs models or managed agents; manages custom agent definitions |
@@ -47,7 +47,7 @@ Run `gemini-api --help` to list commands, or `<subcommand> --help` for flags and
 | `models` | (bare), `list [--all]`, `get <id>` | Bare `models` prints an offline catalog; `list` and `get` query the live API |
 | `environments` | `create`, `list`, `get`, `delete`, `files` (`list`, `upload`, `download`), `connect`, `poll`, `serve` | Remote sandboxes and workspace snapshots (`credentials`, `webhooks`, `triggers` for agent infra) |
 
-**Model selection:** use `gemini-3.8-flash` (default), `gemini-4-argon` (hard reasoning and coding), or `gemini-3.5-flash-lite` (high throughput); for images, `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image`, or `gemini-3-pro-image`. Avoid deprecated `gemini-2.5-*`, `gemini-2.0-*`, and `gemini-1.5-*` models.
+**Model selection:** use `gemini-3.8-flash` (default), `gemini-4-argon` (hard reasoning and coding), or `gemini-3.5-flash-lite` (high throughput); for images, `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image`, or `gemini-3-pro-image`; for video, `gemini-omni-1.2-flash`. Avoid deprecated `gemini-2.5-*`, `gemini-2.0-*`, and `gemini-1.5-*` models.
 
 ## Global flags
 
@@ -89,7 +89,7 @@ gemini-api image "Add warm sunset lighting" -i "$HERO" \
 gemini-api tts "Alice: Ready to ship? Bob: Checks are green." \
   --multi-speaker "Alice=Kore,Bob=Puck" --out ./dialogue.wav
 
-VID_ID=$(gemini-api video "Aerial coastal cliffs at sunrise" --aspect-ratio 16:9 --resolution 1080p --async)
+VID_ID=$(gemini-api video "Aerial coastal cliffs at sunrise" -m gemini-omni-1.2-flash --aspect-ratio 16:9 --resolution 1080p --async)
 gemini-api video --resume "$VID_ID" --out ./cliffs.mp4
 
 FILE_URI=$(gemini-api files upload ./call.mp4 --wait)   # prints files/<id>

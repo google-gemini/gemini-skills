@@ -22,7 +22,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite): 65k / 32k tokens, ultra-fast image generation and editing
 - `gemini-3.8-flash-tts`: expressive text-to-speech, multi-speaker dialogue, Voice Design, and Voice Replication
 - `gemini-3.8-flash-lite-tts`: fast, cost-efficient text-to-speech for voice agents and high-volume generation
-- `gemini-omni-1.1-flash`: video generation, first-frame-to-video, first-and-last-frame transitions, video extensions (up to 40s), video editing, and reference-guided generation
+- `gemini-omni-1.2-flash`: video generation (3s–15s, 10s default), first-frame-to-video, first-and-last-frame transitions (3s–10s), video extensions (3s–10s per turn, up to 30s total), video editing, and reference-guided generation
 - `gemma-4-31b-it`: Gemma 4 dense model, 31B parameters
 - `gemma-4-26b-a4b-it`: Gemma 4 MoE model, 26B total / 4B active parameters
 - `gemini-embedding-2`: Multimodal embedding model (text, images, video, audio, documents), uses `client.models.embed_content`
@@ -60,6 +60,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
+- **Migrating to Gemini Omni 1.2 Flash (`gemini-omni-1.2-flash`)**: Read `references/migration.md` for upgrading from `gemini-omni-1.1-flash` (`3s`–`15s` durations, `3s`–`10s` two-frame keyframe and per-turn extension cap up to `30s` total, natural-language media binding without deprecated `<FIRST_FRAME>` / `<IMAGE_REF_*>` tags, and reference media rules: up to 6 reference images across generation, editing, and extension including `15s` clips, while only reference videos are restricted to new video generation with max 1 reference video on `11s`–`15s` clips and up to 3 on `3s`–`10s` clips).
 
 ## Quick Start
 
