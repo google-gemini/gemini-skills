@@ -173,10 +173,10 @@ For full image generation details, resolutions, aspect ratios, and multi-image r
 For full video generation, editing, extension, and reference parameters, fetch the [Video Generation & Editing guide](https://aistudio.google.com/docs/omni.md).
 
 - [ ] Updated model name from `gemini-omni-1.1-flash` (or `gemini-omni-flash-preview`) to `gemini-omni-1.2-flash`
-- [ ] Reviewed `response_format.duration`: supports `"3s"` to `"15s"` in 1-second increments (`"10s"` default) for text-to-video, single-frame image-to-video, reference-to-video, and per-turn video extensions (up to `40s` cumulative length); two-frame keyframe interpolation (start + end frame) supports `"3s"` to `"10s"`
+- [ ] Reviewed `response_format.duration`: supports `"3s"` to `"15s"` in 1-second increments (`"10s"` default) for text-to-video, single-frame image-to-video, reference-to-video, and video editing; two-frame keyframe interpolation (start + end frame) and per-turn video extensions support `"3s"` to `"10s"` (up to `30s` cumulative length)
 - [ ] Removed deprecated `<FIRST_FRAME>`, `<LAST_FRAME>`, `<IMAGE_REF_*>`, `<VIDEO_REF_*>`, and `[# Sources ...]` prompt tags in favor of natural-language descriptions of uploaded media
 - [ ] Kept `generation_config.video_config.task` unset by default (use only as a fallback if natural-language prompting is ambiguous, as `task` adds strict media-count constraints)
-- [ ] Verified reference media rules: **reference images** (up to 6, including on `"15s"` clips) work across new video generation (R2V), video editing, and prompt-based video extension; **only reference videos** are restricted to new video generation (not video editing or extension) and capped at **1 reference video** on `"15s"` clips (up to 3 reference videos on `"3s"`–`"14s"` clips)
+- [ ] Verified reference media rules: **reference images** (up to 6, including on `"15s"` clips) work across new video generation (R2V), video editing, and prompt-based video extension; **only reference videos** are restricted to new video generation (not video editing or extension) and capped at **1 reference video** on `"11s"`–`"15s"` clips (up to 3 reference videos on `"3s"`–`"10s"` clips)
 
 ---
 
