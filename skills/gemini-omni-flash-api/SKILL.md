@@ -24,8 +24,8 @@ This skill uses the Gemini Omni 1.2 Flash model (`gemini-omni-1.2-flash`) to per
 1. **Analyze request**: Determine the target workflow (text-to-video, first-frame-to-video, two-frame keyframe transition, video extension, video editing, or reference-to-video generation) and inspect any input media assets.
 2. **Run SDK scripts**:
 
-   * Directly run the appropriate utility (`scripts/video/generate_video.py` or `scripts/upload_file.py`). Pass `--dry-run` to preview the validated `interactions.create` payload offline without spending API quota.
-   * Configure settings like `--aspect-ratio` (`16:9` default, `9:16`), `--resolution` (`360p`, `720p` default, `1080p`, `4k`), and `--duration` (integer from `3` to `15` seconds, default `10`; `3` to `10` seconds when combining `--first-frame` and `--last-frame`). *Note: `4k` requests take longer to generate.*
+   * Directly run the appropriate utility (`scripts/video/generate_video.py` or `scripts/upload_file.py`).
+   * Configure settings like `--aspect-ratio` (`16:9` default, `9:16`), `--resolution` (`360p`, `720p` default, `1080p`, `4k`), and `--duration` (integer from `3` to `15` seconds, default `10`; `3` to `10` seconds when combining `--first-frame` and `--last-frame` or extending). *Note: `4k` requests take longer to generate.*
 
 3. **Retrieve and process output**: Outputs are saved to the local filesystem (e.g. `media/`). Report back the completed media path to the user.
 
@@ -59,18 +59,12 @@ Use the following Python scripts to upload media with the Files API, prepare inp
    ./scripts/upload_file.py path/to/image.png
    ```
 
-2. **[generate_video.py](scripts/video/generate_video.py)**: Performs end-to-end video generation and downloads the output video. It detects and uploads local media references (images or videos) before calling the Interactions API, validates Omni 1.2 Flash duration and reference constraints upfront, and supports `--dry-run` for offline payload verification.
+2. **[generate_video.py](scripts/video/generate_video.py)**: Performs end-to-end video generation and downloads the output video. It detects and uploads local media references (images or videos) before calling the Interactions API.
 
    * **Text to video (3s–15s, default 10s)**:
 
      ```bash
      ./scripts/video/generate_video.py "A close-up of a cat drinking tea" --duration 12 --output media/cat_tea.mp4
-     ```
-
-   * **Dry-run payload preview (no API call or quota spent)**:
-
-     ```bash
-     ./scripts/video/generate_video.py "A neon-lit Tokyo alley in the rain" --duration 15 --resolution 1080p --dry-run
      ```
 
    * **Output resolution options (`--resolution`)**:
