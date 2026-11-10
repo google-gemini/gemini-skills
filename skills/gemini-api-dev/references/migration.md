@@ -63,7 +63,7 @@ For full before/after code examples, fetch the [Migration Guide](https://aistudi
 | `gemini-3.7-flash`, `gemini-3.6-flash`, `gemini-3.5-flash`, or `gemini-3-flash-preview` | `gemini-3.8-flash` | Latest Flash: stronger agentic/multimodal performance, reduced token usage/loop spiraling |
 | `gemini-2.5-flash` | `gemini-3.8-flash` or `gemini-3.5-flash-lite` | Latest Flash with Interactions API support, or latest Flash-Lite for cheaper/simpler tasks. |
 | `gemini-2.5-flash-lite` or `gemini-3.1-flash-lite` | `gemini-3.5-flash-lite` | Latest Flash-lite with Interactions API support |
-| `gemini-3.1-pro-preview` or `gemini-2.5-pro` | `gemini-4-argon` | Most powerful model with 1M context, complex reasoning, coding, and research |
+| `gemini-3.1-pro-preview` or `gemini-2.5-pro` | `gemini-4-carbon` | Most powerful model with 1M context, complex reasoning, coding, and research |
 | `gemini-3.1-flash-tts-preview` or `gemini-2.5-*-tts` | `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts` | Latest TTS models with Voice Design, Voice Replication, structured `speech_metadata`, and default WAV (`audio/wav`) output |
 | `gemini-3.1-flash-image` or older image generation models | `gemini-nano-banana-2.1` | Latest Nano Banana image generation model: 131k context, multi-image fusion (up to 14 reference images), enhanced visual quality, and text rendering |
 | `gemini-omni-1.1-flash` or `gemini-omni-flash-preview` | `gemini-omni-1.2-flash` | Latest Omni Flash video model: `3s`–`15s` generation and extension (`10s` default; `3s`–`10s` two-frame keyframe interpolation), improved motion/character consistency, and natural-language media binding |
@@ -111,8 +111,8 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Consider upgrading `gemini-2.5-flash` → `gemini-3.8-flash`
 - [ ] Consider upgrading `gemini-3.1-flash-lite` → `gemini-3.5-flash-lite`
 - [ ] Consider upgrading `gemini-2.5-flash-lite` → `gemini-3.5-flash-lite` or `gemini-3.1-flash-lite`
-- [ ] Consider upgrading `gemini-3.1-pro-preview` → `gemini-4-argon`
-- [ ] Consider upgrading `gemini-2.5-pro` → `gemini-4-argon`
+- [ ] Consider upgrading `gemini-3.1-pro-preview` → `gemini-4-carbon`
+- [ ] Consider upgrading `gemini-2.5-pro` → `gemini-4-carbon`
 - [ ] Consider upgrading `gemini-3.1-flash-tts-preview` → `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`
 - [ ] Consider upgrading `gemini-3.1-flash-image` → `gemini-nano-banana-2.1`
 - [ ] Consider upgrading `gemini-omni-1.1-flash` → `gemini-omni-1.2-flash`
@@ -122,13 +122,13 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Upgrade `antigravity-preview-05-2026` → `antigravity-preview-09-2026` (deprecated October 5, 2026; redirected afterwards)
 - [ ] Upgrade `deep-research-pro-preview-12-2025` → `deep-research-preview-04-2026` or `deep-research-max-preview-04-2026` (deprecated, shutdown October 23, 2026)
 
-### Migrate to Gemini 4 Argon
+### Migrate to Gemini 4 Carbon
 
-Use this checklist when migrating to `gemini-4-argon`. For full details on supported APIs, context window sizes, parameter changes, and continuation patterns, fetch [What's new in Gemini 4 Argon](https://aistudio.google.com/docs/latest-model.md) and the [Long Decode guide](https://aistudio.google.com/docs/long-decode.md).
+Use this checklist when migrating to `gemini-4-carbon`. Upgrading from `gemini-4-argon` to `gemini-4-carbon` requires no request schema changes — swap the model ID and ensure `max_output_tokens` and HTTP timeouts accommodate longer thinking passes. For full details on supported APIs, context window sizes, parameter changes, and continuation patterns, fetch [What's new in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md) and the [Long Decode guide](https://aistudio.google.com/docs/long-decode.md).
 
-- [ ] **Check for unsupported APIs before migrating**: Look up unsupported APIs and features in [What's new in Gemini 4 Argon](https://aistudio.google.com/docs/latest-model.md) (e.g., explicit context caching), ensure they are not used, and flag any unsupported usage to the user before migrating
+- [ ] **Check for unsupported APIs before migrating**: Look up unsupported APIs and features in [What's new in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md) (e.g., explicit context caching), ensure they are not used, and flag any unsupported usage to the user before migrating
 - [ ] Updated SDK: `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS)
-- [ ] Updated model name to `gemini-4-argon`
+- [ ] Updated model name to `gemini-4-carbon`
 - [ ] Removed `temperature`, `top_p`, `top_k` from config
 - [ ] Replaced `thinking_budget` with `thinking_level` (`low`, `medium`, `high`)
 - [ ] Reviewed `max_output_tokens`: raise any limit below `32,768` to at least `32,768` (default cap is `65,536` tokens without long decode)

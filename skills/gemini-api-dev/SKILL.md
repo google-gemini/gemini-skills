@@ -12,7 +12,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 ### Current Models (Use These)
 
-- `gemini-4-argon`: 1M tokens, most powerful model for complex reasoning, coding, and research
+- `gemini-4-carbon`: 1M tokens, most powerful model for complex reasoning, coding, and research
 - `gemini-3.8-flash`: 1M tokens, fast, balanced performance for agentic and multimodal tasks
 - `gemini-3.5-flash-lite`: 1M tokens, fastest, lowest-cost 3.5 model for high-throughput execution
 - `gemini-3.1-flash-lite`: cost-efficient, fastest performance for high-frequency, lightweight tasks
@@ -190,7 +190,7 @@ Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch 
 
 ### Antigravity Agent
 
-The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. It uses `gemini-3.8-flash` by default and also supports `gemini-4-argon` via `agent_config={"type": "antigravity", "model": "gemini-4-argon"}`. See [Antigravity Agent docs](https://aistudio.google.com/docs/antigravity-agent.md) for capabilities, tools, multimodal input, and pricing.
+The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. It uses `gemini-3.8-flash` by default and also supports `gemini-4-carbon` via `agent_config={"type": "antigravity", "model": "gemini-4-carbon"}`. See [Antigravity Agent docs](https://aistudio.google.com/docs/antigravity-agent.md) for capabilities, tools, multimodal input, and pricing.
 
 #### Python
 ```python
@@ -382,7 +382,9 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Deep Research](https://aistudio.google.com/docs/deep-research.md)
 
 **Advanced Features:**
-- [Latest Model (Gemini 4 Argon)](https://aistudio.google.com/docs/latest-model.md)
+- [Latest Gemini Models](https://aistudio.google.com/docs/latest-model.md)
+- [What's New in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md)
+- [Long Decode](https://aistudio.google.com/docs/long-decode.md)
 - [Background Execution](https://aistudio.google.com/docs/background-execution.md)
 - [Flex Inference](https://aistudio.google.com/docs/flex-inference.md)
 - [Priority Inference](https://aistudio.google.com/docs/priority-inference.md)
