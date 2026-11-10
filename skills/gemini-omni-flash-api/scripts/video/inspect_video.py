@@ -9,36 +9,47 @@ def format_size(size_bytes):
     """Formats file size in bytes to a human-readable string."""
     try:
         size_bytes = int(size_bytes)
+        if size_bytes < 0:
+            return "Unknown size"
     except (ValueError, TypeError):
         return "Unknown size"
     
-    for unit in ['B', 'KB', 'MB', 'GB']:
-        if size_bytes < 1024.0:
-            return f"{size_bytes:.2f} {unit}"
-        size_bytes /= 1024.0
-    return f"{size_bytes:.2f} TB"
+    if size_bytes < 1024:
+        return f"{size_bytes} B"
+    
+    val = float(size_bytes)
+    for unit in ['KB', 'MB', 'GB', 'TB']:
+        val /= 1024.0
+        if val < 1024.0:
+            return f"{val:.2f} {unit}"
+    return f"{val:.2f} PB"
 
 def parse_fps(fps_str):
     """Parses fractional frame rates like '30/1' or '24000/1001' into floats."""
     if not fps_str:
         return "Unknown"
+
+    val = None
     if "/" in fps_str:
         try:
-            num, den = map(float, fps_str.split("/"))
-            if den != 0:
-                val = num / den
-                if val.is_integer():
-                    return f"{int(val)} fps"
-                return f"{val:.2f} fps"
+            parts = fps_str.split("/")
+            if len(parts) == 2:
+                num, den = map(float, parts)
+                if den != 0:
+                    val = num / den
         except (ValueError, ZeroDivisionError):
             pass
-    try:
-        val = float(fps_str)
-        if val.is_integer():
-            return f"{int(val)} fps"
-        return f"{val:.2f} fps"
-    except ValueError:
-        return fps_str
+    else:
+        try:
+            val = float(fps_str)
+        except ValueError:
+            pass
+
+    if val is None or val <= 0:
+        return "Unknown"
+    if val.is_integer():
+        return f"{int(val)} fps"
+    return f"{val:.2f} fps"
 
 def inspect_video(file_path, raw=False):
     """Runs ffprobe on the video file and returns parsed metadata dictionary."""
