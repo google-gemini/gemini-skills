@@ -47,7 +47,7 @@ Run `gemini-api --help` to list commands, or `<subcommand> --help` for flags and
 | `models` | (bare), `list [--all]`, `get <id>` | Bare `models` prints an offline catalog; `list` and `get` query the live API |
 | `environments` | `create`, `list`, `get`, `delete`, `files` (`list`, `upload`, `download`), `connect`, `poll`, `serve` | Remote sandboxes and workspace snapshots (`credentials`, `webhooks`, `triggers` for agent infra) |
 
-**Model selection:** use `gemini-3.8-flash` (default), `gemini-4-argon` (hard reasoning and coding), or `gemini-3.5-flash-lite` (high throughput); for images, `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image`, or `gemini-3-pro-image`; for video, `gemini-omni-1.2-flash`. Avoid deprecated `gemini-2.5-*`, `gemini-2.0-*`, and `gemini-1.5-*` models.
+**Model selection:** use `gemini-3.8-flash` (default), `gemini-4-carbon` (hard reasoning and coding), or `gemini-3.5-flash-lite` (high throughput); for images, `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image`, or `gemini-3-pro-image`; for video, `gemini-omni-1.2-flash`. Avoid deprecated `gemini-2.5-*`, `gemini-2.0-*`, and `gemini-1.5-*` models.
 
 ## Global flags
 
