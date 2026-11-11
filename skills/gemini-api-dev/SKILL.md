@@ -1,6 +1,6 @@
 ---
 name: gemini-api-dev
-description: Use this skill when writing code that calls the Gemini API for text generation, multi-turn chat, multimodal understanding, image generation, video generation, speech generation (TTS), voice design, voice replication, streaming responses, background research tasks, function calling, structured output, or migrating from the old generateContent API. Covers SDK usage and best practices for Gemini models and agents in Python and TypeScript.
+description: Use this skill when writing code that calls the Gemini API for text generation, multi-turn chat, multimodal understanding, image generation, video generation, speech generation (TTS), voice design, voice replication, streaming responses, background research tasks, function calling, structured output, calibrated decisions (yes/no, choice, rubric scoring), or migrating from the old generateContent API. Covers SDK usage and best practices for Gemini models and agents in Python and TypeScript.
 ---
 
 # Gemini API Development Skill
@@ -25,6 +25,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - `gemini-omni-1.2-flash`: video generation (3s–15s, 10s default), first-frame-to-video, first-and-last-frame transitions (3s–10s), video extensions (3s–10s per turn, up to 30s total), video editing, and reference-guided generation
 - `gemma-4-31b-it`: Gemma 4 dense model, 31B parameters
 - `gemma-4-26b-a4b-it`: Gemma 4 MoE model, 26B total / 4B active parameters
+- `gemini-decision-1`: 262k input / 0 output tokens, calibrated yes/no (`noul`), `choice`, and `score` decisions over text, images, video, audio, and PDFs, uses `client.decisions.create` / `ai.decisions.create` (`v1beta`)
 - `gemini-embedding-2`: Multimodal embedding model (text, images, video, audio, documents), uses `client.models.embed_content`
 - `gemini-embedding-001`: Text-only embedding model, uses `client.models.embed_content`
 
@@ -41,11 +42,12 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 ### Current SDKs
 
-- **Python**: `google-genai` >= `2.30.1` → `pip install -U google-genai`
-- **JavaScript/TypeScript**: `@google/genai` >= `2.29.1` → `npm install @google/genai`
+- **Python**: `google-genai` >= 3.2.0 → `pip install -U google-genai`
+- **JavaScript/TypeScript**: `@google/genai` >= 3.2.0 → `npm install @google/genai`
 
 > [!NOTE]
-> SDK versions ≥ 2.0.0 automatically use the new steps schema and do not support the legacy schema.
+> SDK versions >= 3.0.0 default to the stable `v1` API (`Interactions API` is GA on `v1`). For `v1beta`-only endpoints such as the Decisions API (`POST /v1beta/decisions`, supported in >= 3.2.0), opt in with `genai.Client(http_options={"api_version": "v1beta"})` in Python, `new GoogleGenAI({ apiVersion: "v1beta" })` in JS/TS, per-call `api_version="v1beta"`, or `GOOGLE_GENAI_API_VERSION=beta`.
+> SDK versions >= 2.0.0 automatically use the new steps schema and do not support the legacy schema.
 > Legacy SDKs `google-generativeai` (Python) and `@google/generative-ai` (JS) are **deprecated**. Never use them.
 
 ## Important Additional Notes
@@ -55,6 +57,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - Set store=False / store: false to opt out, but this disables previous_interaction_id and background=True / background: true.
 - `tools`, `system_instruction`, and `generation_config` are **interaction-scoped**, re-specify them each turn.
 - **Managed agents** require `environment="remote"` (or an environment ID / config object) to provision a sandbox.
+- **Decisions API** (`gemini-decision-1`) requires `v1beta` (`client.decisions.create` / `ai.decisions.create`); use it for closed-ended yes/no, choice, and rubric scoring instead of `response_format`.
 - **Migrating from `generateContent`**: Read `references/migration.md` for the scoping, checklist, and before/after code examples. Always confirm scope with the user before editing.
 - **Model upgrades**: Drop-in, swap the model string. Deprecated models (`gemini-2.0-*`, `gemini-1.5-*`) must be replaced, see `references/migration.md`.
 - **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
@@ -321,7 +324,55 @@ for await (const event of stream) {
 
 For streaming with tools, thinking, agents, and image generation see the full [Streaming guide](https://aistudio.google.com/docs/streaming.md).
 
+## Decisions API
 
+Evaluates 1 to 1,000 independent questions (`noul` yes/no, `choice` single-select, `score` ordered rubric) over shared input (text, image, audio, video, PDF) in one pass with `gemini-decision-1`, returning calibrated probabilities, `confidence`, and 0 output tokens. Fetch the [Decisions API guide](https://aistudio.google.com/docs/decisions-api.md) and [Gemini Decision 1 model page](https://aistudio.google.com/docs/models/gemini-decision-1.md) before writing code.
+
+### Python
+```python
+from google import genai
+
+client = genai.Client(http_options={"api_version": "v1beta"})
+
+result = client.decisions.create(
+    model="gemini-decision-1",
+    input="The blue mug I ordered on Monday arrived cracked on Wednesday.",
+    questions={
+        "is_damaged": {
+            "type": "noul",
+            "instructions": "Did the item arrive damaged?",
+        },
+    },
+)
+
+answer = result.answers["is_damaged"]
+print(f"P(yes)={answer.noul:.2f} confidence={answer.confidence:.2f}")
+```
+
+### JavaScript/TypeScript
+```typescript
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiVersion: "v1beta" });
+
+const result = await ai.decisions.create({
+    model: "gemini-decision-1",
+    input: "The blue mug I ordered on Monday arrived cracked on Wednesday.",
+    questions: {
+        is_damaged: {
+            type: "noul",
+            instructions: "Did the item arrive damaged?",
+        },
+    },
+});
+
+const answer = result.answers?.is_damaged;
+if (answer?.type === "noul") {
+    console.log(`P(yes)=${answer.noul} confidence=${answer.confidence}`);
+}
+```
+
+See the [Decisions API guide](https://aistudio.google.com/docs/decisions-api.md) for `choice` (`criteria` map) and `score` (`criteria` array) schemas, multimodal input blocks, REST (`POST /v1beta/decisions`), and calibration rules.
 
 ## Documentation Pages
 
@@ -334,6 +385,7 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 - [Streaming](https://aistudio.google.com/docs/streaming.md)
 - [Tokens](https://aistudio.google.com/docs/tokens.md)
 - [API Keys](https://aistudio.google.com/docs/api-key.md)
+- [API Versions](https://aistudio.google.com/docs/api-versions.md)
 
 **Tools & Function Calling:**
 - [Function Calling](https://aistudio.google.com/docs/function-calling.md)
@@ -347,6 +399,8 @@ For streaming with tools, thinking, agents, and image generation see the full [S
 
 **Generation & Output:**
 - [Structured Output](https://aistudio.google.com/docs/structured-output.md)
+- [Decisions API](https://aistudio.google.com/docs/decisions-api.md)
+- [Gemini Decision 1 Model](https://aistudio.google.com/docs/models/gemini-decision-1.md)
 - [Thinking](https://aistudio.google.com/docs/thinking.md)
 - [Thought Signatures](https://aistudio.google.com/docs/thought-signatures.md)
 - [Image Generation](https://aistudio.google.com/docs/image-generation.md)
