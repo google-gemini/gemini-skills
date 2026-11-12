@@ -39,8 +39,8 @@ The core changes when migrating from `generateContent` to the Interactions API:
 | **Function calling** | `candidates[0].content.parts[0].function_call` | `function_call` step in `interaction.steps` |
 | **Search grounding** | `groundingMetadata` on candidates | `google_search_call`/`google_search_result` steps + inline `annotations` |
 | **Config/types** | `types.GenerateContentConfig(...)`, `types.Tool(...)`, `types.Content(...)`, `types.Part.*` | Not used. Interactions API uses plain Python dicts and direct params. Check the feature docs for exact format. |
-| **REST endpoint** | `POST /v1beta/models/{model}:generateContent` | `POST /v1beta/interactions` |
-| **SDK package** | `google-genai` ≥ 1.x or legacy `google-generativeai` | `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS) |
+| **REST endpoint** | `POST /v1beta/models/{model}:generateContent` | `POST /v1/interactions` (or `/v1beta/interactions` for beta features) |
+| **SDK package** | `google-genai` >= 1.x or legacy `google-generativeai` | `google-genai` >= 3.2.0 (Python) / `@google/genai` >= 3.2.0 (JS) |
 
 For full before/after code examples, fetch the [Migration Guide](https://aistudio.google.com/docs/migrate-to-interactions.md) or read the Interactions API documentation pages for each feature.
 
@@ -85,7 +85,8 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 
 ### API Migration (generateContent → Interactions)
 
-- [ ] Updated SDK: `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS)
+- [ ] Updated SDK: `google-genai` >= 3.2.0 (Python) / `@google/genai` >= 3.2.0 (JS)
+- [ ] Checked `v1` vs `v1beta` routing (`[BLOCKS]` on SDK >= 3.0.0): SDKs >= 3.0.0 default to `v1` (`Interactions API` is GA on `v1`). Opt in to `v1beta` (`http_options={"api_version": "v1beta"}` in Python, `{ apiVersion: "v1beta" }` in JS/TS, per-call `api_version="v1beta"`, or `GOOGLE_GENAI_API_VERSION=beta`) when calling `v1beta`-only surfaces such as the [Decisions API](https://aistudio.google.com/docs/decisions-api.md) (`client.decisions.create` / `ai.decisions.create`, added in 3.2.0)
 - [ ] Replaced `client.models.generate_content()` → `client.interactions.create()`
 - [ ] Replaced `response.text` → `interaction.output_text`
 - [ ] Replaced `response.candidates[0].content.parts` → iterate `interaction.steps`
@@ -94,10 +95,10 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Moved `response_format` from `GenerateContentConfig` to top-level parameter
 - [ ] Replaced `generate_content_stream()` → `stream=True` + step-based event handling
 - [ ] Updated function calling: candidates-based → step-based tool lifecycle
-- [ ] REST: Changed endpoint to `/v1beta/interactions`
-- [ ] REST: Add `Api-Revision: 2026-05-20` header (SDK ≥ 2.0.0 sets it automatically)
-- [ ] Replaced `google-generativeai` (Python) → `google-genai` ≥ 2.30.1
-- [ ] Replaced `@google/generative-ai` (JS) → `@google/genai` ≥ 2.29.1
+- [ ] REST: Changed endpoint to `/v1/interactions` (or `/v1beta/interactions` for beta features)
+- [ ] REST: Add `Api-Revision: 2026-05-20` header (SDK >= 2.0.0 sets it automatically)
+- [ ] Replaced `google-generativeai` (Python) → `google-genai` >= 3.2.0
+- [ ] Replaced `@google/generative-ai` (JS) → `@google/genai` >= 3.2.0
 - [ ] Updated all import statements to match new package names
 
 ### Model String Updates
@@ -127,7 +128,7 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 Use this checklist when migrating to `gemini-4-carbon`. Upgrading from `gemini-4-argon` to `gemini-4-carbon` requires no request schema changes — swap the model ID and ensure `max_output_tokens` and HTTP timeouts accommodate longer thinking passes. For full details on supported APIs, context window sizes, parameter changes, and continuation patterns, fetch [What's new in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md) and the [Long Decode guide](https://aistudio.google.com/docs/long-decode.md).
 
 - [ ] **Check for unsupported APIs before migrating**: Look up unsupported APIs and features in [What's new in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md) (e.g., explicit context caching), ensure they are not used, and flag any unsupported usage to the user before migrating
-- [ ] Updated SDK: `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS)
+- [ ] Updated SDK: `google-genai` >= 3.2.0 (Python) / `@google/genai` >= 3.2.0 (JS)
 - [ ] Updated model name to `gemini-4-carbon`
 - [ ] Removed `temperature`, `top_p`, `top_k` from config
 - [ ] Replaced `thinking_budget` with `thinking_level` (`low`, `medium`, `high`)
