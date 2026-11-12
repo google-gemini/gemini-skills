@@ -13,7 +13,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 ### Current Models (Use These)
 
 - `gemini-4-carbon`: 1M tokens, most powerful model for complex reasoning, coding, and research
-- `gemini-3.8-flash`: 1M tokens, fast, balanced performance for agentic and multimodal tasks
+- `gemini-4-hydrogen`: 1M tokens, fast, balanced performance for agentic and multimodal tasks
 - `gemini-3.5-flash-lite`: 1M tokens, fastest, lowest-cost 3.5 model for high-throughput execution
 - `gemini-3.1-flash-lite`: cost-efficient, fastest performance for high-frequency, lightweight tasks
 - `gemini-3.5-transcribe`: fast speech-to-text with smart and verbatim modes
@@ -31,7 +31,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 > [!WARNING]
 > Models like `gemini-2.5-*`, `gemini-2.0-*`, `gemini-1.5-*` are **legacy and deprecated**. Never use them.
-> **If a user asks for a deprecated model, use `gemini-3.8-flash` instead and note the substitution.**
+> **If a user asks for a deprecated model, use `gemini-4-hydrogen` instead and note the substitution.**
 
 ### Current Agents
 
@@ -46,7 +46,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - **JavaScript/TypeScript**: `@google/genai` >= 3.2.0 → `npm install @google/genai`
 
 > [!NOTE]
-> SDK versions >= 3.0.0 default to the stable `v1` API (`Interactions API` is GA on `v1`). For `v1beta`-only endpoints such as the Decisions API (`POST /v1beta/decisions`, supported in >= 3.2.0), opt in with `genai.Client(http_options={"api_version": "v1beta"})` in Python, `new GoogleGenAI({ apiVersion: "v1beta" })` in JS/TS, per-call `api_version="v1beta"`, or `GOOGLE_GENAI_API_VERSION=beta`.
+> SDK versions >= 3.0.0 default to the stable `v1` API (`Interactions API` is GA on `v1`). For `v1beta`-only surfaces such as Managed Agents (`agent=...` / `client.agents`) and the Decisions API (`POST /v1beta/decisions`, supported in >= 3.2.0), opt in with `genai.Client(http_options={"api_version": "v1beta"})` in Python, `new GoogleGenAI({ apiVersion: "v1beta" })` in JS/TS, per-call `api_version="v1beta"`, or `GOOGLE_GENAI_API_VERSION=beta`.
 > SDK versions >= 2.0.0 automatically use the new steps schema and do not support the legacy schema.
 > Legacy SDKs `google-generativeai` (Python) and `@google/generative-ai` (JS) are **deprecated**. Never use them.
 
@@ -56,11 +56,11 @@ description: Use this skill when writing code that calls the Gemini API for text
 - Interactions are **stored by default** (store=True in Python, store: true in TypeScript). Paid tier retains for 55 days, free tier for 1 day.
 - Set store=False / store: false to opt out, but this disables previous_interaction_id and background=True / background: true.
 - `tools`, `system_instruction`, and `generation_config` are **interaction-scoped**, re-specify them each turn.
-- **Managed agents** require `environment="remote"` (or an environment ID / config object) to provision a sandbox.
+- **Managed agents** require `v1beta` and `environment="remote"` (or an environment ID / config object) to provision a sandbox.
 - **Decisions API** (`gemini-decision-1`) requires `v1beta` (`client.decisions.create` / `ai.decisions.create`); use it for closed-ended yes/no, choice, and rubric scoring instead of `response_format`.
 - **Migrating from `generateContent`**: Read `references/migration.md` for the scoping, checklist, and before/after code examples. Always confirm scope with the user before editing.
 - **Model upgrades**: Drop-in, swap the model string. Deprecated models (`gemini-2.0-*`, `gemini-1.5-*`) must be replaced, see `references/migration.md`.
-- **Migrating to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
+- **Migrating to Gemini 4 Hydrogen, Gemini 4 Carbon, or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
 - **Migrating to Gemini 3.8 TTS (`gemini-3.8-flash-tts` / `gemini-3.8-flash-lite-tts`)**: Read `references/migration.md` for breaking changes from `gemini-3.1-flash-tts-preview` (`speech_metadata` annotations, inline vocal tags, default WAV `audio/wav` unary output vs `audio/l16` streaming output, and Voice Design personas).
 - **Migrating to Gemini Nano Banana 2.1 (`gemini-nano-banana-2.1`)**: Read `references/migration.md` for upgrading from `gemini-3.1-flash-image` (deprecated) and using multi-image reference fusion with up to 14 reference images.
 - **Migrating to Gemini Omni 1.2 Flash (`gemini-omni-1.2-flash`)**: Read `references/migration.md` for upgrading from `gemini-omni-1.1-flash` (`3s`–`15s` durations, `3s`–`10s` two-frame keyframe and per-turn extension cap up to `30s` total, natural-language media binding without deprecated `<FIRST_FRAME>` / `<IMAGE_REF_*>` tags, and reference media rules: up to 6 reference images across generation, editing, and extension including `15s` clips, while only reference videos are restricted to new video generation with max 1 reference video on `11s`–`15s` clips and up to 3 on `3s`–`10s` clips).
@@ -74,7 +74,7 @@ from google import genai
 client = genai.Client()
 
 interaction = client.interactions.create(
-    model="gemini-3.8-flash",
+    model="gemini-4-hydrogen",
     input="Tell me a short joke about programming."
 )
 print(interaction.output_text)
@@ -87,7 +87,7 @@ import { GoogleGenAI } from "@google/genai";
 const client = new GoogleGenAI({});
 
 const interaction = await client.interactions.create({
-    model: "gemini-3.8-flash",
+    model: "gemini-4-hydrogen",
     input: "Tell me a short joke about programming.",
 });
 console.log(interaction.output_text);
@@ -108,12 +108,12 @@ The SDK provides convenience properties on the `Interaction` response object to 
 ### Python
 ```python
 interaction1 = client.interactions.create(
-    model="gemini-3.8-flash",
+    model="gemini-4-hydrogen",
     input="Hi, my name is Phil."
 )
 # Second turn — server remembers context
 interaction2 = client.interactions.create(
-    model="gemini-3.8-flash",
+    model="gemini-4-hydrogen",
     input="What is my name?",
     previous_interaction_id=interaction1.id
 )
@@ -123,11 +123,11 @@ print(interaction2.output_text)
 ### JavaScript/TypeScript
 ```typescript
 const interaction1 = await client.interactions.create({
-    model: "gemini-3.8-flash",
+    model: "gemini-4-hydrogen",
     input: "Hi, my name is Phil.",
 });
 const interaction2 = await client.interactions.create({
-    model: "gemini-3.8-flash",
+    model: "gemini-4-hydrogen",
     input: "What is my name?",
     previous_interaction_id: interaction1.id,
 });
@@ -136,11 +136,14 @@ console.log(interaction2.output_text);
 
 ## Deep Research Agent
 
-Use `deep-research-preview-04-2026` for fast research or `deep-research-max-preview-04-2026` for maximum exhaustiveness. Agents require `background=True`.
+Use `deep-research-preview-04-2026` for fast research or `deep-research-max-preview-04-2026` for maximum exhaustiveness. Agents require `v1beta` and `background=True`.
 
 ### Python
 ```python
 import time
+from google import genai
+
+client = genai.Client(http_options={"api_version": "v1beta"})
 
 interaction = client.interactions.create(
     agent="deep-research-preview-04-2026",
@@ -162,7 +165,7 @@ while True:
 ```typescript
 import { GoogleGenAI } from "@google/genai";
 
-const client = new GoogleGenAI({});
+const client = new GoogleGenAI({ apiVersion: "v1beta" });
 
 // Start background research
 const initialInteraction = await client.interactions.create({
@@ -189,17 +192,17 @@ Advanced features: collaborative planning, native visualization, MCP integration
 
 ## Managed Agents
 
-Managed agents run inside a sandboxed Linux environment hosted by Google. Fetch the [Managed Agents Quickstart](https://aistudio.google.com/docs/managed-agents-quickstart.md) before writing agent code.
+Managed agents run inside a sandboxed Linux environment hosted by Google (`v1beta`). Fetch the [Managed Agents Quickstart](https://aistudio.google.com/docs/managed-agents-quickstart.md) before writing agent code.
 
 ### Antigravity Agent
 
-The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. It uses `gemini-3.8-flash` by default and also supports `gemini-4-carbon` via `agent_config={"type": "antigravity", "model": "gemini-4-carbon"}`. See [Antigravity Agent docs](https://aistudio.google.com/docs/antigravity-agent.md) for capabilities, tools, multimodal input, and pricing.
+The Antigravity agent (`antigravity-preview-09-2026`) is the general-purpose managed agent. It can execute code (Bash, Python, Node.js), manage files, browse the web, and use Google Search. It uses `gemini-4-hydrogen` by default and also supports `gemini-4-carbon` via `agent_config={"type": "antigravity", "model": "gemini-4-carbon"}`. See [Antigravity Agent docs](https://aistudio.google.com/docs/antigravity-agent.md) for capabilities, tools, multimodal input, and pricing.
 
 #### Python
 ```python
 from google import genai
 
-client = genai.Client()
+client = genai.Client(http_options={"api_version": "v1beta"})
 
 interaction = client.interactions.create(
     agent="antigravity-preview-09-2026",
@@ -215,7 +218,7 @@ print(interaction.output_text)
 ```typescript
 import { GoogleGenAI } from "@google/genai";
 
-const client = new GoogleGenAI({});
+const client = new GoogleGenAI({ apiVersion: "v1beta" });
 
 const interaction = await client.interactions.create({
     agent: "antigravity-preview-09-2026",
@@ -293,7 +296,7 @@ Set `stream=True` to receive incremental server-sent events. Each stream follows
 ### Python
 ```python
 for event in client.interactions.create(
-    model="gemini-3.8-flash",
+    model="gemini-4-hydrogen",
     input="Explain quantum entanglement in simple terms.",
     stream=True,
 ):
@@ -307,7 +310,7 @@ for event in client.interactions.create(
 ### JavaScript/TypeScript
 ```typescript
 const stream = await client.interactions.create({
-    model: "gemini-3.8-flash",
+    model: "gemini-4-hydrogen",
     input: "Explain quantum entanglement in simple terms.",
     stream: true,
 });
@@ -437,6 +440,7 @@ See the [Decisions API guide](https://aistudio.google.com/docs/decisions-api.md)
 
 **Advanced Features:**
 - [Latest Gemini Models](https://aistudio.google.com/docs/latest-model.md)
+- [What's New in Gemini 4 Hydrogen](https://aistudio.google.com/docs/whats-new-gemini-4-hydrogen.md)
 - [What's New in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md)
 - [Long Decode](https://aistudio.google.com/docs/long-decode.md)
 - [Background Execution](https://aistudio.google.com/docs/background-execution.md)
