@@ -35,19 +35,19 @@ Run `gemini-api --help` to list commands, or `<subcommand> --help` for flags and
 
 | Command | Key flags / actions | Default model & behavior |
 |---|---|---|
-| `generate [prompt]` | `-m`, `-i`, `--stdin`, `--system`, `--previous-interaction-id`, `--stream=false`, `--body` | `gemini-3.8-flash`; streams text deltas to stdout |
+| `generate [prompt]` | `-m`, `-i`, `--stdin`, `--system`, `--previous-interaction-id`, `--stream=false`, `--body` | `gemini-4-hydrogen`; streams text deltas to stdout |
 | `image [prompt]` | `-m`, `-i`, `--aspect-ratio`, `--image-size` (512..4K), `--previous-interaction-id`, `--out`, `--body` | `gemini-nano-banana-2.1`; writes image, prints path |
 | `tts [text]` | `-m`, `-f`, `--stdin`, `-v`/`--voice` (default Kore), `--multi-speaker`, `--language`, `--out` | `gemini-3.8-flash-tts`; writes 24 kHz WAV, prints path (unstored) |
 | `music [prompt]` | `-m`, `-f`, `--stdin`, `--out`, `--body` | `lyria-3.5`; writes audio track, prints path |
 | `video [prompt]` | `-m`, `-i`, `--aspect-ratio`, `--resolution` (360p..4k), `--previous-interaction-id`, `--async`, `--resume`, `--out`, `--body` | pass `-m gemini-omni-1.2-flash` (`≤ v0.4.5` preset defaults to `gemini-omni-1.1-flash`); polls until done, writes MP4, prints path (`upscale` via `--body`) |
-| `analyze [question]` | `-i` (required, repeatable), `--stdin`, `--system`, `-m` | `gemini-3.8-flash`; answers over PDFs, media, CSV/text, YouTube URLs (unstored) |
-| `transcribe` | `-m`, `-i` (required, repeatable), `--format` (md, text, json, srt), `--no-speakers`, `--no-timestamps`, `--out` | `gemini-3.5-transcribe` (audio; 30m speaker/timestamp cap) or `gemini-3.8-flash` (video); writes `--out` (or `./transcript-*`), prints path (unstored) |
+| `analyze [question]` | `-i` (required, repeatable), `--stdin`, `--system`, `-m` | `gemini-4-hydrogen`; answers over PDFs, media, CSV/text, YouTube URLs (unstored) |
+| `transcribe` | `-m`, `-i` (required, repeatable), `--format` (md, text, json, srt), `--no-speakers`, `--no-timestamps`, `--out` | `gemini-3.5-transcribe` (audio; 30m speaker/timestamp cap) or `gemini-4-hydrogen` (video); writes `--out` (or `./transcript-*`), prints path (unstored) |
 | `agent` | `run`, `status`, `cancel`, `delete-interaction`; `create`, `list`, `get`, `delete` | Runs models or managed agents; manages custom agent definitions |
 | `files` | `upload [--wait]`, `list`, `get`, `generated-files-list`, `register`, `delete` | Uploads reusable `files/<id>` URIs (48h TTL; up to 2 GB, 50 MB PDFs) |
 | `models` | (bare), `list [--all]`, `get <id>` | Bare `models` prints an offline catalog; `list` and `get` query the live API |
 | `environments` | `create`, `list`, `get`, `delete`, `files` (`list`, `upload`, `download`), `connect`, `poll`, `serve` | Remote sandboxes and workspace snapshots (`credentials`, `webhooks`, `triggers` for agent infra) |
 
-**Model selection:** use `gemini-3.8-flash` (default), `gemini-4-carbon` (hard reasoning and coding), or `gemini-3.5-flash-lite` (high throughput); for images, `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image`, or `gemini-3-pro-image`; for video, `gemini-omni-1.2-flash`. Avoid deprecated `gemini-2.5-*`, `gemini-2.0-*`, and `gemini-1.5-*` models.
+**Model selection:** use `gemini-4-hydrogen` (default), `gemini-4-carbon` (hard reasoning and coding), or `gemini-3.5-flash-lite` (high throughput); for images, `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image`, or `gemini-3-pro-image`; for video, `gemini-omni-1.2-flash`. Avoid deprecated `gemini-2.5-*`, `gemini-2.0-*`, and `gemini-1.5-*` models.
 
 ## Global flags
 
