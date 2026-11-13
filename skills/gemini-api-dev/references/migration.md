@@ -18,7 +18,7 @@ Even imperative requests like "migrate my code", "upgrade to gemini 3", "migrate
 **Sizing the scope (large repos).** Before asking, get a per-directory count:
 
 ```sh
-rg -l "generate_content|generateContent|gemini-1\.5|gemini-2\.0|gemini-2\.5|gemini-3\.1-pro|gemini-3\.1-flash-lite|gemini-3\.1-flash-tts|gemini-3\.5|gemini-3\.6|gemini-3\.7|gemini-3-flash|thinking_budget|temperature" --type-not md | cut -d/ -f1 | sort | uniq -c | sort -rn
+rg -l "generate_content|generateContent|gemini-1\.5|gemini-2\.0|gemini-2\.5|gemini-3\.1-pro|gemini-3\.1-flash-lite|gemini-3\.1-flash-tts|gemini-3\.5|gemini-3\.6|gemini-3\.7|gemini-3\.8-flash([\"'\s]|$)|gemini-3-flash|gemini-omni-1\.1|gemini-omni-flash-preview|thinking_budget|temperature" --type-not md | cut -d/ -f1 | sort | uniq -c | sort -rn
 ```
 
 Present the breakdown in your question (e.g. *"Found 42 references across 3 directories: src/ (28), tests/ (10), scripts/ (4). Which to migrate?"*).
@@ -39,8 +39,8 @@ The core changes when migrating from `generateContent` to the Interactions API:
 | **Function calling** | `candidates[0].content.parts[0].function_call` | `function_call` step in `interaction.steps` |
 | **Search grounding** | `groundingMetadata` on candidates | `google_search_call`/`google_search_result` steps + inline `annotations` |
 | **Config/types** | `types.GenerateContentConfig(...)`, `types.Tool(...)`, `types.Content(...)`, `types.Part.*` | Not used. Interactions API uses plain Python dicts and direct params. Check the feature docs for exact format. |
-| **REST endpoint** | `POST /v1beta/models/{model}:generateContent` | `POST /v1beta/interactions` |
-| **SDK package** | `google-genai` ≥ 1.x or legacy `google-generativeai` | `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS) |
+| **REST endpoint** | `POST /v1beta/models/{model}:generateContent` | `POST /v1/interactions` (or `/v1beta/interactions` for beta features) |
+| **SDK package** | `google-genai` >= 1.x or legacy `google-generativeai` | `google-genai` >= 3.2.0 (Python) / `@google/genai` >= 3.2.0 (JS) |
 
 For full before/after code examples, fetch the [Migration Guide](https://aistudio.google.com/docs/migrate-to-interactions.md) or read the Interactions API documentation pages for each feature.
 
@@ -50,22 +50,23 @@ For full before/after code examples, fetch the [Migration Guide](https://aistudi
 
 | Model | Status | Drop-in Replacement |
 |-------|--------|-------------------|
-| `gemini-2.0-flash` | Deprecated | `gemini-3.8-flash` |
+| `gemini-2.0-flash` | Deprecated | `gemini-4-hydrogen` |
 | `gemini-2.0-flash-lite` | Deprecated | `gemini-3.5-flash-lite` |
-| `gemini-1.5-pro` | Deprecated | `gemini-3.8-flash` |
-| `gemini-1.5-flash` | Deprecated | `gemini-3.8-flash` |
+| `gemini-1.5-pro` | Deprecated | `gemini-4-hydrogen` |
+| `gemini-1.5-flash` | Deprecated | `gemini-4-hydrogen` |
 | `gemini-3.1-flash-image` | Deprecated (shutdown October 29, 2026) | `gemini-nano-banana-2.1` |
 
 ### Active Legacy Models (migration recommended)
 
 | Current Model | Recommended Target | Why |
 |--------------|-------------------|-----|
-| `gemini-3.7-flash`, `gemini-3.6-flash`, `gemini-3.5-flash`, or `gemini-3-flash-preview` | `gemini-3.8-flash` | Latest Flash: stronger agentic/multimodal performance, reduced token usage/loop spiraling |
-| `gemini-2.5-flash` | `gemini-3.8-flash` or `gemini-3.5-flash-lite` | Latest Flash with Interactions API support, or latest Flash-Lite for cheaper/simpler tasks. |
+| `gemini-3.8-flash`, `gemini-3.7-flash`, `gemini-3.6-flash`, `gemini-3.5-flash`, or `gemini-3-flash-preview` | `gemini-4-hydrogen` | Latest Gemini 4 daily driver: 1M unified context, `xhigh` thinking, long decode, and stronger agentic execution |
+| `gemini-2.5-flash` | `gemini-4-hydrogen` or `gemini-3.5-flash-lite` | Latest daily driver with Interactions API support, or latest Flash-Lite for cheaper/simpler tasks. |
 | `gemini-2.5-flash-lite` or `gemini-3.1-flash-lite` | `gemini-3.5-flash-lite` | Latest Flash-lite with Interactions API support |
-| `gemini-3.1-pro-preview` or `gemini-2.5-pro` | `gemini-4-argon` | Most powerful model with 1M context, complex reasoning, coding, and research |
+| `gemini-3.1-pro-preview` or `gemini-2.5-pro` | `gemini-4-carbon` | Most powerful model with 1M context, complex reasoning, coding, and research |
 | `gemini-3.1-flash-tts-preview` or `gemini-2.5-*-tts` | `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts` | Latest TTS models with Voice Design, Voice Replication, structured `speech_metadata`, and default WAV (`audio/wav`) output |
 | `gemini-3.1-flash-image` or older image generation models | `gemini-nano-banana-2.1` | Latest Nano Banana image generation model: 131k context, multi-image fusion (up to 14 reference images), enhanced visual quality, and text rendering |
+| `gemini-omni-1.1-flash` or `gemini-omni-flash-preview` | `gemini-omni-1.2-flash` | Latest Omni Flash video model: `3s`–`15s` generation and extension (`10s` default; `3s`–`10s` two-frame keyframe interpolation), improved motion/character consistency, and natural-language media binding |
 | Legacy audio understanding / ASR | `gemini-3.5-transcribe` | Dedicated speech-to-text with auto language detection, diarization, word timestamps, and smart formatting |
 | Legacy Live API (`gemini-3.1-flash-live-preview`, `gemini-2.5-flash-native-audio-*`, `gemini-2.0-flash-live-001`) | `gemini-3.8-live` or `gemini-3.8-live-extended-thinking` | Install `google-gemini/gemini-live-api-dev` skill and see its `references/migration.md` for Live API protocol changes |
 
@@ -84,7 +85,8 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 
 ### API Migration (generateContent → Interactions)
 
-- [ ] Updated SDK: `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS)
+- [ ] Updated SDK: `google-genai` >= 3.2.0 (Python) / `@google/genai` >= 3.2.0 (JS)
+- [ ] Checked `v1` vs `v1beta` routing (`[BLOCKS]` on SDK >= 3.0.0): SDKs >= 3.0.0 default to `v1` (`Interactions API` is GA on `v1`). Opt in to `v1beta` (`http_options={"api_version": "v1beta"}` in Python, `{ apiVersion: "v1beta" }` in JS/TS, per-call `api_version="v1beta"`, or `GOOGLE_GENAI_API_VERSION=beta`) when calling `v1beta`-only surfaces such as Managed Agents (`agent=...` / `client.agents`) or the [Decisions API](https://aistudio.google.com/docs/decisions-api.md) (`client.decisions.create` / `ai.decisions.create`, added in 3.2.0)
 - [ ] Replaced `client.models.generate_content()` → `client.interactions.create()`
 - [ ] Replaced `response.text` → `interaction.output_text`
 - [ ] Replaced `response.candidates[0].content.parts` → iterate `interaction.steps`
@@ -93,40 +95,58 @@ Every item is tagged: **`[BLOCKS]`** items cause errors or broken behavior if mi
 - [ ] Moved `response_format` from `GenerateContentConfig` to top-level parameter
 - [ ] Replaced `generate_content_stream()` → `stream=True` + step-based event handling
 - [ ] Updated function calling: candidates-based → step-based tool lifecycle
-- [ ] REST: Changed endpoint to `/v1beta/interactions`
-- [ ] REST: Add `Api-Revision: 2026-05-20` header (SDK ≥ 2.0.0 sets it automatically)
-- [ ] Replaced `google-generativeai` (Python) → `google-genai` ≥ 2.30.1
-- [ ] Replaced `@google/generative-ai` (JS) → `@google/genai` ≥ 2.29.1
+- [ ] REST: Changed endpoint to `/v1/interactions` (or `/v1beta/interactions` for beta features)
+- [ ] REST: Add `Api-Revision: 2026-05-20` header (SDK >= 2.0.0 sets it automatically)
+- [ ] Replaced `google-generativeai` (Python) → `google-genai` >= 3.2.0
+- [ ] Replaced `@google/generative-ai` (JS) → `@google/genai` >= 3.2.0
 - [ ] Updated all import statements to match new package names
 
 ### Model String Updates
 
 - [ ] Replaced `gemini-2.0-*` model strings with current equivalents
 - [ ] Replaced `gemini-1.5-*` model strings with current equivalents
-- [ ] Consider upgrading `gemini-3.7-flash` → `gemini-3.8-flash`
-- [ ] Consider upgrading `gemini-3.6-flash` → `gemini-3.8-flash`
-- [ ] Consider upgrading `gemini-3.5-flash` → `gemini-3.8-flash`
-- [ ] Consider upgrading `gemini-3-flash-preview` → `gemini-3.8-flash`
-- [ ] Consider upgrading `gemini-2.5-flash` → `gemini-3.8-flash`
+- [ ] Consider upgrading `gemini-3.8-flash` → `gemini-4-hydrogen`
+- [ ] Consider upgrading `gemini-3.7-flash` → `gemini-4-hydrogen`
+- [ ] Consider upgrading `gemini-3.6-flash` → `gemini-4-hydrogen`
+- [ ] Consider upgrading `gemini-3.5-flash` → `gemini-4-hydrogen`
+- [ ] Consider upgrading `gemini-3-flash-preview` → `gemini-4-hydrogen`
+- [ ] Consider upgrading `gemini-2.5-flash` → `gemini-4-hydrogen`
 - [ ] Consider upgrading `gemini-3.1-flash-lite` → `gemini-3.5-flash-lite`
 - [ ] Consider upgrading `gemini-2.5-flash-lite` → `gemini-3.5-flash-lite` or `gemini-3.1-flash-lite`
-- [ ] Consider upgrading `gemini-3.1-pro-preview` → `gemini-4-argon`
-- [ ] Consider upgrading `gemini-2.5-pro` → `gemini-4-argon`
+- [ ] Consider upgrading `gemini-3.1-pro-preview` → `gemini-4-carbon`
+- [ ] Consider upgrading `gemini-2.5-pro` → `gemini-4-carbon`
 - [ ] Consider upgrading `gemini-3.1-flash-tts-preview` → `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`
 - [ ] Consider upgrading `gemini-3.1-flash-image` → `gemini-nano-banana-2.1`
+- [ ] Consider upgrading `gemini-omni-1.1-flash` → `gemini-omni-1.2-flash`
 
 ### Agent Updates
 
 - [ ] Upgrade `antigravity-preview-05-2026` → `antigravity-preview-09-2026` (deprecated October 5, 2026; redirected afterwards)
 - [ ] Upgrade `deep-research-pro-preview-12-2025` → `deep-research-preview-04-2026` or `deep-research-max-preview-04-2026` (deprecated, shutdown October 23, 2026)
 
-### Migrate to Gemini 4 Argon
+### Migrate to Gemini 4 Hydrogen
 
-Use this checklist when migrating to `gemini-4-argon`. For full details on supported APIs, context window sizes, parameter changes, and continuation patterns, fetch [What's new in Gemini 4 Argon](https://aistudio.google.com/docs/latest-model.md) and the [Long Decode guide](https://aistudio.google.com/docs/long-decode.md).
+Use this checklist when migrating from `gemini-3.8-flash` (or earlier) to `gemini-4-hydrogen`. Adding or switching between `gemini-4-carbon` and `gemini-4-hydrogen` across turns requires no request schema changes (Hydrogen defaults to `thinking_level="high"` and adds `"xhigh"`, while Carbon defaults to `"medium"` and caps at `"high"`). For full details on supported APIs, context window sizes, parameter changes, and continuation patterns, fetch [What's new in Gemini 4 Hydrogen](https://aistudio.google.com/docs/whats-new-gemini-4-hydrogen.md) and the [Long Decode guide](https://aistudio.google.com/docs/long-decode.md).
 
-- [ ] **Check for unsupported APIs before migrating**: Look up unsupported APIs and features in [What's new in Gemini 4 Argon](https://aistudio.google.com/docs/latest-model.md) (e.g., explicit context caching), ensure they are not used, and flag any unsupported usage to the user before migrating
-- [ ] Updated SDK: `google-genai` ≥ 2.30.1 (Python) / `@google/genai` ≥ 2.29.1 (JS)
-- [ ] Updated model name to `gemini-4-argon`
+- [ ] **Check for unsupported APIs before migrating**: Look up unsupported APIs and features in [What's new in Gemini 4 Hydrogen](https://aistudio.google.com/docs/whats-new-gemini-4-hydrogen.md) (e.g., explicit context caching `cachedContents` / `caches.create`), ensure they are not used, and flag any unsupported usage to the user before migrating
+- [ ] Updated SDK: `google-genai` >= 3.2.0 (Python) / `@google/genai` >= 3.2.0 (JS)
+- [ ] Updated model name to `gemini-4-hydrogen`
+- [ ] Removed `temperature`, `top_p`, `top_k` from config
+- [ ] Replaced `thinking_budget` with `thinking_level` (`low`, `medium`, `high` default, `xhigh`) and removed `"minimal"` (rejected with an error on `gemini-4-hydrogen`)
+- [ ] Reviewed `max_output_tokens`: raise any limit below `32,768` to at least `32,768` (input, thinking, and output share one 1M token window; default cap is `65,536` tokens without long decode)
+- [ ] **Decide whether long decode is needed**: Refer to the [Long Decode guide](https://aistudio.google.com/docs/long-decode.md) (input, thinking, and output share a single 1M token window). Only if needed for the workload:
+  - [ ] Set `max_output_tokens` explicitly above `65,536` (up to `1,048,576` minus input tokens)
+  - [ ] Enable [long decode](https://aistudio.google.com/docs/long-decode.md) via [background execution](https://aistudio.google.com/docs/background-execution.md) (`background=True`), poll while `interaction.status in ("in_progress", "queued")`, and join text across all `model_output` steps in `interaction.steps`
+  - [ ] Do not use `total_input_tokens` for context compaction, as it sums input tokens across all continuation hops
+  - [ ] Increase HTTP client read timeouts to at least 15–20 minutes
+
+### Migrate to Gemini 4 Carbon
+
+Use this checklist when migrating to `gemini-4-carbon`. Upgrading from `gemini-4-argon` to `gemini-4-carbon` requires no request schema changes — swap the model ID and ensure `max_output_tokens` and HTTP timeouts accommodate longer thinking passes. For full details on supported APIs, context window sizes, parameter changes, and continuation patterns, fetch [What's new in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md) and the [Long Decode guide](https://aistudio.google.com/docs/long-decode.md).
+
+- [ ] **Check for unsupported APIs before migrating**: Look up unsupported APIs and features in [What's new in Gemini 4 Carbon](https://aistudio.google.com/docs/whats-new-gemini-4-carbon.md) (e.g., explicit context caching), ensure they are not used, and flag any unsupported usage to the user before migrating
+- [ ] Updated SDK: `google-genai` >= 3.2.0 (Python) / `@google/genai` >= 3.2.0 (JS)
+- [ ] Updated model name to `gemini-4-carbon`
 - [ ] Removed `temperature`, `top_p`, `top_k` from config
 - [ ] Replaced `thinking_budget` with `thinking_level` (`low`, `medium`, `high`)
 - [ ] Reviewed `max_output_tokens`: raise any limit below `32,768` to at least `32,768` (default cap is `65,536` tokens without long decode)
@@ -136,11 +156,11 @@ Use this checklist when migrating to `gemini-4-argon`. For full details on suppo
   - [ ] Do not use `total_input_tokens` for context compaction, as it sums input tokens across all continuation hops
   - [ ] Increase HTTP client read timeouts to at least 15–20 minutes
 
-### Migrate to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite
+### Migrate to Gemini 3.5 Flash-Lite
 
-Use this checklist if the user requests to migrate to Gemini 3.8 Flash or Gemini 3.5 Flash-Lite. For full documentation of the changes, fetch the [What's new in Gemini 3.8 Flash guide](https://aistudio.google.com/docs/whats-new-gemini-3.8.md) and look for the migration section.
+Use this checklist if the user requests to migrate to Gemini 3.5 Flash-Lite. For full documentation of the changes, fetch the [What's new in Gemini 3.6 and 3.5 Flash-Lite guide](https://aistudio.google.com/docs/whats-new-gemini-3.6.md) and look for the migration section.
 
-- [ ] Updated model name to `gemini-3.8-flash` or `gemini-3.5-flash-lite` (depending on user request)
+- [ ] Updated model name to `gemini-3.5-flash-lite`
 - [ ] Removed `temperature`, `top_p`, `top_k` from config
 - [ ] Replaced `thinking_budget` with `thinking_level` (`minimal`, `low`, `medium`, `high`)
 
@@ -165,6 +185,16 @@ For full image generation details, resolutions, aspect ratios, and multi-image r
 - [ ] Support for wide / panoramic aspect ratios (`1:4`, `4:1`, `1:8`, `8:1`) and output resolutions (`1K` default, `2K`, `4K`)
 - [ ] Grounding with Google Web and Image Search supported natively
 - [ ] Configurable thinking levels (`minimal`, `medium` default, `high`)
+
+### Migrate to Gemini Omni 1.2 Flash (`gemini-omni-1.2-flash`)
+
+For full video generation, editing, extension, and reference parameters, fetch the [Video Generation & Editing guide](https://aistudio.google.com/docs/omni.md).
+
+- [ ] Updated model name from `gemini-omni-1.1-flash` (or `gemini-omni-flash-preview`) to `gemini-omni-1.2-flash`
+- [ ] Reviewed `response_format.duration`: supports `"3s"` to `"15s"` in 1-second increments (`"10s"` default) for text-to-video, single-frame image-to-video, reference-to-video, and video editing; two-frame keyframe interpolation (start + end frame) and per-turn video extensions support `"3s"` to `"10s"` (up to `30s` cumulative length)
+- [ ] Removed deprecated `<FIRST_FRAME>`, `<LAST_FRAME>`, `<IMAGE_REF_*>`, `<VIDEO_REF_*>`, and `[# Sources ...]` prompt tags in favor of natural-language descriptions of uploaded media
+- [ ] Kept `generation_config.video_config.task` unset by default (use only as a fallback if natural-language prompting is ambiguous, as `task` adds strict media-count constraints)
+- [ ] Verified reference media rules: **reference images** (up to 6, including on `"15s"` clips) work across new video generation (R2V), video editing, and prompt-based video extension; **only reference videos** are restricted to new video generation (not video editing or extension) and capped at **1 reference video** on `"11s"`–`"15s"` clips (up to 3 reference videos on `"3s"`–`"10s"` clips)
 
 ---
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Generates, extends, and edits videos using the Gemini Omni 1.1 Flash model via the google-genai Interactions API.
+Generates, extends, and edits videos using the Gemini Omni 1.2 Flash model via the google-genai Interactions API.
 Can automatically upload local media references using the Files API.
-Supports first frame and first+last frame transitions, video extensions (up to 40s),
-video references (<VIDEO_REF_0>, etc.), image references, and parallel batch execution.
+Supports first frame and first+last frame transitions, video extensions (3s-10s per turn, up to 30s total),
+video references, image references, and parallel batch execution.
 Uses the official google-genai SDK.
 """
 
@@ -28,7 +28,7 @@ if hasattr(sys.stdout, "reconfigure"):
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from upload_file import upload_file, wait_for_active
 
-DEFAULT_MODEL = "gemini-omni-1.1-flash"
+DEFAULT_MODEL = "gemini-omni-1.2-flash"
 
 def get_api_key():
     """Retrieves API key strictly from GEMINI_API_KEY environment variable."""
@@ -125,7 +125,7 @@ def slugify(text):
     return text.strip('_')[:50]
 
 def parse_and_validate_duration(value):
-    """Parses and formats a duration integer between 3 and 10 with optional 's' suffix."""
+    """Parses and formats a duration integer between 3 and 15 with optional 's' suffix."""
     if value is None:
         return None
     if isinstance(value, (int, float)):
@@ -139,14 +139,14 @@ def parse_and_validate_duration(value):
         try:
             val = float(clean_value)
         except ValueError:
-            raise ValueError(f"Invalid duration value: '{value}'. Must be an integer (e.g., 5, 10).")
+            raise ValueError(f"Invalid duration value: '{value}'. Must be an integer (e.g., 5, 10, 15).")
             
     if not val.is_integer():
         raise ValueError(f"Duration must be an integer, not a float (e.g., got {value}).")
         
     val_int = int(val)
-    if val_int < 3 or val_int > 10:
-        raise ValueError(f"Duration must be between 3 (inclusive) and 10 (inclusive) seconds. Got {val_int}.")
+    if val_int < 3 or val_int > 15:
+        raise ValueError(f"Duration must be between 3 (inclusive) and 15 (inclusive) seconds. Got {val_int}.")
         
     return f"{val_int}s"
 
@@ -310,6 +310,8 @@ def generate_video(
         raise ValueError("--last-frame must be used with --first-frame (the model requires a starting frame when specifying a final frame).")
 
     duration = parse_and_validate_duration(duration)
+    if duration and first_frame and last_frame and int(duration[:-1]) > 10:
+        raise ValueError(f"First-and-last-frame transitions support 3 to 10 seconds maximum (got {duration}).")
     input_parts = []
 
     # Collect reference images (supporting image_path and image_reference aliases)
@@ -408,35 +410,23 @@ def generate_video(
             "mime_type": rv_mime
         })
 
-    # 6. Format and add text prompt with appropriate role tags if not explicitly declared
+    # 6. Format and add text prompt using natural-language role hints when needed
     prompt_text = prompt
 
-    if "[# Sources" not in prompt and "[# References" not in prompt:
-        if extend_video:
-            sources_part = "[# Sources <VIDEO_0>@Video1]"
-            ref_parts = []
-            img_start_num = (2 if last_frame and last_frame != first_frame else 1) if first_frame else 0
-            for idx, _ in enumerate(ref_images):
-                ref_parts.append(f"<IMAGE_REF_{idx}>@Image{img_start_num + idx + 1}")
-            vid_start_num = 1
-            if video_path:
-                if isinstance(video_path, list):
-                    vid_start_num += len(video_path)
-                else:
-                    vid_start_num += 1
-            for idx, _ in enumerate(ref_videos):
-                ref_parts.append(f"<VIDEO_REF_{idx}>@Video{vid_start_num + idx + 1}")
-            
-            if ref_parts:
-                prompt_text = f"{sources_part} [# References {' '.join(ref_parts)}] {prompt_text}"
-            else:
-                prompt_text = f"{sources_part} {prompt_text}"
-        elif first_frame and last_frame:
-            if "<FIRST_FRAME>" not in prompt and "<LAST_FRAME>" not in prompt:
-                prompt_text = f"<FIRST_FRAME> <LAST_FRAME> {prompt_text}"
-        elif first_frame:
-            if "<FIRST_FRAME>" not in prompt:
-                prompt_text = f"<FIRST_FRAME> {prompt_text}"
+    if extend_video:
+        lower_prompt = prompt_text.lower()
+        if not any(tok in lower_prompt for tok in ("extend", "continue", "continuation", "keep going")):
+            prompt_text = f"Extend this video. {prompt_text}"
+    elif first_frame and last_frame:
+        if first_frame == last_frame:
+            if "starting frame" not in prompt_text.lower() and "first frame" not in prompt_text.lower():
+                prompt_text = f"{prompt_text} Use this image as both the starting frame and the final frame."
+        else:
+            if "starting frame" not in prompt_text.lower() and "first frame" not in prompt_text.lower():
+                prompt_text = f"{prompt_text} Use the first image as the starting frame and the second image as the final frame."
+    elif first_frame:
+        if "starting frame" not in prompt_text.lower() and "first frame" not in prompt_text.lower():
+            prompt_text = f"{prompt_text} Use this image as the starting frame."
 
     input_parts.append({
         "type": "text",
@@ -586,23 +576,23 @@ class SanitizedArgumentParser(argparse.ArgumentParser):
         self.exit(2, f"{self.prog}: error: {sanitized_msg}\n")
 
 def main():
-    parser = SanitizedArgumentParser(description="Generate, extend, and edit videos using Gemini Omni 1.1 Flash model via google-genai SDK (supports parallel batch execution).")
+    parser = SanitizedArgumentParser(description="Generate, extend, and edit videos using Gemini Omni 1.2 Flash model via google-genai SDK (supports parallel batch execution).")
     parser.add_argument("prompt", nargs="?", help="Text prompt / instruction for a single video generation")
-    parser.add_argument("--first-frame", "-f", help="Local image path or File API URI for starting frame (<FIRST_FRAME>)")
-    parser.add_argument("--last-frame", "-l", help="Local image path or File API URI for final transition frame (<LAST_FRAME>). Must be used with --first-frame.")
-    parser.add_argument("--image", "--image-reference", "--ref-image", "-i", action="append", dest="image", help="Optional local image path or File API URI for referencing / image-to-video (can be specified multiple times)")
+    parser.add_argument("--first-frame", "-f", help="Local image path or File API URI for starting frame")
+    parser.add_argument("--last-frame", "-l", help="Local image path or File API URI for final transition frame (3s-10s max). Must be used with --first-frame.")
+    parser.add_argument("--image", "--image-reference", "--ref-image", "-i", action="append", dest="image", help="Optional local image path or File API URI for referencing / image-to-video (up to 6 images, can be specified multiple times)")
     parser.add_argument("--video", "-v", action="append", help="Optional local video path or File API URI for editing / source video (can be specified multiple times)")
-    parser.add_argument("--extend", "-e", help="Optional local video path or File API URI to extend (by up to 10s per turn, up to 40s total)")
-    parser.add_argument("--video-reference", "--ref-video", "-vr", action="append", dest="video_reference", help="Optional local video path or File API URI for reference video(s) (<VIDEO_REF_0>, <VIDEO_REF_1>, ...). Ideal duration is ~3s (up to 3 recommended). Can be specified multiple times.")
-    parser.add_argument("--task", choices=["text_to_video", "image_to_video", "reference_to_video", "edit", "extend"], default=None, help="Explicit video task mode. Note: omitting task allows combining extensions with reference images and videos.")
+    parser.add_argument("--extend", "-e", help="Optional local video path or File API URI to extend (by 3s-10s per turn, up to 30s total)")
+    parser.add_argument("--video-reference", "--ref-video", "-vr", action="append", dest="video_reference", help="Optional local video path or File API URI for reference video(s) on new generation (~3s each; up to 3 for 3s-10s clips, max 1 for 11s-15s clips). Can be specified multiple times.")
+    parser.add_argument("--task", choices=["text_to_video", "image_to_video", "reference_to_video", "edit", "extend"], default=None, help="Explicit video task mode (optional fallback; omitting task allows combining extensions with reference images).")
     parser.add_argument("--aspect-ratio", default="16:9", choices=["16:9", "9:16"], help="Aspect ratio (default: 16:9, omitted automatically if explicit task='extend' is set)")
-    parser.add_argument("--duration", type=argparse_duration_type, default=None, help="Video duration as an integer between 3 and 10 seconds (e.g., 5, 10). Default: None (API/Model decides, typically 10s or matches source)")
+    parser.add_argument("--duration", type=argparse_duration_type, default=None, help="Video duration as an integer between 3 and 15 seconds (e.g., 5, 10, 15; 3 to 10s for two-frame interpolation and extension). Default: None (10s default)")
     parser.add_argument("--resolution", "-res", type=argparse_resolution_type, default=None, help="Video output resolution: 360p, 720p, 1080p, or 4k (default: 720p). Note: 4k requests take longer to generate.")
     parser.add_argument("--model", default=DEFAULT_MODEL, help=f"Gemini Omni Flash video model ID (default: {DEFAULT_MODEL})")
     parser.add_argument("--output", "-o", help="Local output file path for single generation (default: media/output.mp4)")
     parser.add_argument("--strip-audio", "-a", action="store_true", help="Completely strip/disable audio stream from the input video(s) before uploading so Gemini Omni Flash can regenerate new audio from scratch")
     parser.add_argument("--previous-interaction-id", help="Optional Interaction ID of a previous generation for turn-by-turn editing or extending")
-    parser.add_argument("--timeout", type=int, default=600, help="Per-request HTTP timeout in seconds (default: 600). Recommend 900+ for multi-turn 4K extensions up to 40s.")
+    parser.add_argument("--timeout", type=int, default=600, help="Per-request HTTP timeout in seconds (default: 600). Recommend 900+ for 15s 4K clips or multi-turn extensions up to 30s.")
     
     # Parallel batch configuration options
     parser.add_argument("--batch", help="Path to a JSON file containing an array of generation jobs")
