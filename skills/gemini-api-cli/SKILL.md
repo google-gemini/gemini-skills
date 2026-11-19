@@ -7,7 +7,7 @@ The `gemini-api` CLI exposes every Gemini API resource as a shell subcommand. Co
 
 ## CLI vs SDK
 
-**CLI for shell work, SDK for application code.** Use `gemini-api` from terminals, scripts, and CI jobs to generate media files, analyze local PDFs or recordings, run Deep Research, and manage agent sandboxes (`gemini-api` is a stateless Gemini API client, distinct from the interactive `@google/gemini-cli` coding agent). Use the Google GenAI SDKs (`gemini-api-dev`, `gemini-live-api-dev`) when calls live inside application source or need bidirectional Live API WebSockets.
+**CLI for shell work, SDK for application code.** Use `gemini-api` from terminals, scripts, and CI jobs to generate media files, analyze local PDFs or recordings, run Deep Research, and manage agent sandboxes (`gemini-api` is a stateless Gemini API client, distinct from the interactive `@google/gemini-cli` coding agent). Use the Google GenAI SDKs (`gemini-api-dev`, `gemini-live-api-dev`, `genie-4-live-world`) when calls live inside application source or need bidirectional Live API / Live Interactions WebSockets or WebRTC.
 
 ## Install and auth
 

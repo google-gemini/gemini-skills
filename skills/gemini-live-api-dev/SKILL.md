@@ -24,6 +24,8 @@ Key capabilities:
 
 > [!NOTE]
 > The Live API connects directly via **WebSockets**. For WebRTC support or simplified integration, use a [partner integration](#partner-integrations).
+>
+> **Looking for real-time interactive world generation (`models/genie-4`)?** Genie 4 uses the **Live Interactions API** (`interactions.connect()` over WebRTC or WebSocket, not `ai.live.connect()`). Use the **`google-gemini/genie-4-live-world`** skill instead.
 
 ## Models
 
