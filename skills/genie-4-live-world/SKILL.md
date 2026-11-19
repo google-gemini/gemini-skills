@@ -12,7 +12,7 @@ description: Use this skill when building real-time interactive world generation
 ### Model Specifications & Hard Constraints
 
 - **Model ID**: `"models/genie-4"` (replaces any legacy early-access world-model ID). Always target `api_version="v1beta"` (`apiVersion: "v1beta"` in JS/TS).
-- **Output stream & pricing**: `16:9` widescreen video (`1280x720` / `720p`) at `24 fps` (`240` video tokens/frame = `5,760` video tokens/s) bundled with `48 kHz` 16-bit stereo audio (`$1.50 / 1M` input tokens, `$9.00 / 1M` text output tokens, `$17.50 / 1M` video+audio output tokens — `~$0.101 / sec`, `~$6.07 / min`).
+- **Output stream & pricing**: `16:9` widescreen video (`1280x720` / `720p`) at `24 fps` (`240` video tokens/frame = `5,760` video tokens/s) bundled with `48 kHz` 16-bit stereo audio (`$1.50 / 1M` input tokens, `$9.00 / 1M` text output tokens, `$17.50 / 1M` video+audio output tokens — `~$0.101 / sec`, `~$6.05 / min`).
 - **Paid tier & rate limits**: Free tier is not supported (`0` streams). Limits scale by billing tier: `Tier 1` (`2` concurrent sessions, `50` RPD), `Tier 2` (`5` concurrent sessions, `250` RPD), `Tier 3` (`10` concurrent sessions, `1,000` RPD).
 - **Bounded session duration & no resumption**: Sessions cap at **`120 seconds`** (`2` minutes; visual coherence and object permanence are strongest during the first `45-90s`) and **cannot be resumed** once completed, cancelled, or expired.
 - **Stop billing explicitly with `complete()`**: Calling `detach()` (or exiting Python's `async with` block without `complete()`) disconnects the local socket **without** terminating the server-side session. Always call `await conn.complete()` (Python) or `await session.complete()` (JS/TS) when the user exits.
@@ -21,8 +21,8 @@ description: Use this skill when building real-time interactive world generation
 
 ## SDKs & Transports
 
-- **Python**: `google-genai >= 3.3.0` (`Python >= 3.11`) → `pip install -U google-genai`
-- **JavaScript / TypeScript**: `@google/genai >= 3.3.0` (`Node.js >= 22`) → `npm install @google/genai`
+- **Python**: `google-genai >= 3.5.0` (`Python >= 3.11`) → `pip install -U google-genai`
+- **JavaScript / TypeScript**: `@google/genai >= 3.5.0` (`Node.js >= 22`) → `npm install @google/genai`
 
 | Runtime | Supported Transports | Recommended Choice |
 | :--- | :--- | :--- |
@@ -81,7 +81,7 @@ export async function createGenieSession() {
 ### 2. Browser Client (WebRTC Media + DataChannel Controls)
 
 > [!IMPORTANT]
-> Pass `{ transport: "webrtc" }` directly to `clientAi.interactions.connect(...)` and attach media via `session.transport.setVideoElement(videoEl)`. Do **not** rely on `import { InteractionWebRTCTransport } from "@google/genai"`, as top-level `@google/genai` does not re-export `InteractionWebRTCTransport` by default.
+> Pass `{ transport: "webrtc" }` directly to `clientAi.interactions.connect(...)` and attach media via `session.transport.setVideoElement(videoEl)` — prefer this built-in transport option over manually instantiating `InteractionWebRTCTransport`.
 
 ```typescript
 import { GoogleGenAI } from "@google/genai";
@@ -416,11 +416,11 @@ Send a plain string (`await conn.send("...")` / `await session.send("...")`) or 
 ## Migrating Early-Access Prototypes to `models/genie-4`
 
 - [ ] Replaced any early-access world-model identifier with `"models/genie-4"` (`api_version="v1beta"`).
-- [ ] Upgraded SDKs to `google-genai >= 3.3.0` (Python) and `@google/genai >= 3.3.0` (JS/TS).
+- [ ] Upgraded SDKs to `google-genai >= 3.5.0` (Python) and `@google/genai >= 3.5.0` (JS/TS).
 - [ ] Replaced custom HTTP `:webrtc` SDP `fetch`, manual `RTCPeerConnection` setup, and raw `new WebSocket(...)` clients with `interactions.create(...)` + `interactions.auth_tokens.create(...)` / `interactions.authTokens.create(...)` + `interactions.connect(...)`.
 - [ ] Placed `reference_image` (`{"mime_type": ..., "data": ...}` — no `"type"` field) at the top level of `world_setup` alongside `world_prompt` (`{"text": ...}` or plain string — no `"type"` field).
 - [ ] Passed ephemeral tokens via client initialization (`new GoogleGenAI({ apiKey: authToken })` / `genai.Client(api_key=auth_token)`), not to `connect()`.
-- [ ] Used `{ transport: "webrtc" }` + `session.transport.setVideoElement(videoEl)` in browser code without importing `InteractionWebRTCTransport` from top-level `@google/genai`, and compressed WebRTC `reference_image` JPEGs so the JSON event stays under `64 KB`.
+- [ ] Used `{ transport: "webrtc" }` + `session.transport.setVideoElement(videoEl)` in browser code (preferring the built-in transport option over manual `InteractionWebRTCTransport` instantiation), and compressed WebRTC `reference_image` JPEGs so the JSON event stays under `64 KB`.
 - [ ] Removed outer `while True:` loops around `conn.receive()` / `session.receive()`, and ensured teardown calls `await conn.complete()` / `await session.complete()` rather than `detach()` alone.
 
 ## Documentation Lookup

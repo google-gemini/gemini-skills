@@ -141,4 +141,4 @@ cat build.log | gemini-api generate "Extract unique compiler errors." --stdin --
 }'
 ```
 
-Full CLI reference: [aistudio.google.com/docs/cli.md](https://aistudio.google.com/docs/cli.md); docs index: [llms.txt](https://aistudio.google.com/docs/llms.txt).
+Full CLI reference: [aistudio.google.com/docs/cli.md](https://aistudio.google.com/docs/cli.md); docs index: [llms.txt](https://aistudio.google.com/llms.txt).

@@ -44,11 +44,11 @@ description: Use this skill when writing code that calls the Gemini API for text
 
 ### Current SDKs
 
-- **Python**: `google-genai` >= 3.2.0 → `pip install -U google-genai`
-- **JavaScript/TypeScript**: `@google/genai` >= 3.2.0 → `npm install @google/genai`
+- **Python**: `google-genai` >= 3.5.0 → `pip install -U google-genai`
+- **JavaScript/TypeScript**: `@google/genai` >= 3.5.0 → `npm install @google/genai`
 
 > [!NOTE]
-> SDK versions >= 3.0.0 default to the stable `v1` API (`Interactions API` is GA on `v1`). For `v1beta`-only surfaces such as Managed Agents (`agent=...` / `client.agents`) and the Decisions API (`POST /v1beta/decisions`, supported in >= 3.2.0), opt in with `genai.Client(http_options={"api_version": "v1beta"})` in Python, `new GoogleGenAI({ apiVersion: "v1beta" })` in JS/TS, per-call `api_version="v1beta"`, or `GOOGLE_GENAI_API_VERSION=beta`.
+> SDK versions >= 3.0.0 default to the stable `v1` API (`Interactions API` is GA on `v1`). For `v1beta`-only surfaces such as Managed Agents (`agent=...` / `client.agents`), the Decisions API (`POST /v1beta/decisions`, supported in >= 3.2.0), and Live Interactions (`interactions.connect()` / `auth_tokens` / `authTokens` for `models/genie-4`, supported in >= 3.5.0), opt in with `genai.Client(http_options={"api_version": "v1beta"})` in Python, `new GoogleGenAI({ apiVersion: "v1beta" })` in JS/TS, per-call `api_version="v1beta"`, or `GOOGLE_GENAI_API_VERSION=beta`.
 > SDK versions >= 2.0.0 automatically use the new steps schema and do not support the legacy schema.
 > Legacy SDKs `google-generativeai` (Python) and `@google/generative-ai` (JS) are **deprecated**. Never use them.
 
@@ -60,7 +60,7 @@ description: Use this skill when writing code that calls the Gemini API for text
 - `tools`, `system_instruction`, and `generation_config` are **interaction-scoped**, re-specify them each turn.
 - **Managed agents** require `v1beta` and `environment="remote"` (or an environment ID / config object) to provision a sandbox.
 - **Decisions API** (`gemini-decision-1`) requires `v1beta` (`client.decisions.create` / `ai.decisions.create`); use it for closed-ended yes/no, choice, and rubric scoring instead of `response_format`.
-- **Interactive world simulation (`models/genie-4`)**: Requires `v1beta`, a Paid tier API key, and SDKs >= 3.3.0 (`interactions.connect()` over WebRTC in browsers or WebSocket in Python/Node.js; always call `complete()` to stop billing). Use the **`google-gemini/genie-4-live-world`** skill.
+- **Interactive world simulation (`models/genie-4`)**: Requires `v1beta`, a Paid tier API key, and SDKs >= 3.5.0 (`interactions.connect()` over WebRTC in browsers or WebSocket in Python/Node.js; always call `complete()` to stop billing). Use the **`google-gemini/genie-4-live-world`** skill.
 - **Migrating from `generateContent`**: Read `references/migration.md` for the scoping, checklist, and before/after code examples. Always confirm scope with the user before editing.
 - **Model upgrades**: Drop-in, swap the model string. Deprecated models (`gemini-2.0-*`, `gemini-1.5-*`) must be replaced, see `references/migration.md`.
 - **Migrating to Gemini 4 Hydrogen, Gemini 4 Neon, Gemini 4 Carbon, or Gemini 3.5 Flash-Lite**: Read `references/migration.md` for the scoping and checklist.
