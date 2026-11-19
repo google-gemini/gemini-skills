@@ -112,7 +112,7 @@ def normalize_file_uri(uri):
     """Normalizes any File API URI/reference to the standard format with query parameters stripped."""
     if not uri:
         return None
-    match = re.search(r'files/([a-zA-Z0-9]+)', uri)
+    match = re.search(r'files/([a-zA-Z0-9_\-]+)', uri)
     if match:
         file_id = match.group(1)
         return f"https://generativelanguage.googleapis.com/files/{file_id}"
