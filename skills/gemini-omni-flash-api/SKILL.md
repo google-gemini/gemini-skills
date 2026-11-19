@@ -7,6 +7,9 @@ description: Use this skill for generative video editing, text-to-video, image- 
 
 This skill uses the Gemini Omni 1.2 Flash model (`gemini-omni-1.2-flash`) to perform text-to-video generation, image-to-video generation (first-frame and two-frame keyframe transitions), reference-to-video (R2V) generation, video extensions (3s–10s per turn, up to 30s total), and video editing.
 
+> [!NOTE]
+> **Looking for real-time interactive world generation (`models/genie-4`)?** Unlike offline clip generation with `gemini-omni-1.2-flash`, Genie 4 streams live keyboard-steerable 720p @ 24 fps worlds over the Live Interactions API (`interactions.connect()`). Use the **`google-gemini/genie-4-live-world`** skill instead.
+
 > [!WARNING]
 > **Important Regional Restrictions**: Uploading videos to use for video edits, extensions, or references is **NOT** available in the EEA, Switzerland, the United Kingdom, and some US states. If a video-to-video edit completes quickly with empty outputs (`total_output_tokens: 0` or no video content), it is likely due to this restriction.
 
